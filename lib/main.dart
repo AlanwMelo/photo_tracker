@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:photo_tracker/screens/map_and_photos.dart';
 import 'package:photo_tracker/screens/open_map.dart';
 
 void main() {
@@ -58,7 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
       _counter++;
-      Navigator.push(context, MaterialPageRoute(builder: (context) => OpenMap(mapController: MapController(), markerList: [],)));
+      Navigator.push(context, MaterialPageRoute(builder: (context) => MapAndPhotos()));
     });
   }
 
