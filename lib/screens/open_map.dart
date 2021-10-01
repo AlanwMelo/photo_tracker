@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:photo_tracker/screens/plugins/scale_layer_plugin_option.dart';
+import 'package:speech_balloon/speech_balloon.dart';
 
 class OpenMap extends StatefulWidget {
   final List<Marker> markerList;
@@ -63,6 +65,9 @@ class NewMapTestState extends State<OpenMap> with TickerProviderStateMixin {
       body: FlutterMap(
         mapController: mapController,
         options: MapOptions(
+          plugins: [
+            ScaleLayerPlugin(),
+          ],
           center: new LatLng(51.5, -0.09),
           // Alterar para mapbounds !!!!!!
           zoom: 13.0,
@@ -76,23 +81,36 @@ class NewMapTestState extends State<OpenMap> with TickerProviderStateMixin {
           ),
           MarkerLayerOptions(
             markers: [
+              // Definir a prioridade através da ordem em que eles estarão nessa lista, as primeira imagens da lista são os markers superiores
               Marker(
                 rotate: true,
-                width: 80.0,
-                height: 80.0,
-                point: LatLng(51.5, -0.09),
+                height: 200,
+                width: 200,
+                point: LatLng(51.5, -0.089),
                 builder: (ctx) => Container(
-                  child: GestureDetector(
-                      onDoubleTap: () async {
-                        print('tap');
-
-                        mapController.move(
-                            LatLng(-22.910454, -47.062978), 13.0);
-                      },
-                      child: FlutterLogo()),
+                  child: SpeechBalloon(
+                    nipLocation: NipLocation.bottom,
+                    color: Colors.white70,
+                    borderColor: Colors.green,
+                    borderWidth: 4,
+                    child: Container(
+                        child: Center(
+                            child: Image.network(
+                      "https://w0.peakpx.com/wallpaper/368/756/HD-wallpaper-kyogre-ishmam-legendary-pokemon.jpg",
+                      fit: BoxFit.contain,
+                    ))),
+                  ),
                 ),
               ),
             ],
+          ),
+        ],
+        nonRotatedLayers: [
+          ScaleLayerPluginOption(
+            lineColor: Colors.blue,
+            lineWidth: 2,
+            textStyle: TextStyle(color: Colors.blue, fontSize: 12),
+            padding: EdgeInsets.all(10),
           ),
         ],
       ),
