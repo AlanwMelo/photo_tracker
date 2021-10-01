@@ -68,8 +68,6 @@ class NewMapTestState extends State<OpenMap> with TickerProviderStateMixin {
           zoom: 13.0,
           debugMultiFingerGestureWinner: true,
           enableMultiFingerGestureRace: true,
-          allowPanning: false,
-          nePanBoundary:
         ),
         layers: [
           TileLayerOptions(
