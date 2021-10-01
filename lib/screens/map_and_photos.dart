@@ -41,7 +41,7 @@ class _MapAndPhotos extends State<MapAndPhotos> {
     return StreamBuilder(
         stream: null,
         builder: (context, snapshot) {
-          double mapHeight = useAbleHeight * 0.6;
+          double mapHeight = useAbleHeight * 0.5;
 
           return Container(
             height: useAbleHeight,
@@ -55,14 +55,38 @@ class _MapAndPhotos extends State<MapAndPhotos> {
                   child: _openMap(),
                 ),
                 Expanded(
-                    child: Container(
-                  color: Colors.blue,
-                  child: ElevatedButton(
-                      onPressed: () {
-                        _moveMap();
-                      },
-                      child: Text('Teste Controller')),
-                ))
+                  child: Container(
+                    width: useAbleWidth,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: useAbleWidth,
+                          height: (useAbleHeight - mapHeight) * 0.2,
+                          color: Colors.blue,
+                          child: ElevatedButton(
+                              onPressed: () {
+                                _moveMap();
+                              },
+                              child: Text('Lista')),
+                        ),
+                        Expanded(
+                          child: Container(
+                              width: useAbleWidth,
+                              color: Colors.black,
+                              child: Center(child: Image.network("https://www.wallpapertip.com/wmimgs/165-1657683_primal-kyogre-wallpapers-wallpaper-cave-shiny-primal-kyogre.jpg"))),
+                        ),
+                        /*Expanded(
+                          child: Container(
+                              width: useAbleWidth,
+                              color: Colors.red,
+                              child: Center(child: Image.network("https://w0.peakpx.com/wallpaper/368/756/HD-wallpaper-kyogre-ishmam-legendary-pokemon.jpg", fit: BoxFit.contain,))),
+                        ),*/
+                      ],
+                    ),
+                  ),
+                )
               ],
             ),
           );
