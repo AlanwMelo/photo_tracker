@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:photo_tracker/screens/classes/listItem.dart';
 import 'package:photo_tracker/screens/open_map.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 
@@ -18,33 +19,13 @@ class _MapAndPhotos extends State<MapAndPhotos> {
   AppBar appBar = AppBar(
     title: Text('title'),
   );
-  double screenUseableHeight = 0;
-  double screenUseablewidth = 0;
+  double screenUsableHeight = 0;
+  double screenUsableWidth = 0;
   GlobalKey<NewMapTestState> openMapController = GlobalKey<NewMapTestState>();
   late AutoScrollController scrollController;
   MapController openMapController22 = MapController();
-  List<int> testList = [
-    0,
-    1,
-    2,
-    3,
-    4,
-    5,
-    6,
-    7,
-    8,
-    9,
-    0,
-    1,
-    2,
-    3,
-    4,
-    5,
-    6,
-    7,
-    8,
-    9
-  ];
+  List<ListItem> fileList = [];
+  int selectedImg = 0;
 
   @override
   void initState() {
@@ -58,13 +39,13 @@ class _MapAndPhotos extends State<MapAndPhotos> {
   @override
   Widget build(BuildContext context) {
     /// Recupera o tamanho da tela desconsiderando a AppBar
-    screenUseableHeight =
+    screenUsableHeight =
         MediaQuery.of(context).size.height - appBar.preferredSize.height;
-    screenUseablewidth = MediaQuery.of(context).size.width;
+    screenUsableWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
       appBar: appBar,
-      body: _mapAndPhotosBody(screenUseableHeight, screenUseablewidth),
+      body: _mapAndPhotosBody(screenUsableHeight, screenUsableWidth),
     );
   }
 
@@ -108,15 +89,11 @@ class _MapAndPhotos extends State<MapAndPhotos> {
                               width: useAbleWidth,
                               color: Colors.black,
                               child: Center(
-                                  child: Image.network(
-                                      "https://www.wallpapertip.com/wmimgs/165-1657683_primal-kyogre-wallpapers-wallpaper-cave-shiny-primal-kyogre.jpg"))),
+                                  child: Image.file(
+                                      File(
+                                          '/data/user/0/com.example.photo_tracker/cache/file_picker/IMG_20210815_093346.jpg'),
+                                      fit: BoxFit.contain))),
                         ),
-                        /*Expanded(
-                          child: Container(
-                              width: useAbleWidth,
-                              color: Colors.red,
-                              child: Center(child: Image.network("https://w0.peakpx.com/wallpaper/368/756/HD-wallpaper-kyogre-ishmam-legendary-pokemon.jpg", fit: BoxFit.contain,))),
-                        ),*/
                       ],
                     ),
                   ),
@@ -142,36 +119,47 @@ class _MapAndPhotos extends State<MapAndPhotos> {
 
   imgList(double size) {
     /// Usar o valor de height para garantir os quadrado em qualquer tamanho de tela
+
     return Container(
-      width: testList.length == 0 ? 0 : MediaQuery.of(context).size.width - 45,
+      width: fileList.length == 0 ? 0 : MediaQuery.of(context).size.width - 45,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        itemCount: testList.length,
+        itemCount: fileList.length,
         controller: scrollController,
         itemBuilder: (BuildContext context, int index) {
           return AutoScrollTag(
             key: ValueKey(index),
             controller: scrollController,
             index: index,
-            child: Container(
-              margin: EdgeInsets.all(2),
-              padding: EdgeInsets.all(2),
-              color: Colors.red,
-              width: size,
-              child: Column(
-                children: [
-                  Container(
-                    height: size * 0.7,
-                    color: Colors.amber,
-                  ),
-                  Expanded(
-                    child: Container(
-                      width: size,
-                      color: Colors.white30,
-                      child: Center(child: Text('${testList[index]}')),
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  selectedImg = index;
+                });
+                scrollController.scrollToIndex(index);
+              },
+              child: Container(
+                margin: EdgeInsets.all(2),
+                padding: EdgeInsets.all(2),
+                color: selectedImg == index
+                    ? Colors.lightGreen
+                    : Colors.lightBlueAccent,
+                width: size,
+                child: Column(
+                  children: [
+                    Container(
+                      height: size * 0.7,
+                      child: Image.file(File(fileList[index].imgPath)),
                     ),
-                  )
-                ],
+                    Expanded(
+                      child: Container(
+                        width: size,
+                        color: Colors.white30,
+                        child: Center(child: Text('$index')),
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
           );
@@ -184,7 +172,7 @@ class _MapAndPhotos extends State<MapAndPhotos> {
     return Container(
       decoration: BoxDecoration(
           border: Border(left: BorderSide(color: Colors.black, width: 1))),
-      width: testList.length == 0 ? MediaQuery.of(context).size.width : 45,
+      width: fileList.length == 0 ? MediaQuery.of(context).size.width : 45,
       height: height,
       child: TextButton(
         onPressed: () async {
@@ -194,59 +182,10 @@ class _MapAndPhotos extends State<MapAndPhotos> {
               allowedExtensions: ['jpg']);
 
           if (result != null) {
-            List<File> files = result.paths.map((path) => File(path!)).toList();
-            files.forEach((element) async {
-              Future<Map<String, IfdTag>> data =
-                  readExifFromBytes(await element.readAsBytes());
-
-              ///Realiza a conversao da localização do padrao DMM para double, salva o Timestamp e localização das fotos
-              await data.then((data) {
-                double latitude = 0;
-                double latitudeRef = 1;
-                double longitude = 0;
-                double longitudeRef = 1;
-                bool locationError = false;
-
-                if (!data.containsKey('GPS GPSLatitude') ||
-                    !data.containsKey('GPS GPSLongitude') ||
-                    !data.containsKey('GPS GPSLatitudeRef') ||
-                    !data.containsKey('GPS GPSLongitudeRef')) {
-                  locationError = !locationError;
-                }
-
-                print(locationError);
-
-                data.forEach((key, value) {
-                  //print('$key : $value');
-                  if (key == 'GPS GPSLatitude') {
-                    latitude =
-                        getDoublePositionForLatLng(value.values.toList());
-                  }
-                  if (key == 'GPS GPSLongitude') {
-                    longitude =
-                        getDoublePositionForLatLng(value.values.toList());
-                  }
-                  if (key == 'GPS GPSLatitudeRef' &&
-                      value.toString().toLowerCase().contains('s')) {
-                    latitudeRef = -1;
-                  }
-                  if (key == 'GPS GPSLongitudeRef' &&
-                      value.toString().toLowerCase().contains('w')) {
-                    longitudeRef = -1;
-                  }
-                });
-
-                _moveMap(
-                    LatLng(latitude * latitudeRef, longitude * longitudeRef));
-
-                print(
-                    '${latitude * latitudeRef} / ${longitude * longitudeRef}');
-              });
-            });
+            _loadPhotosToList(result);
           } else {
             // User canceled the picker
           }
-          //scrollController.scrollToIndex(0);
           //_moveMap();
         },
         child: Icon(Icons.add_a_photo_outlined),
@@ -254,7 +193,7 @@ class _MapAndPhotos extends State<MapAndPhotos> {
     );
   }
 
-  getDoublePositionForLatLng(List latLngList) {
+  getDoublePositionForLatLngFromExif(List latLngList) {
     Ratio degrees = latLngList[0];
     Ratio minutes = latLngList[1];
     Ratio milliseconds = latLngList[2];
@@ -264,5 +203,79 @@ class _MapAndPhotos extends State<MapAndPhotos> {
         (milliseconds.toDouble() / 3600);
 
     return latLngInDouble;
+  }
+
+  _loadPhotosToList(FilePickerResult result) {
+    List<File> files = result.paths.map((path) => File(path!)).toList();
+    files.forEach((element) async {
+      ///Realiza a conversao da localização do padrao DMM para double, salva o Timestamp e localização das fotos
+      Future<Map<String, IfdTag>> data =
+          readExifFromBytes(await element.readAsBytes());
+      await data.then((data) {
+        double latitude = 0;
+        double latitudeRef = 1;
+        double longitude = 0;
+        double longitudeRef = 1;
+        bool locationError = false;
+        DateTime? dateTime;
+        bool dateTimeError = false;
+
+        if (!data.containsKey('GPS GPSLatitude') ||
+            !data.containsKey('GPS GPSLongitude') ||
+            !data.containsKey('GPS GPSLatitudeRef') ||
+            !data.containsKey('GPS GPSLongitudeRef')) {
+          locationError = !locationError;
+        }
+        if (!data.containsKey('Image DateTime')) {
+          dateTimeError = !dateTimeError;
+        }
+
+        print(locationError);
+
+        data.forEach((key, value) {
+          //print('$key : $value');
+          if (key == 'GPS GPSLatitude') {
+            latitude =
+                getDoublePositionForLatLngFromExif(value.values.toList());
+          }
+          if (key == 'GPS GPSLongitude') {
+            longitude =
+                getDoublePositionForLatLngFromExif(value.values.toList());
+          }
+          if (key == 'GPS GPSLatitudeRef' &&
+              value.toString().toLowerCase().contains('s')) {
+            latitudeRef = -1;
+          }
+          if (key == 'GPS GPSLongitudeRef' &&
+              value.toString().toLowerCase().contains('w')) {
+            longitudeRef = -1;
+          }
+          if (key == 'Image DateTime') {
+            int year = int.parse(value.printable.substring(0, 4));
+            int month = int.parse(value.printable.substring(5, 7));
+            int day = int.parse(value.printable.substring(8, 11));
+            int hour = int.parse(value.printable.substring(11, 13));
+            int minute = int.parse(value.printable.substring(14, 16));
+            int second = int.parse(value.printable.substring(17, 19));
+
+            dateTime = DateTime(year, month, day, hour, minute, second);
+          }
+        });
+
+        _moveMap(LatLng(latitude * latitudeRef, longitude * longitudeRef));
+
+        fileList.add(ListItem(
+            LatLng(latitude * latitudeRef, longitude * longitudeRef),
+            dateTime,
+            element.absolute.path));
+
+        openMapController.currentState!.addMarker(
+            LatLng(latitude * latitudeRef, longitude * longitudeRef),
+            dateTime,
+            element.absolute.path);
+
+        setState(() {});
+      });
+    });
   }
 }

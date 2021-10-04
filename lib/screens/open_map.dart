@@ -1,9 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:photo_tracker/screens/plugins/scale_layer_plugin_option.dart';
 import 'package:speech_balloon/speech_balloon.dart';
+
+import 'classes/listItem.dart';
 
 class OpenMap extends StatefulWidget {
   final List<Marker> markerList;
@@ -15,8 +19,15 @@ class OpenMap extends StatefulWidget {
 }
 
 class NewMapTestState extends State<OpenMap> with TickerProviderStateMixin {
-  //MapController mapController = MapController();
   late final MapController mapController;
+  List<ListItem> markerList = [];
+  var markers;
+
+  addMarker(LatLng latLng, DateTime? timestamp, String imgPath) {
+    setState(() {
+      markerList.add(ListItem(latLng, timestamp, imgPath));
+    });
+  }
 
   @override
   void initState() {
@@ -61,6 +72,29 @@ class NewMapTestState extends State<OpenMap> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    /// Cria os marcadores no mapa, precisa ficar na build
+    markers = markerList.map((marker) {
+      return Marker(
+        rotate: true,
+        height: 200,
+        width: 200,
+        point: marker.latLng,
+        builder: (ctx) => Container(
+          child: SpeechBalloon(
+            nipLocation: NipLocation.bottom,
+            color: Colors.white70,
+            borderColor: Colors.green,
+            borderWidth: 4,
+            child: Container(
+                child: Center(
+                    child:
+                        Image.file(File(marker.imgPath), fit: BoxFit.contain))),
+          ),
+        ),
+      );
+    }).toList();
+
+    ///
     return Scaffold(
       body: FlutterMap(
         mapController: mapController,
@@ -68,7 +102,7 @@ class NewMapTestState extends State<OpenMap> with TickerProviderStateMixin {
           plugins: [
             ScaleLayerPlugin(),
           ],
-          center: LatLng(-46.8940797, -22.830448),
+          center: LatLng(-22.830448, -46.86940797222222),
           // Alterar para mapbounds !!!!!!
           zoom: 13.0,
           debugMultiFingerGestureWinner: true,
@@ -80,29 +114,8 @@ class NewMapTestState extends State<OpenMap> with TickerProviderStateMixin {
                 'https://api.mapbox.com/styles/v1/alanwillian/ck20ujxl3cuqj1cnzfnsckw1n/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoiYWxhbndpbGxpYW4iLCJhIjoiY2t1NzdmemNpNWg3cDJ2cDNidzByMDBoaCJ9.MPIAwrrnDmfwY2ihEWYhQQ',
           ),
           MarkerLayerOptions(
-            markers: [
-              // Definir a prioridade através da ordem em que eles estarão nessa lista, as primeira imagens da lista são os markers superiores
-              Marker(
-                rotate: true,
-                height: 200,
-                width: 200,
-                point: LatLng(-46.8940797, -22.830448),
-                builder: (ctx) => Container(
-                  child: SpeechBalloon(
-                    nipLocation: NipLocation.bottom,
-                    color: Colors.white70,
-                    borderColor: Colors.green,
-                    borderWidth: 4,
-                    child: Container(
-                        child: Center(
-                            child: Image.network(
-                      "https://w0.peakpx.com/wallpaper/368/756/HD-wallpaper-kyogre-ishmam-legendary-pokemon.jpg",
-                      fit: BoxFit.contain,
-                    ))),
-                  ),
-                ),
-              ),
-            ],
+            // Definir a prioridade através da ordem em que eles estarão nessa lista, as primeira imagens da lista são os markers superiores
+            markers: markers,
           ),
         ],
         nonRotatedLayers: [
