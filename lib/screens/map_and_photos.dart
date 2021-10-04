@@ -1,8 +1,13 @@
+import 'dart:io';
+
+import 'package:exif/exif.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:photo_tracker/screens/open_map.dart';
+import 'package:scroll_to_index/scroll_to_index.dart';
 
 class MapAndPhotos extends StatefulWidget {
   @override
@@ -16,6 +21,7 @@ class _MapAndPhotos extends State<MapAndPhotos> {
   double screenUseableHeight = 0;
   double screenUseablewidth = 0;
   GlobalKey<NewMapTestState> openMapController = GlobalKey<NewMapTestState>();
+  late AutoScrollController scrollController;
   MapController openMapController22 = MapController();
   List<int> testList = [
     0,
@@ -42,7 +48,10 @@ class _MapAndPhotos extends State<MapAndPhotos> {
 
   @override
   void initState() {
-    // TODO: implement initState
+    scrollController = AutoScrollController(
+        viewportBoundaryGetter: () =>
+            Rect.fromLTRB(0, 0, 0, MediaQuery.of(context).padding.bottom),
+        axis: Axis.vertical);
     super.initState();
   }
 
@@ -122,39 +131,48 @@ class _MapAndPhotos extends State<MapAndPhotos> {
     return OpenMap(key: openMapController, markerList: []);
   }
 
-  _moveMap() {
+  _moveMap(LatLng latLng, {double? zoom}) {
     NewMapTestState mapController = openMapController.currentState!;
+    if (zoom == null) {
+      zoom = 17.0;
+    }
 
-    mapController.animatedMapMove(LatLng(-22.910454, -47.062978), 13.0);
+    mapController.animatedMapMove(latLng, zoom);
   }
 
   imgList(double size) {
     /// Usar o valor de height para garantir os quadrado em qualquer tamanho de tela
     return Container(
-      width: MediaQuery.of(context).size.width - 45,
+      width: testList.length == 0 ? 0 : MediaQuery.of(context).size.width - 45,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: testList.length,
+        controller: scrollController,
         itemBuilder: (BuildContext context, int index) {
-          return Container(
-            margin: EdgeInsets.all(2),
-            padding: EdgeInsets.all(2),
-            color: Colors.red,
-            width: size,
-            child: Column(
-              children: [
-                Container(
-                  height: size * 0.7,
-                  color: Colors.amber,
-                ),
-                Expanded(
-                  child: Container(
-                    width: size,
-                    color: Colors.white30,
-                    child: Center(child: Text('${testList[index]}')),
+          return AutoScrollTag(
+            key: ValueKey(index),
+            controller: scrollController,
+            index: index,
+            child: Container(
+              margin: EdgeInsets.all(2),
+              padding: EdgeInsets.all(2),
+              color: Colors.red,
+              width: size,
+              child: Column(
+                children: [
+                  Container(
+                    height: size * 0.7,
+                    color: Colors.amber,
                   ),
-                )
-              ],
+                  Expanded(
+                    child: Container(
+                      width: size,
+                      color: Colors.white30,
+                      child: Center(child: Text('${testList[index]}')),
+                    ),
+                  )
+                ],
+              ),
             ),
           );
         },
@@ -165,18 +183,86 @@ class _MapAndPhotos extends State<MapAndPhotos> {
   addMoreButton(double height) {
     return Container(
       decoration: BoxDecoration(
-        border: Border(
-          left: BorderSide(color: Colors.black, width: 1)
-        )
-      ),
-      width: 45,
+          border: Border(left: BorderSide(color: Colors.black, width: 1))),
+      width: testList.length == 0 ? MediaQuery.of(context).size.width : 45,
       height: height,
       child: TextButton(
-        onPressed: () {
-          _moveMap();
+        onPressed: () async {
+          FilePickerResult? result = await FilePicker.platform.pickFiles(
+              allowMultiple: true,
+              type: FileType.custom,
+              allowedExtensions: ['jpg']);
+
+          if (result != null) {
+            List<File> files = result.paths.map((path) => File(path!)).toList();
+            files.forEach((element) async {
+              Future<Map<String, IfdTag>> data =
+                  readExifFromBytes(await element.readAsBytes());
+
+              ///Realiza a conversao da localização do padrao DMM para double, salva o Timestamp e localização das fotos
+              await data.then((data) {
+                double latitude = 0;
+                double latitudeRef = 1;
+                double longitude = 0;
+                double longitudeRef = 1;
+                bool locationError = false;
+
+                if (!data.containsKey('GPS GPSLatitude') ||
+                    !data.containsKey('GPS GPSLongitude') ||
+                    !data.containsKey('GPS GPSLatitudeRef') ||
+                    !data.containsKey('GPS GPSLongitudeRef')) {
+                  locationError = !locationError;
+                }
+
+                print(locationError);
+
+                data.forEach((key, value) {
+                  //print('$key : $value');
+                  if (key == 'GPS GPSLatitude') {
+                    latitude =
+                        getDoublePositionForLatLng(value.values.toList());
+                  }
+                  if (key == 'GPS GPSLongitude') {
+                    longitude =
+                        getDoublePositionForLatLng(value.values.toList());
+                  }
+                  if (key == 'GPS GPSLatitudeRef' &&
+                      value.toString().toLowerCase().contains('s')) {
+                    latitudeRef = -1;
+                  }
+                  if (key == 'GPS GPSLongitudeRef' &&
+                      value.toString().toLowerCase().contains('w')) {
+                    longitudeRef = -1;
+                  }
+                });
+
+                _moveMap(
+                    LatLng(latitude * latitudeRef, longitude * longitudeRef));
+
+                print(
+                    '${latitude * latitudeRef} / ${longitude * longitudeRef}');
+              });
+            });
+          } else {
+            // User canceled the picker
+          }
+          //scrollController.scrollToIndex(0);
+          //_moveMap();
         },
         child: Icon(Icons.add_a_photo_outlined),
       ),
     );
+  }
+
+  getDoublePositionForLatLng(List latLngList) {
+    Ratio degrees = latLngList[0];
+    Ratio minutes = latLngList[1];
+    Ratio milliseconds = latLngList[2];
+
+    double latLngInDouble = degrees.toDouble() +
+        (minutes.toDouble() / 60) +
+        (milliseconds.toDouble() / 3600);
+
+    return latLngInDouble;
   }
 }

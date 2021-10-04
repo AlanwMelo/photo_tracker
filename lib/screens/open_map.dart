@@ -68,7 +68,7 @@ class NewMapTestState extends State<OpenMap> with TickerProviderStateMixin {
           plugins: [
             ScaleLayerPlugin(),
           ],
-          center: new LatLng(51.5, -0.09),
+          center: LatLng(-46.8940797, -22.830448),
           // Alterar para mapbounds !!!!!!
           zoom: 13.0,
           debugMultiFingerGestureWinner: true,
@@ -86,7 +86,7 @@ class NewMapTestState extends State<OpenMap> with TickerProviderStateMixin {
                 rotate: true,
                 height: 200,
                 width: 200,
-                point: LatLng(51.5, -0.089),
+                point: LatLng(-46.8940797, -22.830448),
                 builder: (ctx) => Container(
                   child: SpeechBalloon(
                     nipLocation: NipLocation.bottom,
