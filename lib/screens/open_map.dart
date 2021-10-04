@@ -22,6 +22,7 @@ class NewMapTestState extends State<OpenMap> with TickerProviderStateMixin {
   late final MapController mapController;
   List<ListItem> markerList = [];
   var markers;
+  String selectFileName = '';
 
   addMarker(LatLng latLng, DateTime? timestamp, String imgPath) {
     setState(() {
@@ -83,12 +84,11 @@ class NewMapTestState extends State<OpenMap> with TickerProviderStateMixin {
           child: SpeechBalloon(
             nipLocation: NipLocation.bottom,
             color: Colors.white70,
-            borderColor: Colors.green,
+            borderColor: selectFileName == marker.imgPath
+                ? Colors.lightGreen
+                : Colors.lightBlue,
             borderWidth: 4,
-            child: Container(
-                child: Center(
-                    child:
-                        Image.file(File(marker.imgPath), fit: BoxFit.contain))),
+            child: _markerContainer(marker),
           ),
         ),
       );
@@ -126,6 +126,18 @@ class NewMapTestState extends State<OpenMap> with TickerProviderStateMixin {
             padding: EdgeInsets.all(10),
           ),
         ],
+      ),
+    );
+  }
+
+  _markerContainer(ListItem marker) {
+    return GestureDetector(
+      onTap: () {
+        selectFileName = marker.imgPath;
+        setState(() {});
+      },
+      child: Container(
+        child: Image.file(File(marker.imgPath), fit: BoxFit.contain),
       ),
     );
   }

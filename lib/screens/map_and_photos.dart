@@ -4,7 +4,6 @@ import 'package:exif/exif.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:photo_tracker/screens/classes/listItem.dart';
 import 'package:photo_tracker/screens/open_map.dart';
@@ -23,7 +22,6 @@ class _MapAndPhotos extends State<MapAndPhotos> {
   double screenUsableWidth = 0;
   GlobalKey<NewMapTestState> openMapController = GlobalKey<NewMapTestState>();
   late AutoScrollController scrollController;
-  MapController openMapController22 = MapController();
   List<ListItem> fileList = [];
   int selectedImg = 0;
 
@@ -91,7 +89,7 @@ class _MapAndPhotos extends State<MapAndPhotos> {
                               child: Center(
                                   child: Image.file(
                                       File(
-                                          '/data/user/0/com.example.photo_tracker/cache/file_picker/IMG_20210815_093346.jpg'),
+                                          '/data/user/0/com.example.photo_tracker/cache/file_picker/IMG_20210815_094451.jpg'),
                                       fit: BoxFit.contain))),
                         ),
                       ],
@@ -108,8 +106,9 @@ class _MapAndPhotos extends State<MapAndPhotos> {
     return OpenMap(key: openMapController, markerList: []);
   }
 
-  _moveMap(LatLng latLng, {double? zoom}) {
+  _moveMap(LatLng latLng, String fileName, {double? zoom}) {
     NewMapTestState mapController = openMapController.currentState!;
+    openMapController.currentState!.selectFileName = fileName;
     if (zoom == null) {
       zoom = 17.0;
     }
@@ -137,6 +136,7 @@ class _MapAndPhotos extends State<MapAndPhotos> {
                   selectedImg = index;
                 });
                 scrollController.scrollToIndex(index);
+                _moveMap(fileList[index].latLng, fileList[index].imgPath);
               },
               child: Container(
                 margin: EdgeInsets.all(2),
@@ -262,7 +262,7 @@ class _MapAndPhotos extends State<MapAndPhotos> {
           }
         });
 
-        _moveMap(LatLng(latitude * latitudeRef, longitude * longitudeRef));
+        _moveMap(LatLng(latitude * latitudeRef, longitude * longitudeRef), element.absolute.path);
 
         fileList.add(ListItem(
             LatLng(latitude * latitudeRef, longitude * longitudeRef),
@@ -273,6 +273,8 @@ class _MapAndPhotos extends State<MapAndPhotos> {
             LatLng(latitude * latitudeRef, longitude * longitudeRef),
             dateTime,
             element.absolute.path);
+
+        fileList.sort((a,b) => a.timestamp!.compareTo(b.timestamp!));
 
         setState(() {});
       });
