@@ -28,7 +28,7 @@ class _MapAndPhotos extends State<MapAndPhotos> {
   List<ListItem> fileList = [];
   int selectedImg = 0;
   Timer? moveMapDebounce;
-  Duration debounceDuration = Duration(milliseconds: 1000);
+  Duration debounceDuration = Duration(milliseconds: 500);
 
   @override
   void initState() {
@@ -124,7 +124,7 @@ class _MapAndPhotos extends State<MapAndPhotos> {
     /// Usar o valor de height para garantir os quadrado em qualquer tamanho de tela
 
     return Container(
-      width: fileList.length == 0 ? 0 : MediaQuery.of(context).size.width - 45,
+      width: fileList.length == 0 ? 0 : MediaQuery.of(context).size.width - 55,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: fileList.length,
@@ -155,7 +155,7 @@ class _MapAndPhotos extends State<MapAndPhotos> {
                       child: Container(
                         width: size,
                         color: Colors.white30,
-                        child: Center(child: Text('$index')),
+                        child: Center(child: Text('${index+1}')),
                       ),
                     )
                   ],
@@ -170,11 +170,16 @@ class _MapAndPhotos extends State<MapAndPhotos> {
 
   addMoreButton(double height) {
     return Container(
-      decoration: BoxDecoration(
-          border: Border(left: BorderSide(color: Colors.black, width: 1))),
-      width: fileList.length == 0 ? MediaQuery.of(context).size.width : 45,
+      width: fileList.length == 0 ? MediaQuery.of(context).size.width : 55,
       height: height,
-      child: TextButton(
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          primary: Colors.lightBlue,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.zero
+          )
+
+        ),
         onPressed: () async {
           FilePickerResult? result = await FilePicker.platform.pickFiles(
               allowMultiple: true,
@@ -188,7 +193,7 @@ class _MapAndPhotos extends State<MapAndPhotos> {
           }
           //_moveMap();
         },
-        child: Icon(Icons.add_a_photo_outlined),
+        child: Center(child: Icon(Icons.add_a_photo_outlined)),
       ),
     );
   }
