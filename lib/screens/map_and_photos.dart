@@ -136,12 +136,7 @@ class _MapAndPhotos extends State<MapAndPhotos> {
             index: index,
             child: GestureDetector(
               onTap: () {
-                openMapController.currentState!
-                    .giveMarkerFocus(fileList[index]);
-                selectedImg = index;
-                scrollController.scrollToIndex(index);
-                _moveMap(fileList[index].latLng, fileList[index].imgPath);
-                setState(() {});
+                _listAndCarouselSynchronizer(fileList[index], index);
               },
               child: Container(
                 margin: EdgeInsets.all(2),
@@ -271,6 +266,8 @@ class _MapAndPhotos extends State<MapAndPhotos> {
             dateTime,
             element.absolute.path));
 
+        ListItem thisItem = fileList.last;
+
         openMapController.currentState!.addMarker(
             LatLng(latitude * latitudeRef, longitude * longitudeRef),
             dateTime,
@@ -278,12 +275,8 @@ class _MapAndPhotos extends State<MapAndPhotos> {
 
         fileList.sort((a, b) => a.timestamp!.compareTo(b.timestamp!));
 
-        setState(() {});
-
-        _moveMapDebounce(ListItem(
-            LatLng(latitude * latitudeRef, longitude * longitudeRef),
-            dateTime,
-            element.absolute.path));
+        _listAndCarouselSynchronizer(
+            thisItem, fileList.indexWhere((element) => element == thisItem));
       });
     });
   }
@@ -305,10 +298,13 @@ class _MapAndPhotos extends State<MapAndPhotos> {
           );
         }).toList(),
         options: CarouselOptions(
+          enableInfiniteScroll: true,
           height: useAbleHeight,
           viewportFraction: 1,
           onPageChanged: (index, reason) {
-            _moveMapDebounce(fileList[index]);
+            if (reason == CarouselPageChangedReason.manual) {
+              _listAndCarouselSynchronizer(fileList[index], index);
+            }
           },
         ),
       ),
@@ -326,5 +322,14 @@ class _MapAndPhotos extends State<MapAndPhotos> {
       openMapController.currentState!.giveMarkerFocus(listItem);
       _moveMap(listItem.latLng, listItem.imgPath);
     });
+  }
+
+  /// Chamado quando o index muda, move o carrossel, a lista e o mapa para a mesma imagem
+  _listAndCarouselSynchronizer(ListItem fileList, int index) {
+    selectedImg = index;
+    scrollController.scrollToIndex(index);
+    carouselController.animateToPage(index);
+    _moveMapDebounce(fileList);
+    setState(() {});
   }
 }
