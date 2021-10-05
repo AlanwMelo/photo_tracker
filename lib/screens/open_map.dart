@@ -22,7 +22,7 @@ class NewMapTestState extends State<OpenMap> with TickerProviderStateMixin {
   late final MapController mapController;
   List<ListItem> markerList = [];
   var markers;
-  String selectFileName = '';
+  String? selectFileName;
 
   addMarker(LatLng latLng, DateTime? timestamp, String imgPath) {
     setState(() {
@@ -74,6 +74,7 @@ class NewMapTestState extends State<OpenMap> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     /// Cria os marcadores no mapa, precisa ficar na build
+
     markers = markerList.map((marker) {
       return Marker(
         rotate: true,
@@ -93,8 +94,6 @@ class NewMapTestState extends State<OpenMap> with TickerProviderStateMixin {
         ),
       );
     }).toList();
-
-    ///
     return Scaffold(
       body: FlutterMap(
         mapController: mapController,
@@ -114,7 +113,6 @@ class NewMapTestState extends State<OpenMap> with TickerProviderStateMixin {
                 'https://api.mapbox.com/styles/v1/alanwillian/ck20ujxl3cuqj1cnzfnsckw1n/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoiYWxhbndpbGxpYW4iLCJhIjoiY2t1NzdmemNpNWg3cDJ2cDNidzByMDBoaCJ9.MPIAwrrnDmfwY2ihEWYhQQ',
           ),
           MarkerLayerOptions(
-            // Definir a prioridade através da ordem em que eles estarão nessa lista, as primeira imagens da lista são os markers superiores
             markers: markers,
           ),
         ],
@@ -134,11 +132,22 @@ class NewMapTestState extends State<OpenMap> with TickerProviderStateMixin {
     return GestureDetector(
       onTap: () {
         selectFileName = marker.imgPath;
+        giveMarkerFocus(marker);
         setState(() {});
       },
       child: Container(
         child: Image.file(File(marker.imgPath), fit: BoxFit.contain),
       ),
     );
+  }
+
+  /// Usado para a caixa selecionada ser exibida acima das outras no mapa
+  giveMarkerFocus(ListItem marker) {
+    int indexOfItem =
+        markerList.indexWhere((element) => element.imgPath == marker.imgPath);
+    ListItem item = markerList[indexOfItem];
+    markerList.removeAt(indexOfItem);
+    markerList.add(item);
+    setState(() {});
   }
 }

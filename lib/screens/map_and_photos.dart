@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:io';
 
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:exif/exif.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
@@ -21,9 +23,12 @@ class _MapAndPhotos extends State<MapAndPhotos> {
   double screenUsableHeight = 0;
   double screenUsableWidth = 0;
   GlobalKey<NewMapTestState> openMapController = GlobalKey<NewMapTestState>();
+  CarouselController carouselController = CarouselController();
   late AutoScrollController scrollController;
   List<ListItem> fileList = [];
   int selectedImg = 0;
+  Timer? moveMapDebounce;
+  Duration debounceDuration = Duration(milliseconds: 1000);
 
   @override
   void initState() {
@@ -32,6 +37,12 @@ class _MapAndPhotos extends State<MapAndPhotos> {
             Rect.fromLTRB(0, 0, 0, MediaQuery.of(context).padding.bottom),
         axis: Axis.vertical);
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    moveMapDebounce!.cancel();
+    super.dispose();
   }
 
   @override
@@ -83,14 +94,7 @@ class _MapAndPhotos extends State<MapAndPhotos> {
                           ),
                         ),
                         Expanded(
-                          child: Container(
-                              width: useAbleWidth,
-                              color: Colors.black,
-                              child: Center(
-                                  child: Image.file(
-                                      File(
-                                          '/data/user/0/com.example.photo_tracker/cache/file_picker/IMG_20210815_094451.jpg'),
-                                      fit: BoxFit.contain))),
+                          child: _carouselSlider(useAbleHeight, useAbleWidth),
                         ),
                       ],
                     ),
@@ -132,11 +136,12 @@ class _MapAndPhotos extends State<MapAndPhotos> {
             index: index,
             child: GestureDetector(
               onTap: () {
-                setState(() {
-                  selectedImg = index;
-                });
+                openMapController.currentState!
+                    .giveMarkerFocus(fileList[index]);
+                selectedImg = index;
                 scrollController.scrollToIndex(index);
                 _moveMap(fileList[index].latLng, fileList[index].imgPath);
+                setState(() {});
               },
               child: Container(
                 margin: EdgeInsets.all(2),
@@ -207,6 +212,7 @@ class _MapAndPhotos extends State<MapAndPhotos> {
 
   _loadPhotosToList(FilePickerResult result) {
     List<File> files = result.paths.map((path) => File(path!)).toList();
+
     files.forEach((element) async {
       ///Realiza a conversao da localização do padrao DMM para double, salva o Timestamp e localização das fotos
       Future<Map<String, IfdTag>> data =
@@ -229,8 +235,6 @@ class _MapAndPhotos extends State<MapAndPhotos> {
         if (!data.containsKey('Image DateTime')) {
           dateTimeError = !dateTimeError;
         }
-
-        print(locationError);
 
         data.forEach((key, value) {
           //print('$key : $value');
@@ -262,8 +266,6 @@ class _MapAndPhotos extends State<MapAndPhotos> {
           }
         });
 
-        _moveMap(LatLng(latitude * latitudeRef, longitude * longitudeRef), element.absolute.path);
-
         fileList.add(ListItem(
             LatLng(latitude * latitudeRef, longitude * longitudeRef),
             dateTime,
@@ -274,10 +276,55 @@ class _MapAndPhotos extends State<MapAndPhotos> {
             dateTime,
             element.absolute.path);
 
-        fileList.sort((a,b) => a.timestamp!.compareTo(b.timestamp!));
+        fileList.sort((a, b) => a.timestamp!.compareTo(b.timestamp!));
 
         setState(() {});
+
+        _moveMapDebounce(ListItem(
+            LatLng(latitude * latitudeRef, longitude * longitudeRef),
+            dateTime,
+            element.absolute.path));
       });
+    });
+  }
+
+  _carouselSlider(double useAbleHeight, double useAbleWidth) {
+    return Container(
+      width: useAbleWidth,
+      color: Colors.black,
+      child: CarouselSlider(
+        carouselController: carouselController,
+        items: fileList.map((item) {
+          return Builder(
+            builder: (BuildContext context) {
+              return Container(
+                width: useAbleWidth,
+                child: Image.file(File(item.imgPath), fit: BoxFit.contain),
+              );
+            },
+          );
+        }).toList(),
+        options: CarouselOptions(
+          height: useAbleHeight,
+          viewportFraction: 1,
+          onPageChanged: (index, reason) {
+            _moveMapDebounce(fileList[index]);
+          },
+        ),
+      ),
+    );
+  }
+
+  /// ###################### Debouncers ######################
+  /// Inicia o timer do debouncer e, se a função não for chamada novamente em 1 segundo, move o mapa
+  /// Se for chamada o timer é resetado
+  _moveMapDebounce(ListItem listItem) {
+    if (moveMapDebounce?.isActive ?? false) {
+      moveMapDebounce!.cancel();
+    }
+    moveMapDebounce = Timer(debounceDuration, () {
+      openMapController.currentState!.giveMarkerFocus(listItem);
+      _moveMap(listItem.latLng, listItem.imgPath);
     });
   }
 }
