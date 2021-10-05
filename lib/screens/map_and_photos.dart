@@ -2,10 +2,10 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:exif/exif.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:photo_tracker/screens/classes/listItem.dart';
 import 'package:photo_tracker/screens/classes/loadPhotosToList.dart';
@@ -97,7 +97,24 @@ class _MapAndPhotos extends State<MapAndPhotos> {
                           ),
                         ),
                         Expanded(
-                          child: _carouselSlider(useAbleHeight, useAbleWidth),
+                          child: fileList.length != 0
+                              ? _carouselSlider(useAbleHeight, useAbleWidth)
+                              : Container(
+                                  width: useAbleWidth,
+                                  color: Colors.black,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        child: Icon(
+                                          Icons.image_search_outlined,
+                                          color: Colors.white70,
+                                          size: 100,
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
                         ),
                       ],
                     ),
@@ -142,6 +159,20 @@ class _MapAndPhotos extends State<MapAndPhotos> {
         itemCount: fileList.length,
         controller: scrollController,
         itemBuilder: (BuildContext context, int index) {
+          _imgContainerColor() {
+            Color containerColor = Colors.lightBlueAccent;
+            if (fileList[index].locationError) {
+              containerColor = Colors.deepOrangeAccent;
+            } else if (fileList[index].timeError) {
+              containerColor = Colors.orangeAccent;
+            }
+            if (selectedImg == index) {
+              containerColor = Colors.lightGreen;
+            }
+
+            return containerColor;
+          }
+
           return AutoScrollTag(
             key: ValueKey(index),
             controller: scrollController,
@@ -150,12 +181,17 @@ class _MapAndPhotos extends State<MapAndPhotos> {
               onTap: () {
                 _listAndCarouselSynchronizer(fileList[index], index);
               },
+              onLongPress: () {
+                if (!fileList[index].locationError) {
+                  openMapController.currentState!.rmvMarker(fileList[index]);
+                }
+                fileList.removeAt(index);
+                setState(() {});
+              },
               child: Container(
                 margin: EdgeInsets.all(2),
                 padding: EdgeInsets.all(2),
-                color: selectedImg == index
-                    ? Colors.lightGreen
-                    : Colors.lightBlueAccent,
+                color: _imgContainerColor(),
                 width: size,
                 child: Column(
                   children: [
@@ -202,8 +238,7 @@ class _MapAndPhotos extends State<MapAndPhotos> {
             for (var element in loadToListItems) {
               fileList.add(element);
               thisItem = element;
-              openMapController.currentState!.addMarker(
-                  element.latLng, element.timestamp, element.imgPath);
+              _addMarkerToMap(element);
             }
             fileList.sort((a, b) => a.timestamp!.compareTo(b.timestamp!));
 
@@ -212,7 +247,6 @@ class _MapAndPhotos extends State<MapAndPhotos> {
           } else {
             // User canceled the picker
           }
-          //_moveMap();
         },
         child: Center(child: Icon(Icons.add_a_photo_outlined)),
       ),
@@ -257,8 +291,30 @@ class _MapAndPhotos extends State<MapAndPhotos> {
       moveMapDebounce!.cancel();
     }
     moveMapDebounce = Timer(debounceDuration, () {
-      openMapController.currentState!.giveMarkerFocus(listItem);
-      _moveMap(listItem.latLng, listItem.imgPath);
+      if (!listItem.locationError) {
+        openMapController.currentState!.giveMarkerFocus(listItem);
+        _moveMap(listItem.latLng, listItem.imgPath);
+      } else if (listItem.locationError) {
+        Fluttertoast.cancel();
+        Fluttertoast.showToast(
+            msg: "Esta imagem não contém informação de localização",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 2,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      } else {
+        Fluttertoast.cancel();
+        Fluttertoast.showToast(
+            msg: "Esta imagem não contém informação de data",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 2,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      }
     });
   }
 
@@ -269,5 +325,12 @@ class _MapAndPhotos extends State<MapAndPhotos> {
     carouselController.animateToPage(index);
     _moveMapDebounce(fileList);
     setState(() {});
+  }
+
+  _addMarkerToMap(ListItem element) {
+    if (!element.locationError) {
+      openMapController.currentState!
+          .addMarker(element.latLng, element.timestamp, element.imgPath);
+    }
   }
 }
