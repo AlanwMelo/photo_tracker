@@ -107,7 +107,13 @@ class _MapAndPhotos extends State<MapAndPhotos> {
   }
 
   _openMap() {
-    return OpenMap(key: openMapController, markerList: []);
+    return OpenMap(
+      key: openMapController,
+      markerList: [],
+      markerSelected: (var marker) {
+        _listAndCarouselSynchronizer(marker, fileList.indexWhere((element) => element.imgPath == marker.imgPath));
+      },
+    );
   }
 
   _moveMap(LatLng latLng, String fileName, {double? zoom}) {
@@ -155,7 +161,7 @@ class _MapAndPhotos extends State<MapAndPhotos> {
                       child: Container(
                         width: size,
                         color: Colors.white30,
-                        child: Center(child: Text('${index+1}')),
+                        child: Center(child: Text('${index + 1}')),
                       ),
                     )
                   ],
@@ -174,12 +180,8 @@ class _MapAndPhotos extends State<MapAndPhotos> {
       height: height,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          primary: Colors.lightBlue,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.zero
-          )
-
-        ),
+            primary: Colors.lightBlue,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero)),
         onPressed: () async {
           FilePickerResult? result = await FilePicker.platform.pickFiles(
               allowMultiple: true,

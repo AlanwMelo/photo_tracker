@@ -11,8 +11,9 @@ import 'classes/listItem.dart';
 
 class OpenMap extends StatefulWidget {
   final List<Marker> markerList;
+  final Function(ListItem) markerSelected;
 
-  const OpenMap({Key? key, required this.markerList}) : super(key: key);
+  const OpenMap({Key? key, required this.markerList, required this.markerSelected}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => NewMapTestState();
@@ -133,6 +134,7 @@ class NewMapTestState extends State<OpenMap> with TickerProviderStateMixin {
       onTap: () {
         selectFileName = marker.imgPath;
         giveMarkerFocus(marker);
+        widget.markerSelected(marker);
         setState(() {});
       },
       child: Container(
