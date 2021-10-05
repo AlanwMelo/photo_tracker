@@ -13,7 +13,9 @@ class OpenMap extends StatefulWidget {
   final List<Marker> markerList;
   final Function(ListItem) markerSelected;
 
-  const OpenMap({Key? key, required this.markerList, required this.markerSelected}) : super(key: key);
+  const OpenMap(
+      {Key? key, required this.markerList, required this.markerSelected})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() => NewMapTestState();
@@ -27,8 +29,16 @@ class NewMapTestState extends State<OpenMap> with TickerProviderStateMixin {
 
   addMarker(LatLng latLng, DateTime? timestamp, String imgPath) {
     setState(() {
-      markerList.add(ListItem(latLng, timestamp, imgPath));
+      markerList.add(ListItem(latLng, timestamp, imgPath, false, false));
     });
+  }
+
+  rmvMarker(ListItem item) {
+    print(markerList.length);
+    print(markerList.indexWhere((element) => element.imgPath == item.imgPath));
+    markerList.removeAt(markerList.indexWhere((element) => element.imgPath == item.imgPath));
+    print(markerList.length);
+    setState(() {});
   }
 
   @override
