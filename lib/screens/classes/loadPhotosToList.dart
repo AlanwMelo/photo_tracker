@@ -24,7 +24,7 @@ class LoadPhotosToList {
       double longitude = 0;
       double longitudeRef = 1;
       bool locationError = false;
-      DateTime? dateTime;
+      DateTime? dateTime = DateTime.fromMillisecondsSinceEpoch(0);
       bool dateTimeError = false;
 
       await data.then((data) async {
@@ -77,7 +77,7 @@ class LoadPhotosToList {
       listOfItems.add(ListItem(
           LatLng(latitude * latitudeRef, longitude * longitudeRef),
           dateTime,
-          element.absolute.path));
+          element.absolute.path, locationError, dateTimeError));
     }
     return listOfItems;
   }
