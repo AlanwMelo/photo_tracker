@@ -8,6 +8,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:photo_tracker/screens/classes/listItem.dart';
+import 'package:photo_tracker/screens/classes/loadPhotosToList.dart';
 import 'package:photo_tracker/screens/open_map.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 
@@ -18,7 +19,7 @@ class MapAndPhotos extends StatefulWidget {
 
 class _MapAndPhotos extends State<MapAndPhotos> {
   AppBar appBar = AppBar(
-    title: Text('title'),
+    title: Text('Photo Tracker'),
   );
   double screenUsableHeight = 0;
   double screenUsableWidth = 0;
@@ -41,7 +42,9 @@ class _MapAndPhotos extends State<MapAndPhotos> {
 
   @override
   void dispose() {
-    moveMapDebounce!.cancel();
+    if (moveMapDebounce?.isActive ?? false) {
+      moveMapDebounce!.cancel();
+    }
     super.dispose();
   }
 
@@ -111,7 +114,10 @@ class _MapAndPhotos extends State<MapAndPhotos> {
       key: openMapController,
       markerList: [],
       markerSelected: (var marker) {
-        _listAndCarouselSynchronizer(marker, fileList.indexWhere((element) => element.imgPath == marker.imgPath));
+        _listAndCarouselSynchronizer(
+            marker,
+            fileList
+                .indexWhere((element) => element.imgPath == marker.imgPath));
       },
     );
   }
@@ -183,13 +189,26 @@ class _MapAndPhotos extends State<MapAndPhotos> {
             primary: Colors.lightBlue,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero)),
         onPressed: () async {
+          ListItem? thisItem;
           FilePickerResult? result = await FilePicker.platform.pickFiles(
               allowMultiple: true,
               type: FileType.custom,
               allowedExtensions: ['jpg']);
 
           if (result != null) {
-            _loadPhotosToList(result);
+            List<ListItem> loadToListItems =
+                await LoadPhotosToList(result).loadPhotos();
+
+            for (var element in loadToListItems) {
+              fileList.add(element);
+              thisItem = element;
+              openMapController.currentState!.addMarker(
+                  element.latLng, element.timestamp, element.imgPath);
+            }
+            fileList.sort((a, b) => a.timestamp!.compareTo(b.timestamp!));
+
+            _listAndCarouselSynchronizer(thisItem!,
+                fileList.indexWhere((element) => element == thisItem));
           } else {
             // User canceled the picker
           }
@@ -198,94 +217,6 @@ class _MapAndPhotos extends State<MapAndPhotos> {
         child: Center(child: Icon(Icons.add_a_photo_outlined)),
       ),
     );
-  }
-
-  getDoublePositionForLatLngFromExif(List latLngList) {
-    Ratio degrees = latLngList[0];
-    Ratio minutes = latLngList[1];
-    Ratio milliseconds = latLngList[2];
-
-    double latLngInDouble = degrees.toDouble() +
-        (minutes.toDouble() / 60) +
-        (milliseconds.toDouble() / 3600);
-
-    return latLngInDouble;
-  }
-
-  _loadPhotosToList(FilePickerResult result) {
-    List<File> files = result.paths.map((path) => File(path!)).toList();
-
-    files.forEach((element) async {
-      ///Realiza a conversao da localização do padrao DMM para double, salva o Timestamp e localização das fotos
-      Future<Map<String, IfdTag>> data =
-          readExifFromBytes(await element.readAsBytes());
-      await data.then((data) {
-        double latitude = 0;
-        double latitudeRef = 1;
-        double longitude = 0;
-        double longitudeRef = 1;
-        bool locationError = false;
-        DateTime? dateTime;
-        bool dateTimeError = false;
-
-        if (!data.containsKey('GPS GPSLatitude') ||
-            !data.containsKey('GPS GPSLongitude') ||
-            !data.containsKey('GPS GPSLatitudeRef') ||
-            !data.containsKey('GPS GPSLongitudeRef')) {
-          locationError = !locationError;
-        }
-        if (!data.containsKey('Image DateTime')) {
-          dateTimeError = !dateTimeError;
-        }
-
-        data.forEach((key, value) {
-          //print('$key : $value');
-          if (key == 'GPS GPSLatitude') {
-            latitude =
-                getDoublePositionForLatLngFromExif(value.values.toList());
-          }
-          if (key == 'GPS GPSLongitude') {
-            longitude =
-                getDoublePositionForLatLngFromExif(value.values.toList());
-          }
-          if (key == 'GPS GPSLatitudeRef' &&
-              value.toString().toLowerCase().contains('s')) {
-            latitudeRef = -1;
-          }
-          if (key == 'GPS GPSLongitudeRef' &&
-              value.toString().toLowerCase().contains('w')) {
-            longitudeRef = -1;
-          }
-          if (key == 'Image DateTime') {
-            int year = int.parse(value.printable.substring(0, 4));
-            int month = int.parse(value.printable.substring(5, 7));
-            int day = int.parse(value.printable.substring(8, 11));
-            int hour = int.parse(value.printable.substring(11, 13));
-            int minute = int.parse(value.printable.substring(14, 16));
-            int second = int.parse(value.printable.substring(17, 19));
-
-            dateTime = DateTime(year, month, day, hour, minute, second);
-          }
-        });
-
-        fileList.add(ListItem(
-            LatLng(latitude * latitudeRef, longitude * longitudeRef),
-            dateTime,
-            element.absolute.path));
-
-        ListItem thisItem = fileList.last;
-
-        openMapController.currentState!.addMarker(
-            LatLng(latitude * latitudeRef, longitude * longitudeRef),
-            dateTime,
-            element.absolute.path);
-
-        fileList.sort((a, b) => a.timestamp!.compareTo(b.timestamp!));
-
-        _listAndCarouselSynchronizer(
-            thisItem, fileList.indexWhere((element) => element == thisItem));
-      });
-    });
   }
 
   _carouselSlider(double useAbleHeight, double useAbleWidth) {
