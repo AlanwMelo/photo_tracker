@@ -1,9 +1,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.photo_tracker">
-
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <application
         android:icon="@drawable/ic_launcher"
         android:roundIcon="@drawable/ic_launcher"
+        android:requestLegacyExternalStorage="true"
         android:label="Photo Tracker">
         <activity
             android:name=".MainActivity"
@@ -38,4 +42,5 @@
             android:name="flutterEmbedding"
             android:value="2" />
     </application>
+
 </manifest>
