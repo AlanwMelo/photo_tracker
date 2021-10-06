@@ -91,18 +91,50 @@ class DBManager {
   deleteImageItem(String imgPath) async {
     Database db = await _startDB();
 
-    await db
-        .rawQuery('DELETE FROM imageItem WHERE imgPath=?', ['$imgPath']);
+    await db.rawQuery('DELETE FROM imageItem WHERE imgPath=?', ['$imgPath']);
 
     CacheCleaner().cleanUnusedImgs();
+  }
+
+  getMainListItems() async {
+    Database db = await _startDB();
+
+    List<Map> result = await db.rawQuery('SELECT * FROM mainList');
+
+    return result;
+  }
+
+  getFirstItemOfList(String listName) async {
+    Database db = await _startDB();
+
+    List<Map> result = await db.rawQuery(
+        'SELECT * FROM imageItem WHERE mainListName=? ORDER BY timestamp ASC LIMIT 1',
+        [listName]);
+
+    return result;
+  }
+
+  getListItemCount(String listName) async {
+    Database db = await _startDB();
+    int resultCount = 0;
+    print(listName);
+
+    List<Map> result = await db.rawQuery(
+        'SELECT COUNT(*) FROM imageItem WHERE mainListName=?', [listName]);
+
+    for (var element in result) {
+      resultCount = element['COUNT(*)'];
+    }
+
+    return resultCount;
   }
 
   getOrphanFileNames() async {
     Database db = await _startDB();
 
-    List<Map> result = await db.rawQuery('SELECT imgPath,mainListName FROM imageItem WHERE mainListName NOT IN (SELECT mainListName FROM mainList)');
+    List<Map> result = await db.rawQuery(
+        'SELECT imgPath,mainListName FROM imageItem WHERE mainListName NOT IN (SELECT mainListName FROM mainList)');
 
     return result;
   }
-
 }
