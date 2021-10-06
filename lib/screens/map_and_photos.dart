@@ -10,10 +10,15 @@ import 'package:latlong2/latlong.dart';
 import 'package:photo_tracker/classes/alertDialog.dart';
 import 'package:photo_tracker/classes/listItem.dart';
 import 'package:photo_tracker/classes/loadPhotosToList.dart';
+import 'package:photo_tracker/db/dbManager.dart';
 import 'package:photo_tracker/screens/open_map.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 
 class MapAndPhotos extends StatefulWidget {
+  final String listName;
+
+  const MapAndPhotos({Key? key, required this.listName}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() => _MapAndPhotos();
 }
@@ -31,6 +36,7 @@ class _MapAndPhotos extends State<MapAndPhotos> {
   int selectedImg = 0;
   Timer? moveMapDebounce;
   Duration debounceDuration = Duration(milliseconds: 500);
+  DBManager dbManager = DBManager();
 
   @override
   void initState() {
@@ -63,68 +69,63 @@ class _MapAndPhotos extends State<MapAndPhotos> {
   }
 
   _mapAndPhotosBody(double useAbleHeight, double useAbleWidth) {
-    return StreamBuilder(
-        stream: null,
-        builder: (context, snapshot) {
-          double mapHeight = useAbleHeight * 0.5;
-
-          return Container(
-            height: useAbleHeight,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Container(
-                  color: Colors.white,
-                  height: mapHeight,
-                  width: useAbleWidth,
-                  child: _openMap(),
-                ),
-                Expanded(
-                  child: Container(
+    double mapHeight = useAbleHeight * 0.5;
+    return Container(
+      height: useAbleHeight,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Container(
+            color: Colors.white,
+            height: mapHeight,
+            width: useAbleWidth,
+            child: _openMap(),
+          ),
+          Expanded(
+            child: Container(
+              width: useAbleWidth,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Container(
                     width: useAbleWidth,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.start,
+                    height: (useAbleHeight - mapHeight) * 0.2,
+                    color: Colors.blue.withOpacity(0.3),
+                    child: Row(
                       children: [
-                        Container(
-                          width: useAbleWidth,
-                          height: (useAbleHeight - mapHeight) * 0.2,
-                          color: Colors.blue.withOpacity(0.3),
-                          child: Row(
-                            children: [
-                              imgList((useAbleHeight - mapHeight) * 0.2),
-                              addMoreButton((useAbleHeight - mapHeight) * 0.2),
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          child: fileList.length != 0
-                              ? _carouselSlider(useAbleHeight, useAbleWidth)
-                              : Container(
-                                  width: useAbleWidth,
-                                  color: Colors.black87,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Container(
-                                        child: Icon(
-                                          Icons.image_search_outlined,
-                                          color: Colors.white70,
-                                          size: 80,
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                        ),
+                        imgList((useAbleHeight - mapHeight) * 0.2),
+                        addMoreButton((useAbleHeight - mapHeight) * 0.2),
                       ],
                     ),
                   ),
-                )
-              ],
+                  Expanded(
+                    child: fileList.length != 0
+                        ? _carouselSlider(useAbleHeight, useAbleWidth)
+                        : Container(
+                      width: useAbleWidth,
+                      color: Colors.black87,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            child: Icon(
+                              Icons.image_search_outlined,
+                              color: Colors.white70,
+                              size: 80,
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          );
-        });
+          )
+        ],
+      ),
+    );
   }
 
   _openMap() {
@@ -197,6 +198,7 @@ class _MapAndPhotos extends State<MapAndPhotos> {
                                 openMapController.currentState!
                                     .rmvMarker(fileList[index]);
                               }
+                              dbManager.deleteImageItem(fileList[index].imgPath);
                               fileList.removeAt(index);
                               setState(() {});
                             }
@@ -255,6 +257,16 @@ class _MapAndPhotos extends State<MapAndPhotos> {
               fileList.add(element);
               thisItem = element;
               _addMarkerToMap(element);
+
+              dbManager.createNewImageItem(
+                  widget.listName,
+                  element.imgPath,
+                  element.latLng.latitude,
+                  element.latLng.longitude,
+                  double.parse(
+                      element.timestamp.millisecondsSinceEpoch.toString()),
+                  element.locationError,
+                  element.timeError);
             }
             fileList.sort((a, b) => a.timestamp.compareTo(b.timestamp));
 

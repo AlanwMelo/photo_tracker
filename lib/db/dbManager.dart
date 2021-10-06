@@ -88,6 +88,15 @@ class DBManager {
     CacheCleaner().cleanUnusedImgs();
   }
 
+  deleteImageItem(String imgPath) async {
+    Database db = await _startDB();
+
+    await db
+        .rawQuery('DELETE FROM imageItem WHERE imgPath=?', ['$imgPath']);
+
+    CacheCleaner().cleanUnusedImgs();
+  }
+
   getOrphanFileNames() async {
     Database db = await _startDB();
 

@@ -70,14 +70,12 @@ class _MyHomePageState extends State<MyHomePage> {
                       itemCount: mainList.length,
                       itemBuilder: (BuildContext context, int index) {
                         return GestureDetector(
-                          onDoubleTap: (){
-                            CacheCleaner().cleanUnusedImgs();
-                          },
                           onTap: () {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => MapAndPhotos()));
+                                    builder: (context) =>
+                                        MapAndPhotos(listName: 'name')));
                           },
                           onLongPress: () {
                             showDialog(

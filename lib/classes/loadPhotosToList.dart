@@ -99,7 +99,6 @@ class LoadPhotosToList {
         }
       });
 
-      DBManager().createNewImageItem('budega', newLocation, latitude, longitude, dateTime.millisecondsSinceEpoch.toDouble(), locationError, dateTimeError);
       listOfItems.add(ListItem(
           LatLng(latitude * latitudeRef, longitude * longitudeRef),
           dateTime,
