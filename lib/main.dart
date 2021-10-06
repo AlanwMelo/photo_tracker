@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:photo_tracker/classes/alertDialog.dart';
 import 'package:photo_tracker/classes/cacheCleaner.dart';
+import 'package:photo_tracker/classes/createListItemFromQueryResult.dart';
+import 'package:photo_tracker/classes/listItem.dart';
 import 'package:photo_tracker/classes/mainListItem.dart';
 import 'package:photo_tracker/classes/newListDialog.dart';
 import 'package:photo_tracker/screens/map_and_photos.dart';
@@ -39,13 +42,14 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  List<MainListItem> mainsListR = [];
-  List mainList = [1, 2, 3];
+  List<MainListItem> mainList = [];
+  final DBManager dbManager = DBManager();
 
   @override
   void initState() {
     super.initState();
     CacheCleaner().cleanUnusedImgs();
+    _loadMainList();
   }
 
   @override
@@ -70,6 +74,9 @@ class _MyHomePageState extends State<MyHomePage> {
                       itemCount: mainList.length,
                       itemBuilder: (BuildContext context, int index) {
                         return GestureDetector(
+                          onDoubleTap: () {
+                            _loadMainList();
+                          },
                           onTap: () {
                             Navigator.push(
                                 context,
@@ -108,7 +115,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   child: Center(
                                 child: Container(
                                   child: Text(
-                                    'Nome da lista',
+                                    '${mainList[index].name} ${mainList[index].itemCount}',
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -181,5 +188,24 @@ class _MyHomePageState extends State<MyHomePage> {
         )),
       ),
     );
+  }
+
+  _loadMainList() async {
+    var mainListItems = await dbManager.getMainListItems();
+    mainListItems.forEach((file) async {
+      ListItem firstListItem;
+      var firstItemResult =
+          await dbManager.getFirstItemOfList(file['mainListName']);
+      for (var element in firstItemResult) {
+        firstListItem = await CreateListItemFromQueryResult().create(element);
+        MainListItem addThisItem = MainListItem(
+            file['mainListName'],
+            firstListItem,
+            DateTime.fromMillisecondsSinceEpoch(
+                double.parse(file['created'].toString()).ceil()),
+            await dbManager.getListItemCount(file['mainListName']));
+        mainList.add(addThisItem);
+      }
+    });
   }
 }
