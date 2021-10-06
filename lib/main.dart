@@ -1,11 +1,11 @@
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:photo_tracker/screens/classes/alertDialog.dart';
-import 'package:photo_tracker/screens/classes/listItem.dart';
-import 'package:photo_tracker/screens/classes/loadPhotosToList.dart';
-import 'package:photo_tracker/screens/classes/mainListItem.dart';
-import 'package:photo_tracker/screens/classes/newListDialog.dart';
+import 'package:photo_tracker/classes/alertDialog.dart';
+import 'package:photo_tracker/classes/cacheCleaner.dart';
+import 'package:photo_tracker/classes/mainListItem.dart';
+import 'package:photo_tracker/classes/newListDialog.dart';
 import 'package:photo_tracker/screens/map_and_photos.dart';
+
+import 'db/dbManager.dart';
 
 void main() {
   runApp(MyApp());
@@ -29,14 +29,24 @@ class MyHomePage extends StatefulWidget {
   MyHomePage({Key? key, required this.title}) : super(key: key);
 
   final String title;
+  final DBManager dbManager = DBManager();
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _MyHomePageState createState() {
+    dbManager.createDB();
+    return _MyHomePageState();
+  }
 }
 
 class _MyHomePageState extends State<MyHomePage> {
   List<MainListItem> mainsListR = [];
   List mainList = [1, 2, 3];
+
+  @override
+  void initState() {
+    super.initState();
+    CacheCleaner().cleanUnusedImgs();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,6 +70,9 @@ class _MyHomePageState extends State<MyHomePage> {
                       itemCount: mainList.length,
                       itemBuilder: (BuildContext context, int index) {
                         return GestureDetector(
+                          onDoubleTap: (){
+                            CacheCleaner().cleanUnusedImgs();
+                          },
                           onTap: () {
                             Navigator.push(
                                 context,
@@ -130,7 +143,10 @@ class _MyHomePageState extends State<MyHomePage> {
               context: context,
               builder: (BuildContext context) {
                 return NewListDialog(
-                    alertTitle: 'Criar nova lista', answer: (answer) {});
+                    alertTitle: 'Criar nova lista',
+                    answer: (answer) {
+                      print(answer);
+                    });
               });
 
           /*
