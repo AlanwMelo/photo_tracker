@@ -112,9 +112,8 @@ class NewMapTestState extends State<OpenMap> with TickerProviderStateMixin {
           plugins: [
             ScaleLayerPlugin(),
           ],
-          center: LatLng(-22.830448, -46.86940797222222),
-          // Alterar para mapbounds !!!!!!
-          zoom: 13.0,
+          center: LatLng(-15.745246, -47.593525),
+          zoom: 4,
           debugMultiFingerGestureWinner: true,
           enableMultiFingerGestureRace: true,
         ),
