@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:photo_tracker/screens/classes/alertDialog.dart';
 import 'package:photo_tracker/screens/classes/listItem.dart';
 import 'package:photo_tracker/screens/classes/loadPhotosToList.dart';
 import 'package:photo_tracker/screens/open_map.dart';
@@ -101,7 +102,7 @@ class _MapAndPhotos extends State<MapAndPhotos> {
                               ? _carouselSlider(useAbleHeight, useAbleWidth)
                               : Container(
                                   width: useAbleWidth,
-                                  color: Colors.black,
+                                  color: Colors.black87,
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
@@ -109,7 +110,7 @@ class _MapAndPhotos extends State<MapAndPhotos> {
                                         child: Icon(
                                           Icons.image_search_outlined,
                                           color: Colors.white70,
-                                          size: 100,
+                                          size: 80,
                                         ),
                                       )
                                     ],
@@ -182,11 +183,25 @@ class _MapAndPhotos extends State<MapAndPhotos> {
                 _listAndCarouselSynchronizer(fileList[index], index);
               },
               onLongPress: () {
-                if (!fileList[index].locationError) {
-                  openMapController.currentState!.rmvMarker(fileList[index]);
-                }
-                fileList.removeAt(index);
-                setState(() {});
+                showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return MyAlertDialog(
+                          alertTitle: 'Remover',
+                          alertText: 'Deseja mesmo remover esta imagem?',
+                          alertButton1Text: 'Sim',
+                          alertButton2Text: 'Não',
+                          answer: (answer) {
+                            if (answer == 1) {
+                              if (!fileList[index].locationError) {
+                                openMapController.currentState!
+                                    .rmvMarker(fileList[index]);
+                              }
+                              fileList.removeAt(index);
+                              setState(() {});
+                            }
+                          });
+                    });
               },
               child: Container(
                 margin: EdgeInsets.all(2),
