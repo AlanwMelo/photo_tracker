@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:photo_tracker/screens/classes/alertDialog.dart';
 import 'package:photo_tracker/screens/classes/listItem.dart';
 import 'package:photo_tracker/screens/classes/loadPhotosToList.dart';
-import 'package:photo_tracker/screens/classes/maisListItem.dart';
+import 'package:photo_tracker/screens/classes/mainListItem.dart';
 import 'package:photo_tracker/screens/classes/newListDialog.dart';
 import 'package:photo_tracker/screens/map_and_photos.dart';
 
