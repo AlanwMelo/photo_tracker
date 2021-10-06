@@ -36,6 +36,8 @@ dependencies:
   exif: ^3.0.0
   carousel_slider: ^4.0.0
   fluttertoast: ^8.0.8
+  sqflite: ^2.0.0+4
+  path_provider: ^2.0.5
 
 dev_dependencies:
   flutter_test:

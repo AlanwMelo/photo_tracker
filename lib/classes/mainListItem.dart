@@ -1,4 +1,5 @@
-import 'package:photo_tracker/screens/classes/listItem.dart';
+
+import 'package:photo_tracker/classes/listItem.dart';
 
 class MainListItem {
   final String name;

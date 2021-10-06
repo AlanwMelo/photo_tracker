@@ -4,10 +4,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:photo_tracker/classes/listItem.dart';
 import 'package:photo_tracker/screens/plugins/scale_layer_plugin_option.dart';
 import 'package:speech_balloon/speech_balloon.dart';
 
-import 'classes/listItem.dart';
 
 class OpenMap extends StatefulWidget {
   final List<Marker> markerList;
@@ -27,7 +27,7 @@ class NewMapTestState extends State<OpenMap> with TickerProviderStateMixin {
   var markers;
   String? selectFileName;
 
-  addMarker(LatLng latLng, DateTime? timestamp, String imgPath) {
+  addMarker(LatLng latLng, DateTime timestamp, String imgPath) {
     setState(() {
       markerList.add(ListItem(latLng, timestamp, imgPath, false, false));
     });

@@ -2,7 +2,7 @@ import 'package:latlong2/latlong.dart';
 
 class ListItem{
   final LatLng latLng;
-  final DateTime? timestamp;
+  final DateTime timestamp;
   final String imgPath;
   final bool locationError;
   final bool timeError;

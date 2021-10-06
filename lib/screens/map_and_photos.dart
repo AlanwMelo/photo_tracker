@@ -7,9 +7,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:photo_tracker/screens/classes/alertDialog.dart';
-import 'package:photo_tracker/screens/classes/listItem.dart';
-import 'package:photo_tracker/screens/classes/loadPhotosToList.dart';
+import 'package:photo_tracker/classes/alertDialog.dart';
+import 'package:photo_tracker/classes/listItem.dart';
+import 'package:photo_tracker/classes/loadPhotosToList.dart';
 import 'package:photo_tracker/screens/open_map.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 
@@ -242,6 +242,7 @@ class _MapAndPhotos extends State<MapAndPhotos> {
         onPressed: () async {
           ListItem? thisItem;
           FilePickerResult? result = await FilePicker.platform.pickFiles(
+              allowCompression: true,
               allowMultiple: true,
               type: FileType.custom,
               allowedExtensions: ['jpg']);
@@ -255,7 +256,7 @@ class _MapAndPhotos extends State<MapAndPhotos> {
               thisItem = element;
               _addMarkerToMap(element);
             }
-            fileList.sort((a, b) => a.timestamp!.compareTo(b.timestamp!));
+            fileList.sort((a, b) => a.timestamp.compareTo(b.timestamp));
 
             _listAndCarouselSynchronizer(thisItem!,
                 fileList.indexWhere((element) => element == thisItem));

@@ -2,7 +2,9 @@ import 'dart:io';
 import 'package:exif/exif.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:photo_tracker/screens/classes/listItem.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:photo_tracker/classes/listItem.dart';
+import 'package:photo_tracker/db/dbManager.dart';
 
 class LoadPhotosToList {
   final FilePickerResult result;
@@ -11,11 +13,34 @@ class LoadPhotosToList {
 
   List<ListItem> listOfItems = [];
 
+  ///Verifica se existe/cria o diretório
+  checkDir(String dirPath) async {
+    if (await Directory(dirPath).exists()) {
+      print('The directory already exists');
+      print('Directory: $dirPath');
+      return true;
+    } else {
+      print('The directory doesn\'t exists');
+      print('Creating directory');
+      await Directory(dirPath).create();
+      print('Directory created');
+      print('Directory: $dirPath');
+      return true;
+    }
+  }
+
   loadPhotos() async {
     listOfItems.clear();
     List<File> files = result.paths.map((path) => File(path!)).toList();
+    Directory appDir = await getApplicationDocumentsDirectory();
+    String imagesDir = '${appDir.path}/images/';
+    await checkDir(imagesDir);
 
     for (var element in files) {
+      int nameHelper = element.path.lastIndexOf('/') + 1;
+      String newLocation = '$imagesDir${element.path.substring(nameHelper)}';
+      element.copy(newLocation);
+
       ///Realiza a conversao da localização do padrao DMM para double, salva o Timestamp e localização das fotos
       Future<Map<String, IfdTag>> data =
           readExifFromBytes(await element.readAsBytes());
@@ -24,7 +49,7 @@ class LoadPhotosToList {
       double longitude = 0;
       double longitudeRef = 1;
       bool locationError = false;
-      DateTime? dateTime = DateTime.fromMillisecondsSinceEpoch(0);
+      DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(0);
       bool dateTimeError = false;
 
       await data.then((data) async {
@@ -74,11 +99,16 @@ class LoadPhotosToList {
         }
       });
 
+      DBManager().createNewImageItem('budega', newLocation, latitude, longitude, dateTime.millisecondsSinceEpoch.toDouble(), locationError, dateTimeError);
       listOfItems.add(ListItem(
           LatLng(latitude * latitudeRef, longitude * longitudeRef),
           dateTime,
-          element.absolute.path, locationError, dateTimeError));
+          newLocation,
+          locationError,
+          dateTimeError));
     }
+
+    await FilePicker.platform.clearTemporaryFiles();
     return listOfItems;
   }
 
