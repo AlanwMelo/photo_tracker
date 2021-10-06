@@ -2,8 +2,9 @@
     package="com.example.photo_tracker">
 
     <application
-        android:icon="@mipmap/ic_launcher"
-        android:label="photo_tracker">
+        android:icon="@drawable/ic_launcher"
+        android:roundIcon="@drawable/ic_launcher"
+        android:label="Photo Tracker">
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
