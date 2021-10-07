@@ -189,29 +189,6 @@ class _MyHomePageState extends State<MyHomePage> {
                       _addItemToList(answer);
                     });
               });
-
-          /*
-          FilePickerResult? result = await FilePicker.platform.pickFiles(
-              allowMultiple: true,
-              type: FileType.custom,
-              allowedExtensions: ['jpg']);
-
-          if (result != null) {
-            List<ListItem> loadToListItems =
-                await LoadPhotosToList(result).loadPhotos();
-
-            for (var element in loadToListItems) {
-              */ /*fileList.add(element);
-                  thisItem = element;
-                  _addMarkerToMap(element);*/ /*
-            }
-            */ /*fileList.sort((a, b) => a.timestamp!.compareTo(b.timestamp!));
-
-                _listAndCarouselSynchronizer(thisItem!,
-                    fileList.indexWhere((element) => element == thisItem));*/ /*
-          } else {
-            // User canceled the picker
-          }*/
         },
         child: Center(
             child: Row(
