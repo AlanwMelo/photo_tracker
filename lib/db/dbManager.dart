@@ -128,6 +128,15 @@ class DBManager {
     return resultCount;
   }
 
+  getListItems(String listName) async {
+    Database db = await _startDB();
+
+    List<Map> result = await db
+        .rawQuery('SELECT * FROM imageItem WHERE mainListName=?', [listName]);
+
+    return result;
+  }
+
   getListItem(String listName) async {
     Database db = await _startDB();
 

@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
@@ -8,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:photo_tracker/classes/alertDialog.dart';
+import 'package:photo_tracker/classes/createListItemFromQueryResult.dart';
 import 'package:photo_tracker/classes/listItem.dart';
 import 'package:photo_tracker/classes/loadPhotosToList.dart';
 import 'package:photo_tracker/db/dbManager.dart';
@@ -16,8 +16,10 @@ import 'package:scroll_to_index/scroll_to_index.dart';
 
 class MapAndPhotos extends StatefulWidget {
   final String listName;
+  final Function(bool) answer;
 
-  const MapAndPhotos({Key? key, required this.listName}) : super(key: key);
+  const MapAndPhotos({Key? key, required this.listName, required this.answer})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _MapAndPhotos();
@@ -40,11 +42,11 @@ class _MapAndPhotos extends State<MapAndPhotos> {
 
   @override
   void initState() {
-    print(widget.listName);
     scrollController = AutoScrollController(
         viewportBoundaryGetter: () =>
             Rect.fromLTRB(0, 0, 0, MediaQuery.of(context).padding.bottom),
         axis: Axis.vertical);
+    _loadList(widget.listName);
     super.initState();
   }
 
@@ -53,11 +55,12 @@ class _MapAndPhotos extends State<MapAndPhotos> {
     if (moveMapDebounce?.isActive ?? false) {
       moveMapDebounce!.cancel();
     }
+    widget.answer(true);
     super.dispose();
   }
 
   @override
-  Widget build(BuildContext context) {
+  build(BuildContext context) {
     /// Recupera o tamanho da tela desconsiderando a AppBar
     screenUsableHeight =
         MediaQuery.of(context).size.height - appBar.preferredSize.height;
@@ -69,6 +72,7 @@ class _MapAndPhotos extends State<MapAndPhotos> {
     );
   }
 
+  // ##### Layout - Inicio #####
   _mapAndPhotosBody(double useAbleHeight, double useAbleWidth) {
     double mapHeight = useAbleHeight * 0.5;
     return Container(
@@ -95,8 +99,8 @@ class _MapAndPhotos extends State<MapAndPhotos> {
                     color: Colors.blue.withOpacity(0.3),
                     child: Row(
                       children: [
-                        imgList((useAbleHeight - mapHeight) * 0.2),
-                        addMoreButton((useAbleHeight - mapHeight) * 0.2),
+                        _imgList((useAbleHeight - mapHeight) * 0.2),
+                        _addMoreButton((useAbleHeight - mapHeight) * 0.2),
                       ],
                     ),
                   ),
@@ -104,21 +108,21 @@ class _MapAndPhotos extends State<MapAndPhotos> {
                     child: fileList.length != 0
                         ? _carouselSlider(useAbleHeight, useAbleWidth)
                         : Container(
-                      width: useAbleWidth,
-                      color: Colors.black87,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            child: Icon(
-                              Icons.image_search_outlined,
-                              color: Colors.white70,
-                              size: 80,
+                            width: useAbleWidth,
+                            color: Colors.black87,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  child: Icon(
+                                    Icons.image_search_outlined,
+                                    color: Colors.white70,
+                                    size: 80,
+                                  ),
+                                )
+                              ],
                             ),
-                          )
-                        ],
-                      ),
-                    ),
+                          ),
                   ),
                 ],
               ),
@@ -142,17 +146,7 @@ class _MapAndPhotos extends State<MapAndPhotos> {
     );
   }
 
-  _moveMap(LatLng latLng, String fileName, {double? zoom}) {
-    NewMapTestState mapController = openMapController.currentState!;
-    openMapController.currentState!.selectFileName = fileName;
-    if (zoom == null) {
-      zoom = 17.0;
-    }
-
-    mapController.animatedMapMove(latLng, zoom);
-  }
-
-  imgList(double size) {
+  _imgList(double size) {
     /// Usar o valor de height para garantir os quadrado em qualquer tamanho de tela
 
     return Container(
@@ -199,7 +193,8 @@ class _MapAndPhotos extends State<MapAndPhotos> {
                                 openMapController.currentState!
                                     .rmvMarker(fileList[index]);
                               }
-                              dbManager.deleteImageItem(fileList[index].imgPath);
+                              dbManager
+                                  .deleteImageItem(fileList[index].imgPath);
                               fileList.removeAt(index);
                               setState(() {});
                             }
@@ -234,7 +229,7 @@ class _MapAndPhotos extends State<MapAndPhotos> {
     );
   }
 
-  addMoreButton(double height) {
+  _addMoreButton(double height) {
     return Container(
       width: fileList.length == 0 ? MediaQuery.of(context).size.width : 55,
       height: height,
@@ -243,7 +238,6 @@ class _MapAndPhotos extends State<MapAndPhotos> {
             primary: Colors.lightBlue,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero)),
         onPressed: () async {
-          ListItem? thisItem;
           FilePickerResult? result = await FilePicker.platform.pickFiles(
               allowCompression: true,
               allowMultiple: true,
@@ -253,12 +247,9 @@ class _MapAndPhotos extends State<MapAndPhotos> {
           if (result != null) {
             List<ListItem> loadToListItems =
                 await LoadPhotosToList(result).loadPhotos();
+            loadToListItems.sort((a, b) => a.timestamp.compareTo(b.timestamp));
 
             for (var element in loadToListItems) {
-              fileList.add(element);
-              thisItem = element;
-              _addMarkerToMap(element);
-
               dbManager.createNewImageItem(
                   widget.listName,
                   element.imgPath,
@@ -268,11 +259,12 @@ class _MapAndPhotos extends State<MapAndPhotos> {
                       element.timestamp.millisecondsSinceEpoch.toString()),
                   element.locationError,
                   element.timeError);
+              _addItemToList(element);
             }
-            fileList.sort((a, b) => a.timestamp.compareTo(b.timestamp));
-
-            _listAndCarouselSynchronizer(thisItem!,
-                fileList.indexWhere((element) => element == thisItem));
+            _listAndCarouselSynchronizer(
+                loadToListItems[0],
+                fileList
+                    .indexWhere((element) => element == loadToListItems[0]));
           } else {
             // User canceled the picker
           }
@@ -299,7 +291,7 @@ class _MapAndPhotos extends State<MapAndPhotos> {
           );
         }).toList(),
         options: CarouselOptions(
-          enableInfiniteScroll: true,
+          enableInfiniteScroll: false,
           height: useAbleHeight,
           viewportFraction: 1,
           onPageChanged: (index, reason) {
@@ -312,7 +304,32 @@ class _MapAndPhotos extends State<MapAndPhotos> {
     );
   }
 
-  /// ###################### Debouncers ######################
+  _moveMap(LatLng latLng, String fileName, {double? zoom}) {
+    NewMapTestState mapController = openMapController.currentState!;
+    openMapController.currentState!.selectFileName = fileName;
+    if (zoom == null) {
+      zoom = 17.0;
+    }
+
+    mapController.animatedMapMove(latLng, zoom);
+  }
+
+  // ##### Layout - Fim #####
+
+  // #### Funções - Inicio ####
+  _loadList(String listName) async {
+    var result = await dbManager.getListItems(listName);
+    for (var element in result) {
+      ListItem listItem;
+      listItem = CreateListItemFromQueryResult().create(element);
+      _addMarkerToMap(listItem);
+      fileList.add(listItem);
+      _listAndCarouselSynchronizer(listItem, 0);
+      setState(() {});
+    }
+  }
+
+  /// ###################### Debouncer ######################
   /// Inicia o timer do debouncer e, se a função não for chamada novamente em 1 segundo, move o mapa
   /// Se for chamada o timer é resetado
   _moveMapDebounce(ListItem listItem) {
@@ -362,4 +379,12 @@ class _MapAndPhotos extends State<MapAndPhotos> {
           .addMarker(element.latLng, element.timestamp, element.imgPath);
     }
   }
+
+  _addItemToList(ListItem element) {
+    fileList.add(element);
+    _addMarkerToMap(element);
+    fileList.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+  }
+
+// #### Funções - Fim ####
 }

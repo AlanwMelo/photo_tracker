@@ -1,4 +1,3 @@
-
 import 'package:photo_tracker/classes/listItem.dart';
 
 class MainListItem {
