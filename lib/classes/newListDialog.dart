@@ -29,7 +29,7 @@ class _NewListDialogState extends State<NewListDialog> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  build(BuildContext context) {
     listNameController.addListener(() {
       setState(() {});
     });

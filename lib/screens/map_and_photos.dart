@@ -216,7 +216,12 @@ class _MapAndPhotos extends State<MapAndPhotos> {
                       child: Container(
                         width: size,
                         color: Colors.white30,
-                        child: Center(child: Text('${index + 1}')),
+                        child: Center(
+                            child: Text('${index + 1}',
+                                style: TextStyle(
+                                    color: Colors.black45,
+                                    fontStyle: FontStyle.italic,
+                                    fontWeight: FontWeight.bold))),
                       ),
                     )
                   ],
@@ -318,15 +323,14 @@ class _MapAndPhotos extends State<MapAndPhotos> {
 
   // #### Funções - Inicio ####
   _loadList(String listName) async {
+    ListItem listItem;
     var result = await dbManager.getListItems(listName);
     for (var element in result) {
-      ListItem listItem;
       listItem = CreateListItemFromQueryResult().create(element);
       _addMarkerToMap(listItem);
       fileList.add(listItem);
-      _listAndCarouselSynchronizer(listItem, 0);
-      setState(() {});
     }
+    _listAndCarouselSynchronizer(fileList[0], 0);
   }
 
   /// ###################### Debouncer ######################

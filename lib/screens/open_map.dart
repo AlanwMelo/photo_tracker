@@ -34,10 +34,7 @@ class NewMapTestState extends State<OpenMap> with TickerProviderStateMixin {
   }
 
   rmvMarker(ListItem item) {
-    print(markerList.length);
-    print(markerList.indexWhere((element) => element.imgPath == item.imgPath));
     markerList.removeAt(markerList.indexWhere((element) => element.imgPath == item.imgPath));
-    print(markerList.length);
     setState(() {});
   }
 

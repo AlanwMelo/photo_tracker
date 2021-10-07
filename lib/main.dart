@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:photo_tracker/classes/alertDialog.dart';
 import 'package:photo_tracker/classes/cacheCleaner.dart';
 import 'package:photo_tracker/classes/createListItemFromQueryResult.dart';
@@ -11,6 +12,10 @@ import 'dart:io';
 import 'db/dbManager.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+
   runApp(MyApp());
 }
 
@@ -54,7 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
@@ -81,15 +86,23 @@ class _MyHomePageState extends State<MyHomePage> {
                             itemCount: mainList.length,
                             itemBuilder: (BuildContext context, int index) {
                               return GestureDetector(
-                                onDoubleTap: () {
-                                  _addItemToList('awm');
-                                },
                                 onTap: () {
                                   Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) => MapAndPhotos(
-                                              listName: mainList[index].name)));
+                                                listName: mainList[index].name,
+                                                answer: (answer) async {
+                                                  if (answer) {
+                                                    _addItemToList(
+                                                        mainList[index].name,
+                                                        update: true, updateIndex: index);
+                                                    await Future.delayed(
+                                                        Duration(seconds: 3));
+                                                    setState(() {});
+                                                  }
+                                                },
+                                              )));
                                 },
                                 onLongPress: () {
                                   showDialog(
@@ -212,15 +225,16 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {});
   }
 
-  _addItemToList(String listName) async {
+  _addItemToList(String listName,
+      {bool update = false, int updateIndex = 0}) async {
     var result = await dbManager.getListItem(listName);
     for (var element in result) {
-      await _funcAddItem(element);
+      await _funcAddItem(element, update: update, index: updateIndex);
       setState(() {});
     }
   }
 
-  _funcAddItem(file) async {
+  _funcAddItem(file, {bool update = false, int index = 0}) async {
     ListItem firstListItem;
     var firstItemResult =
         await dbManager.getFirstItemOfList(file['mainListName']);
@@ -232,7 +246,11 @@ class _MyHomePageState extends State<MyHomePage> {
           DateTime.fromMillisecondsSinceEpoch(
               double.parse(file['created'].toString()).ceil()),
           await dbManager.getListItemCount(file['mainListName']));
-      mainList.add(addThisItem);
+      if (update) {
+        mainList[index] = addThisItem;
+      } else {
+        mainList.add(addThisItem);
+      }
       mainList.sort((a, b) => a.created.compareTo(b.created));
     }
     return true;
