@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
+import 'package:photo_tracker/classes/checkAppImagesDir.dart';
 import 'package:photo_tracker/db/dbManager.dart';
 
 class CacheCleaner {
@@ -10,6 +11,7 @@ class CacheCleaner {
     String filesDir = '${appDir.path}/images/';
     List<String> orphanFiles = [];
 
+    CheckAppImagesDir().checkDir(filesDir);
     var map = await dbManager.getOrphanFileNames();
 
     for (var element in map) {

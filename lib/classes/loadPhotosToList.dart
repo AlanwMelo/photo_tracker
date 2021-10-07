@@ -3,8 +3,8 @@ import 'package:exif/exif.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:photo_tracker/classes/checkAppImagesDir.dart';
 import 'package:photo_tracker/classes/listItem.dart';
-import 'package:photo_tracker/db/dbManager.dart';
 
 class LoadPhotosToList {
   final FilePickerResult result;
@@ -13,28 +13,12 @@ class LoadPhotosToList {
 
   List<ListItem> listOfItems = [];
 
-  ///Verifica se existe/cria o diretório
-  checkDir(String dirPath) async {
-    if (await Directory(dirPath).exists()) {
-      print('The directory already exists');
-      print('Directory: $dirPath');
-      return true;
-    } else {
-      print('The directory doesn\'t exists');
-      print('Creating directory');
-      await Directory(dirPath).create();
-      print('Directory created');
-      print('Directory: $dirPath');
-      return true;
-    }
-  }
-
   loadPhotos() async {
     listOfItems.clear();
     List<File> files = result.paths.map((path) => File(path!)).toList();
     Directory appDir = await getApplicationDocumentsDirectory();
     String imagesDir = '${appDir.path}/images/';
-    await checkDir(imagesDir);
+    await  CheckAppImagesDir().checkDir(imagesDir);
 
     for (var element in files) {
       int nameHelper = element.path.lastIndexOf('/') + 1;
