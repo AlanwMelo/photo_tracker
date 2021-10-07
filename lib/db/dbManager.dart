@@ -117,7 +117,6 @@ class DBManager {
   getListItemCount(String listName) async {
     Database db = await _startDB();
     int resultCount = 0;
-    print(listName);
 
     List<Map> result = await db.rawQuery(
         'SELECT COUNT(*) FROM imageItem WHERE mainListName=?', [listName]);
@@ -127,6 +126,15 @@ class DBManager {
     }
 
     return resultCount;
+  }
+
+  getListItem(String listName) async {
+    Database db = await _startDB();
+
+    List<Map> result = await db
+        .rawQuery('SELECT * FROM mainList WHERE mainListName=?', [listName]);
+
+    return result;
   }
 
   getOrphanFileNames() async {

@@ -6,7 +6,7 @@ import 'package:photo_tracker/db/dbManager.dart';
 
 class NewListDialog extends StatefulWidget {
   final String alertTitle;
-  final Function(bool) answer;
+  final Function(String) answer;
 
   NewListDialog({required this.alertTitle, required this.answer});
 
@@ -65,6 +65,9 @@ class _NewListDialogState extends State<NewListDialog> {
         style: ElevatedButton.styleFrom(shape: _myButtonStyle()),
         onPressed: listNameController.text.trim().length >= 3
             ? () async {
+                textEditingKey = !textEditingKey;
+                loadingFiles = !loadingFiles;
+                setState(() {});
                 FilePickerResult? result = await FilePicker.platform.pickFiles(
                     allowCompression: true,
                     allowMultiple: true,
@@ -72,13 +75,14 @@ class _NewListDialogState extends State<NewListDialog> {
                     allowedExtensions: ['jpg']);
 
                 if (result != null) {
-                  textEditingKey = !textEditingKey;
-                  loadingFiles = !loadingFiles;
-                  setState(() {});
                   listOfItems = await LoadPhotosToList(result).loadPhotos();
                   loadingFiles = !loadingFiles;
                   setState(() {});
-                } else {}
+                } else {
+                  textEditingKey = !textEditingKey;
+                  loadingFiles = !loadingFiles;
+                  setState(() {});
+                }
               }
             : null,
         child: Text('Prosseguir'),
@@ -106,7 +110,7 @@ class _NewListDialogState extends State<NewListDialog> {
                 item.timeError);
           }
 
-          widget.answer(true);
+          widget.answer(listNameController.text);
           Navigator.of(context).pop();
         },
         child: listOfItems.length != 1

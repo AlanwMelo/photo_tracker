@@ -1,5 +1,5 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:photo_tracker/classes/alertDialog.dart';
 import 'package:photo_tracker/classes/cacheCleaner.dart';
 import 'package:photo_tracker/classes/createListItemFromQueryResult.dart';
@@ -7,7 +7,7 @@ import 'package:photo_tracker/classes/listItem.dart';
 import 'package:photo_tracker/classes/mainListItem.dart';
 import 'package:photo_tracker/classes/newListDialog.dart';
 import 'package:photo_tracker/screens/map_and_photos.dart';
-
+import 'dart:io';
 import 'db/dbManager.dart';
 
 void main() {
@@ -44,6 +44,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   List<MainListItem> mainList = [];
   final DBManager dbManager = DBManager();
+  bool loading = true;
 
   @override
   void initState() {
@@ -63,74 +64,109 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   _mainListView() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        _newListButton(),
-        mainList.length != 0
-            ? Expanded(
-                child: Container(
-                  child: ListView.builder(
-                      itemCount: mainList.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return GestureDetector(
-                          onDoubleTap: () {
-                            _loadMainList();
-                          },
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        MapAndPhotos(listName: 'name')));
-                          },
-                          onLongPress: () {
-                            showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return MyAlertDialog(
-                                      alertTitle: 'Remover',
-                                      alertText:
-                                          'Deseja mesmo remover esta lista?',
-                                      alertButton1Text: 'Sim',
-                                      alertButton2Text: 'Não',
-                                      answer: (answer) {
-                                        print(answer);
+    return loading
+        ? Container(
+            child: Center(
+              child: CircularProgressIndicator(),
+            ),
+          )
+        : Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              _newListButton(),
+              mainList.length != 0
+                  ? Expanded(
+                      child: Container(
+                        child: ListView.builder(
+                            itemCount: mainList.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              return GestureDetector(
+                                onDoubleTap: () {
+                                  _addItemToList('awm');
+                                },
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => MapAndPhotos(
+                                              listName: mainList[index].name)));
+                                },
+                                onLongPress: () {
+                                  showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return MyAlertDialog(
+                                            alertTitle: 'Remover',
+                                            alertText:
+                                                'Deseja mesmo remover esta lista?',
+                                            alertButton1Text: 'Sim',
+                                            alertButton2Text: 'Não',
+                                            answer: (answer) {
+                                              if (answer == 1) {
+                                                dbManager.deleteList(
+                                                    mainList[index].name);
+                                                mainList.removeAt(index);
+                                                setState(() {});
+                                              }
+                                            });
                                       });
-                                });
-                          },
-                          child: Container(
-                            margin: EdgeInsets.all(4),
-                            height: 100,
-                            color: Colors.lightBlueAccent.withOpacity(0.65),
-                            child: Row(children: [
-                              Container(
-                                height: 100,
-                                width: 100,
-                                child: Image.network(
-                                    'https://wallpaperaccess.com/full/155734.png',
-                                    fit: BoxFit.fill),
-                              ),
-                              Expanded(
-                                  child: Center(
+                                },
                                 child: Container(
-                                  child: Text(
-                                    '${mainList[index].name} ${mainList[index].itemCount}',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
+                                  margin: EdgeInsets.all(4),
+                                  height: 80,
+                                  color:
+                                      Colors.lightBlueAccent.withOpacity(0.40),
+                                  child: Row(children: [
+                                    Container(
+                                      height: 100,
+                                      width: 100,
+                                      child: Image.file(
+                                          File(mainList[index]
+                                              .firstItem
+                                              .imgPath),
+                                          fit: BoxFit.fill),
                                     ),
-                                  ),
+                                    Container(
+                                      margin: EdgeInsets.only(left: 10),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Container(
+                                            padding: EdgeInsets.only(top: 25),
+                                            height: 55,
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.69, // 85
+                                            child: Text(
+                                              '${mainList[index].name} ',
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                          Text(
+                                            'Quantidade de imagens: ${mainList[index].itemCount}',
+                                            style: TextStyle(
+                                              color: Colors.black45,
+                                              fontStyle: FontStyle.italic,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  ]),
                                 ),
-                              ))
-                            ]),
-                          ),
-                        );
-                      }),
-                ),
-              )
-            : Container()
-      ],
-    );
+                              );
+                            }),
+                      ),
+                    )
+                  : Container()
+            ],
+          );
   }
 
   _newListButton() {
@@ -150,7 +186,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 return NewListDialog(
                     alertTitle: 'Criar nova lista',
                     answer: (answer) {
-                      print(answer);
+                      _addItemToList(answer);
                     });
               });
 
@@ -192,20 +228,36 @@ class _MyHomePageState extends State<MyHomePage> {
 
   _loadMainList() async {
     var mainListItems = await dbManager.getMainListItems();
-    mainListItems.forEach((file) async {
-      ListItem firstListItem;
-      var firstItemResult =
-          await dbManager.getFirstItemOfList(file['mainListName']);
-      for (var element in firstItemResult) {
-        firstListItem = await CreateListItemFromQueryResult().create(element);
-        MainListItem addThisItem = MainListItem(
-            file['mainListName'],
-            firstListItem,
-            DateTime.fromMillisecondsSinceEpoch(
-                double.parse(file['created'].toString()).ceil()),
-            await dbManager.getListItemCount(file['mainListName']));
-        mainList.add(addThisItem);
-      }
-    });
+    for (var file in mainListItems) {
+      await _funcAddItem(file);
+    }
+    loading = !loading;
+    setState(() {});
+  }
+
+  _addItemToList(String listName) async {
+    var result = await dbManager.getListItem(listName);
+    for (var element in result) {
+      await _funcAddItem(element);
+      setState(() {});
+    }
+  }
+
+  _funcAddItem(file) async {
+    ListItem firstListItem;
+    var firstItemResult =
+        await dbManager.getFirstItemOfList(file['mainListName']);
+    for (var element in firstItemResult) {
+      firstListItem = await CreateListItemFromQueryResult().create(element);
+      MainListItem addThisItem = MainListItem(
+          file['mainListName'],
+          firstListItem,
+          DateTime.fromMillisecondsSinceEpoch(
+              double.parse(file['created'].toString()).ceil()),
+          await dbManager.getListItemCount(file['mainListName']));
+      mainList.add(addThisItem);
+      mainList.sort((a, b) => a.created.compareTo(b.created));
+    }
+    return true;
   }
 }

@@ -40,6 +40,7 @@ class _MapAndPhotos extends State<MapAndPhotos> {
 
   @override
   void initState() {
+    print(widget.listName);
     scrollController = AutoScrollController(
         viewportBoundaryGetter: () =>
             Rect.fromLTRB(0, 0, 0, MediaQuery.of(context).padding.bottom),
