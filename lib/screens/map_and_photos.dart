@@ -36,8 +36,9 @@ class _MapAndPhotos extends State<MapAndPhotos> {
   late AutoScrollController scrollController;
   List<ListItem> fileList = [];
   int selectedImg = 0;
+  int errorToast = 0;
   Timer? moveMapDebounce;
-  Duration debounceDuration = Duration(milliseconds: 500);
+  Duration debounceDuration = Duration(milliseconds: 1000);
   DBManager dbManager = DBManager();
 
   @override
@@ -326,7 +327,9 @@ class _MapAndPhotos extends State<MapAndPhotos> {
     ListItem listItem;
     var result = await dbManager.getListItems(listName);
     for (var element in result) {
-      listItem = CreateListItemFromQueryResult().create(element);
+      listItem = await CreateListItemFromQueryResult().create(element);
+      print(element);
+      print(listItem.locationError);
       _addMarkerToMap(listItem);
       fileList.add(listItem);
     }
@@ -345,15 +348,18 @@ class _MapAndPhotos extends State<MapAndPhotos> {
         openMapController.currentState!.giveMarkerFocus(listItem);
         _moveMap(listItem.latLng, listItem.imgPath);
       } else if (listItem.locationError) {
-        Fluttertoast.cancel();
-        Fluttertoast.showToast(
-            msg: "Esta imagem não contém informação de localização",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.CENTER,
-            timeInSecForIosWeb: 2,
-            backgroundColor: Colors.red,
-            textColor: Colors.white,
-            fontSize: 16.0);
+        if (errorToast == 0) {
+          errorToast = errorToast + 1;
+          Fluttertoast.showToast(
+              msg:
+                  "Uma ou mais imagens desta lista não contém a informação de localização.",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              timeInSecForIosWeb: 2,
+              backgroundColor: Colors.red,
+              textColor: Colors.white,
+              fontSize: 16.0);
+        }
       } else {
         Fluttertoast.cancel();
         Fluttertoast.showToast(
