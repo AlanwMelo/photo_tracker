@@ -36,7 +36,6 @@ class _MapAndPhotos extends State<MapAndPhotos> {
   late AutoScrollController scrollController;
   List<ListItem> fileList = [];
   int selectedImg = 0;
-  int errorToast = 0;
   Timer? moveMapDebounce;
   Duration debounceDuration = Duration(milliseconds: 1000);
   DBManager dbManager = DBManager();
@@ -253,7 +252,6 @@ class _MapAndPhotos extends State<MapAndPhotos> {
           if (result != null) {
             List<ListItem> loadToListItems =
                 await LoadPhotosToList(result).loadPhotos();
-            loadToListItems.sort((a, b) => a.timestamp.compareTo(b.timestamp));
 
             for (var element in loadToListItems) {
               dbManager.createNewImageItem(
@@ -267,10 +265,7 @@ class _MapAndPhotos extends State<MapAndPhotos> {
                   element.timeError);
               _addItemToList(element);
             }
-            _listAndCarouselSynchronizer(
-                loadToListItems[0],
-                fileList
-                    .indexWhere((element) => element == loadToListItems[0]));
+            _getIndexOfFirsLocation(loadToListItems);
           } else {
             // User canceled the picker
           }
@@ -328,12 +323,10 @@ class _MapAndPhotos extends State<MapAndPhotos> {
     var result = await dbManager.getListItems(listName);
     for (var element in result) {
       listItem = await CreateListItemFromQueryResult().create(element);
-      print(element);
-      print(listItem.locationError);
       _addMarkerToMap(listItem);
       fileList.add(listItem);
     }
-    _listAndCarouselSynchronizer(fileList[0], 0);
+    _getIndexOfFirsLocation(fileList);
   }
 
   /// ###################### Debouncer ######################
@@ -347,40 +340,18 @@ class _MapAndPhotos extends State<MapAndPhotos> {
       if (!listItem.locationError) {
         openMapController.currentState!.giveMarkerFocus(listItem);
         _moveMap(listItem.latLng, listItem.imgPath);
-      } else if (listItem.locationError) {
-        if (errorToast == 0) {
-          errorToast = errorToast + 1;
-          Fluttertoast.showToast(
-              msg:
-                  "Uma ou mais imagens desta lista não contém a informação de localização.",
-              toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.CENTER,
-              timeInSecForIosWeb: 2,
-              backgroundColor: Colors.red,
-              textColor: Colors.white,
-              fontSize: 16.0);
-        }
-      } else {
-        Fluttertoast.cancel();
-        Fluttertoast.showToast(
-            msg: "Esta imagem não contém informação de data",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.CENTER,
-            timeInSecForIosWeb: 2,
-            backgroundColor: Colors.red,
-            textColor: Colors.white,
-            fontSize: 16.0);
-      }
+      } else {}
     });
   }
 
   /// Chamado quando o index muda, move o carrossel, a lista e o mapa para a mesma imagem
-  _listAndCarouselSynchronizer(ListItem fileList, int index) {
+  _listAndCarouselSynchronizer(ListItem fileList, int index) async {
+    setState(() {});
     selectedImg = index;
+    await carouselController.onReady;
     scrollController.scrollToIndex(index);
     carouselController.animateToPage(index);
     _moveMapDebounce(fileList);
-    setState(() {});
   }
 
   _addMarkerToMap(ListItem element) {
@@ -393,7 +364,44 @@ class _MapAndPhotos extends State<MapAndPhotos> {
   _addItemToList(ListItem element) {
     fileList.add(element);
     _addMarkerToMap(element);
+  }
+
+  _getIndexOfFirsLocation(List<ListItem> filesList) {
+    /// Encontra o primerio item da lista carregada com localização e direciona o synchronizer para ele
+    /// se nenhum item com localição for encontrado aponta para o zero
+    ListItem? firstItem;
+    int itemIndex = 0;
+
+    if (filesList.any((element) => element.locationError == true)) {
+      Fluttertoast.showToast(
+          msg:
+          "Uma ou mais imagens desta lista não contém a informação de localização.",
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 2,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    }
+
+    for (var item in filesList) {
+      if (!item.locationError) {
+        firstItem = item;
+      } else {
+        itemIndex = itemIndex + 1;
+      }
+    }
+
+    if (firstItem == null) {
+      firstItem = filesList[0];
+      itemIndex = 0;
+    }
+
     fileList.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+
+    int mainListIndex = fileList.indexWhere(
+        (element) => element.imgPath == filesList[itemIndex].imgPath);
+    _listAndCarouselSynchronizer(filesList[itemIndex], mainListIndex);
   }
 
 // #### Funções - Fim ####
