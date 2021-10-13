@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:exif/exif.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:photo_tracker/classes/checkAppImagesDir.dart';
@@ -18,12 +19,11 @@ class LoadPhotosToList {
     List<File> files = result.paths.map((path) => File(path!)).toList();
     Directory appDir = await getApplicationDocumentsDirectory();
     String imagesDir = '${appDir.path}/images/';
-    await  CheckAppImagesDir().checkDir(imagesDir);
+    await CheckAppImagesDir().checkDir(imagesDir);
 
     for (var element in files) {
       int nameHelper = element.path.lastIndexOf('/') + 1;
       String newLocation = '$imagesDir${element.path.substring(nameHelper)}';
-      element.copy(newLocation);
 
       ///Realiza a conversao da localização do padrao DMM para double, salva o Timestamp e localização das fotos
       Future<Map<String, IfdTag>> data =
@@ -89,6 +89,9 @@ class LoadPhotosToList {
           newLocation,
           locationError,
           dateTimeError));
+
+      await FlutterImageCompress.compressAndGetFile(element.path, newLocation,
+          quality: 25);
     }
 
     await FilePicker.platform.clearTemporaryFiles();
