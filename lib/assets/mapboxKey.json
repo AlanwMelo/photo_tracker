@@ -1,0 +1,3 @@
+{
+  "mapboxKey": "http://api.mapbox.com/styles/v1/{YOUR_USER_HERE}/{YOUR_MAP_CODE_HERE}/tiles/256/{z}/{x}/{y}@2x?access_token={YOUR_TOKEN_HERE}"
+}
