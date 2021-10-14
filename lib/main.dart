@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -49,12 +51,14 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   List<MainListItem> mainList = [];
   final DBManager dbManager = DBManager();
+  late String mapBoxKey;
   bool loading = true;
 
   @override
   void initState() {
     super.initState();
     CacheCleaner().cleanUnusedImgs();
+    _loadMapboxKey();
     _loadMainList();
   }
 
@@ -91,12 +95,14 @@ class _MyHomePageState extends State<MyHomePage> {
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) => MapAndPhotos(
+                                                mapboxKey: mapBoxKey,
                                                 listName: mainList[index].name,
                                                 answer: (answer) async {
                                                   if (answer) {
                                                     _addItemToList(
                                                         mainList[index].name,
-                                                        update: true, updateIndex: index);
+                                                        update: true,
+                                                        updateIndex: index);
                                                     await Future.delayed(
                                                         Duration(seconds: 3));
                                                     setState(() {});
@@ -255,4 +261,10 @@ class _MyHomePageState extends State<MyHomePage> {
     }
     return true;
   }
+
+   _loadMapboxKey() async {
+    String data = await DefaultAssetBundle.of(context).loadString('lib/assets/mapboxKey.json');
+    final jsonResult = jsonDecode(data);
+    mapBoxKey = jsonResult['mapboxKey'];
+   }
 }

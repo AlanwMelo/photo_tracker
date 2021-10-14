@@ -15,10 +15,11 @@ import 'package:photo_tracker/screens/open_map.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 
 class MapAndPhotos extends StatefulWidget {
+  final String mapboxKey;
   final String listName;
   final Function(bool) answer;
 
-  const MapAndPhotos({Key? key, required this.listName, required this.answer})
+  const MapAndPhotos({Key? key, required this.listName, required this.answer, required this.mapboxKey})
       : super(key: key);
 
   @override
@@ -42,6 +43,7 @@ class _MapAndPhotos extends State<MapAndPhotos> {
 
   @override
   void initState() {
+    print(widget.mapboxKey);
     scrollController = AutoScrollController(
         viewportBoundaryGetter: () =>
             Rect.fromLTRB(0, 0, 0, MediaQuery.of(context).padding.bottom),
@@ -137,6 +139,7 @@ class _MapAndPhotos extends State<MapAndPhotos> {
     return OpenMap(
       key: openMapController,
       markerList: [],
+      mapBoxKey: widget.mapboxKey,
       markerSelected: (var marker) {
         _listAndCarouselSynchronizer(
             marker,

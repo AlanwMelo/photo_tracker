@@ -8,13 +8,16 @@ import 'package:photo_tracker/classes/listItem.dart';
 import 'package:photo_tracker/screens/plugins/scale_layer_plugin_option.dart';
 import 'package:speech_balloon/speech_balloon.dart';
 
-
 class OpenMap extends StatefulWidget {
   final List<Marker> markerList;
   final Function(ListItem) markerSelected;
+  final String mapBoxKey;
 
   const OpenMap(
-      {Key? key, required this.markerList, required this.markerSelected})
+      {Key? key,
+      required this.markerList,
+      required this.markerSelected,
+      required this.mapBoxKey})
       : super(key: key);
 
   @override
@@ -34,7 +37,8 @@ class NewMapTestState extends State<OpenMap> with TickerProviderStateMixin {
   }
 
   rmvMarker(ListItem item) {
-    markerList.removeAt(markerList.indexWhere((element) => element.imgPath == item.imgPath));
+    markerList.removeAt(
+        markerList.indexWhere((element) => element.imgPath == item.imgPath));
     setState(() {});
   }
 
@@ -111,13 +115,13 @@ class NewMapTestState extends State<OpenMap> with TickerProviderStateMixin {
           ],
           center: LatLng(-15.745246, -47.593525),
           zoom: 4,
+          maxZoom: 18.0,
           debugMultiFingerGestureWinner: true,
           enableMultiFingerGestureRace: true,
         ),
         layers: [
           TileLayerOptions(
-            urlTemplate:
-                'https://api.mapbox.com/styles/v1/alanwillian/ck20ujxl3cuqj1cnzfnsckw1n/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoiYWxhbndpbGxpYW4iLCJhIjoiY2t1NzdmemNpNWg3cDJ2cDNidzByMDBoaCJ9.MPIAwrrnDmfwY2ihEWYhQQ',
+            urlTemplate: widget.mapBoxKey.toString(),
           ),
           MarkerLayerOptions(
             markers: markers,
