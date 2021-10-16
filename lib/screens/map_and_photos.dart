@@ -247,7 +247,6 @@ class _MapAndPhotos extends State<MapAndPhotos> {
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero)),
         onPressed: () async {
           FilePickerResult? result = await FilePicker.platform.pickFiles(
-              allowCompression: true,
               allowMultiple: true,
               type: FileType.custom,
               allowedExtensions: ['jpg']);

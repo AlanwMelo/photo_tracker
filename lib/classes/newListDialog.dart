@@ -69,7 +69,6 @@ class _NewListDialogState extends State<NewListDialog> {
                 loadingFiles = !loadingFiles;
                 setState(() {});
                 FilePickerResult? result = await FilePicker.platform.pickFiles(
-                    allowCompression: true,
                     allowMultiple: true,
                     type: FileType.custom,
                     allowedExtensions: ['jpg']);

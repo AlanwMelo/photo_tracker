@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,6 +10,7 @@ import 'package:photo_tracker/classes/createListItemFromQueryResult.dart';
 import 'package:photo_tracker/classes/listItem.dart';
 import 'package:photo_tracker/classes/mainListItem.dart';
 import 'package:photo_tracker/classes/newListDialog.dart';
+import 'package:photo_tracker/screens/exifViewer.dart';
 import 'package:photo_tracker/screens/map_and_photos.dart';
 import 'dart:io';
 import 'db/dbManager.dart';
@@ -90,6 +92,13 @@ class _MyHomePageState extends State<MyHomePage> {
                             itemCount: mainList.length,
                             itemBuilder: (BuildContext context, int index) {
                               return GestureDetector(
+                                onDoubleTap: () async {
+                                  FilePickerResult? result = await FilePicker.platform.pickFiles(
+                                      allowMultiple: false,
+                                      type: FileType.custom,
+                                      allowedExtensions: ['jpg']);
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => ExifViewer(result: result)));
+                                },
                                 onTap: () {
                                   Navigator.push(
                                       context,
