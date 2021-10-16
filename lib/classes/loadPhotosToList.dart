@@ -15,6 +15,7 @@ class LoadPhotosToList {
   List<ListItem> listOfItems = [];
 
   loadPhotos() async {
+    print('result Start');
     listOfItems.clear();
     List<File> files = result.paths.map((path) => File(path!)).toList();
     Directory appDir = await getApplicationDocumentsDirectory();
@@ -37,6 +38,8 @@ class LoadPhotosToList {
       bool dateTimeError = false;
 
       await data.then((data) async {
+        print(data);
+
         if (!data.containsKey('GPS GPSLatitude') ||
             !data.containsKey('GPS GPSLongitude') ||
             !data.containsKey('GPS GPSLatitudeRef') ||
@@ -49,18 +52,26 @@ class LoadPhotosToList {
 
         for (var value in data.entries) {
           if (value.key == 'GPS GPSLatitude') {
-            latitude = await getDoublePositionForLatLngFromExif(value
-                .value.printable
-                .replaceAll('[', '')
-                .replaceAll(']', '')
-                .split(','));
+            if (value.value.printable.contains('0/0')) {
+              locationError = true;
+            } else {
+              latitude = await getDoublePositionForLatLngFromExif(value
+                  .value.printable
+                  .replaceAll('[', '')
+                  .replaceAll(']', '')
+                  .split(','));
+            }
           }
           if (value.key == 'GPS GPSLongitude') {
-            longitude = await getDoublePositionForLatLngFromExif(value
-                .value.printable
-                .replaceAll('[', '')
-                .replaceAll(']', '')
-                .split(','));
+            if (value.value.printable.contains('0/0')) {
+              locationError = true;
+            } else {
+              longitude = await getDoublePositionForLatLngFromExif(value
+                  .value.printable
+                  .replaceAll('[', '')
+                  .replaceAll(']', '')
+                  .split(','));
+            }
           }
           if (value.key == 'GPS GPSLatitudeRef' &&
               value.value.toString().toLowerCase().contains('s')) {
@@ -83,6 +94,9 @@ class LoadPhotosToList {
         }
       });
 
+      print(locationError);
+      print(latitude);
+      print(longitude);
       listOfItems.add(ListItem(
           LatLng(latitude * latitudeRef, longitude * longitudeRef),
           dateTime,
@@ -95,6 +109,7 @@ class LoadPhotosToList {
     }
 
     await FilePicker.platform.clearTemporaryFiles();
+    print('result done');
     return listOfItems;
   }
 
