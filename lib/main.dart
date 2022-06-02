@@ -10,8 +10,9 @@ import 'package:photo_tracker/classes/createListItemFromQueryResult.dart';
 import 'package:photo_tracker/classes/listItem.dart';
 import 'package:photo_tracker/classes/mainListItem.dart';
 import 'package:photo_tracker/classes/newListDialog.dart';
-import 'package:photo_tracker/screens/exifViewer.dart';
-import 'package:photo_tracker/screens/map_and_photos.dart';
+import 'package:photo_tracker/layouts/Widgets/AppBar.dart';
+import 'package:photo_tracker/layouts/exifViewer.dart';
+import 'package:photo_tracker/layouts/map_and_photos.dart';
 import 'dart:io';
 import 'db/dbManager.dart';
 
@@ -55,6 +56,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final DBManager dbManager = DBManager();
   late String mapBoxKey;
   bool loading = true;
+  var scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -67,10 +69,23 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      key: scaffoldKey,
+      drawer: Drawer(),
+      appBar: TrackerAppBar(
+        title: 'Photo Tracker',
+        showDrawer: true,
+        notificationCallback: (_) {
+          scaffoldKey.currentState?.openDrawer();
+        },
+      )
+      /*AppBar(
+        elevation: 0,
         title: Text(widget.title),
-      ),
-      body: _mainListView(),
+      )*/
+      ,
+      body: Container(),
+
+      ///body: _mainListView(),
     );
   }
 
@@ -93,11 +108,16 @@ class _MyHomePageState extends State<MyHomePage> {
                             itemBuilder: (BuildContext context, int index) {
                               return GestureDetector(
                                 onDoubleTap: () async {
-                                  FilePickerResult? result = await FilePicker.platform.pickFiles(
-                                      allowMultiple: false,
-                                      type: FileType.custom,
-                                      allowedExtensions: ['jpg']);
-                                  Navigator.push(context, MaterialPageRoute(builder: (context) => ExifViewer(result: result)));
+                                  FilePickerResult? result =
+                                      await FilePicker.platform.pickFiles(
+                                          allowMultiple: false,
+                                          type: FileType.custom,
+                                          allowedExtensions: ['jpg']);
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              ExifViewer(result: result)));
                                 },
                                 onTap: () {
                                   Navigator.push(
@@ -271,9 +291,10 @@ class _MyHomePageState extends State<MyHomePage> {
     return true;
   }
 
-   _loadMapboxKey() async {
-    String data = await DefaultAssetBundle.of(context).loadString('lib/assets/mapboxKey.json');
+  _loadMapboxKey() async {
+    String data = await DefaultAssetBundle.of(context)
+        .loadString('lib/assets/mapboxKey.json');
     final jsonResult = jsonDecode(data);
     mapBoxKey = jsonResult['mapboxKey'];
-   }
+  }
 }

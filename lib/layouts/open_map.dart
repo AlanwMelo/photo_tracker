@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:photo_tracker/classes/listItem.dart';
-import 'package:photo_tracker/screens/plugins/scale_layer_plugin_option.dart';
+import 'package:photo_tracker/layouts/plugins/scale_layer_plugin_option.dart';
 import 'package:speech_balloon/speech_balloon.dart';
 
 class OpenMap extends StatefulWidget {
@@ -121,7 +121,8 @@ class NewMapTestState extends State<OpenMap> with TickerProviderStateMixin {
         ),
         layers: [
           TileLayerOptions(
-            urlTemplate: widget.mapBoxKey.toString(),
+            urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+              subdomains: ['a', 'b', 'c']
           ),
           MarkerLayerOptions(
             markers: markers,

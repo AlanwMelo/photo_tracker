@@ -38,8 +38,6 @@ class LoadPhotosToList {
       bool dateTimeError = false;
 
       await data.then((data) async {
-        print(data);
-
         if (!data.containsKey('GPS GPSLatitude') ||
             !data.containsKey('GPS GPSLongitude') ||
             !data.containsKey('GPS GPSLatitudeRef') ||
@@ -52,25 +50,25 @@ class LoadPhotosToList {
 
         for (var value in data.entries) {
           if (value.key == 'GPS GPSLatitude') {
-            if (value.value.printable.contains('0/0')) {
-              locationError = true;
-            } else {
+            try {
               latitude = await getDoublePositionForLatLngFromExif(value
                   .value.printable
                   .replaceAll('[', '')
                   .replaceAll(']', '')
                   .split(','));
+            } catch (e) {
+              locationError = true;
             }
           }
           if (value.key == 'GPS GPSLongitude') {
-            if (value.value.printable.contains('0/0')) {
-              locationError = true;
-            } else {
+            try {
               longitude = await getDoublePositionForLatLngFromExif(value
                   .value.printable
                   .replaceAll('[', '')
                   .replaceAll(']', '')
                   .split(','));
+            } catch (e) {
+              locationError = true;
             }
           }
           if (value.key == 'GPS GPSLatitudeRef' &&
@@ -94,9 +92,6 @@ class LoadPhotosToList {
         }
       });
 
-      print(locationError);
-      print(latitude);
-      print(longitude);
       listOfItems.add(ListItem(
           LatLng(latitude * latitudeRef, longitude * longitudeRef),
           dateTime,

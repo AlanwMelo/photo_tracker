@@ -11,7 +11,7 @@ import 'package:photo_tracker/classes/createListItemFromQueryResult.dart';
 import 'package:photo_tracker/classes/listItem.dart';
 import 'package:photo_tracker/classes/loadPhotosToList.dart';
 import 'package:photo_tracker/db/dbManager.dart';
-import 'package:photo_tracker/screens/open_map.dart';
+import 'package:photo_tracker/layouts/open_map.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 
 class MapAndPhotos extends StatefulWidget {
@@ -43,7 +43,6 @@ class _MapAndPhotos extends State<MapAndPhotos> {
 
   @override
   void initState() {
-    print(widget.mapboxKey);
     scrollController = AutoScrollController(
         viewportBoundaryGetter: () =>
             Rect.fromLTRB(0, 0, 0, MediaQuery.of(context).padding.bottom),
