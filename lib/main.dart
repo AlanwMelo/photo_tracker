@@ -10,7 +10,8 @@ import 'package:photo_tracker/classes/createListItemFromQueryResult.dart';
 import 'package:photo_tracker/classes/listItem.dart';
 import 'package:photo_tracker/classes/mainListItem.dart';
 import 'package:photo_tracker/classes/newListDialog.dart';
-import 'package:photo_tracker/layouts/Widgets/AppBar.dart';
+import 'package:photo_tracker/layouts/Widgets/appBar.dart';
+import 'package:photo_tracker/layouts/Widgets/feedCard.dart';
 import 'package:photo_tracker/layouts/exifViewer.dart';
 import 'package:photo_tracker/layouts/map_and_photos.dart';
 import 'dart:io';
@@ -83,7 +84,7 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       )*/
       ,
-      body: Container(),
+      body: _mainFeed(),
 
       ///body: _mainListView(),
     );
@@ -296,5 +297,69 @@ class _MyHomePageState extends State<MyHomePage> {
         .loadString('lib/assets/mapboxKey.json');
     final jsonResult = jsonDecode(data);
     mapBoxKey = jsonResult['mapboxKey'];
+  }
+
+  _mainFeed() {
+    return Container(
+      color: Colors.blueGrey.withOpacity(0.15),
+      child: Column(
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          Container(
+            child: feedMode(),
+            color: Colors.white,
+          ),
+          feed()
+        ],
+      ),
+    );
+  }
+
+  Container feedMode() {
+    _feedModeContainer(String text, bool selected) {
+      return Expanded(
+        child: Container(
+          decoration: BoxDecoration(
+              border: selected
+                  ? Border(
+                      bottom: BorderSide(width: 3.5, color: Colors.lightBlue),
+                    )
+                  : Border()),
+          child: Center(
+            child: Container(
+              child: Text(
+                text,
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: selected ? Colors.lightBlue : Colors.blueGrey),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Container(
+      height: 50,
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          _feedModeContainer('Feed', true),
+          _feedModeContainer('Favoritos', false)
+        ],
+      ),
+    );
+  }
+
+  Container feed() {
+    return Container(
+      child: Expanded(
+        child: ListView.builder(
+            itemCount: 12,
+            itemBuilder: (context, index) {
+              return FeedCard();
+            }),
+      ),
+    );
   }
 }

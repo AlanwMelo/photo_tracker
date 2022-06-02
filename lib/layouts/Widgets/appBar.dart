@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:photo_tracker/layouts/Widgets/pictureContainer.dart';
 
 class TrackerAppBar extends StatefulWidget with PreferredSizeWidget {
   final String title;
@@ -33,36 +34,11 @@ class _AppBar extends State<TrackerAppBar> {
       titleSpacing: 0,
       leading: widget.showDrawer ? _notificationDrawer() : Container(),
       actions: [
-        pictureContainer(),
+        PictureContainer(),
       ],
     );
   }
 
-  Container pictureContainer() {
-    /// Container com os layouts para a imagem circular
-
-    return Container(
-      height: 70,
-      width: 70,
-      child: Center(
-        child: Container(
-          height: 40,
-          width: 40,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Colors.red,
-            boxShadow: [
-              BoxShadow(
-                blurRadius: 2,
-                spreadRadius: 2,
-                color: Colors.black26,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 
   _notificationDrawer() {
     return IconButton(
