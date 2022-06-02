@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:photo_tracker/layouts/Widgets/pictureContainer.dart';
 
 class FeedCard extends StatefulWidget {
+  final Function(String) cardSelected;
+
+  const FeedCard({Key? key, required this.cardSelected}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() => _FeedCardState();
 }
@@ -10,16 +14,21 @@ class FeedCard extends StatefulWidget {
 class _FeedCardState extends State<FeedCard> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      margin: EdgeInsets.only(top: 15),
-      width: MediaQuery.of(context).size.width,
-      child: Column(
-        children: [
-          _publicationInfo(),
-          _publicationCoverPic(),
-          _publicationInteractionIcons(),
-        ],
+    return GestureDetector(
+      onTap: () {
+        widget.cardSelected('teste');
+      },
+      child: Container(
+        color: Colors.white,
+        margin: EdgeInsets.only(top: 15),
+        width: MediaQuery.of(context).size.width,
+        child: Column(
+          children: [
+            _publicationInfo(),
+            _publicationCoverPic(),
+            _publicationInteractionIcons(),
+          ],
+        ),
       ),
     );
   }
@@ -44,19 +53,19 @@ class _FeedCardState extends State<FeedCard> {
             ],
           ),
           Container(
-              padding: EdgeInsets.only(left: 70),
+              padding: EdgeInsets.only(left: 15),
               child: Text(
                 'Férias 2021',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
               )),
           Container(
-              padding: EdgeInsets.only(left: 70, top: 5, bottom: 3),
+              padding: EdgeInsets.only(left: 15, top: 5, bottom: 3),
               child: Text(
                 'Férias do ano passado',
                 style: TextStyle(fontSize: 15),
               )),
           Container(
-              padding: EdgeInsets.only(left: 70, bottom: 5),
+              padding: EdgeInsets.only(left: 15, bottom: 5),
               child: Row(
                 children: [
                   Text(

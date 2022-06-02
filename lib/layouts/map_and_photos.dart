@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:ui';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
@@ -11,6 +12,7 @@ import 'package:photo_tracker/classes/createListItemFromQueryResult.dart';
 import 'package:photo_tracker/classes/listItem.dart';
 import 'package:photo_tracker/classes/loadPhotosToList.dart';
 import 'package:photo_tracker/db/dbManager.dart';
+import 'package:photo_tracker/layouts/Widgets/AppBar.dart';
 import 'package:photo_tracker/layouts/open_map.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 
@@ -19,7 +21,11 @@ class MapAndPhotos extends StatefulWidget {
   final String listName;
   final Function(bool) answer;
 
-  const MapAndPhotos({Key? key, required this.listName, required this.answer, required this.mapboxKey})
+  const MapAndPhotos(
+      {Key? key,
+      required this.listName,
+      required this.answer,
+      required this.mapboxKey})
       : super(key: key);
 
   @override
@@ -27,9 +33,6 @@ class MapAndPhotos extends StatefulWidget {
 }
 
 class _MapAndPhotos extends State<MapAndPhotos> {
-  AppBar appBar = AppBar(
-    title: Text('Photo Tracker'),
-  );
   double screenUsableHeight = 0;
   double screenUsableWidth = 0;
   GlobalKey<NewMapTestState> openMapController = GlobalKey<NewMapTestState>();
@@ -63,12 +66,16 @@ class _MapAndPhotos extends State<MapAndPhotos> {
   @override
   build(BuildContext context) {
     /// Recupera o tamanho da tela desconsiderando a AppBar
-    screenUsableHeight =
-        MediaQuery.of(context).size.height - appBar.preferredSize.height;
+    screenUsableHeight = MediaQuery.of(context).size.height;
     screenUsableWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      appBar: appBar,
+      appBar: TrackerAppBar(
+          title: 'Holambra',
+          showDrawer: false,
+          notificationCallback: (_) {
+            Navigator.of(context).pop();
+          }),
       body: _mapAndPhotosBody(screenUsableHeight, screenUsableWidth),
     );
   }
@@ -81,33 +88,31 @@ class _MapAndPhotos extends State<MapAndPhotos> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
+          /// Container do Mapa
           Container(
             color: Colors.white,
             height: mapHeight,
             width: useAbleWidth,
             child: _openMap(),
           ),
+
+          /// Container da lista e imagens
           Expanded(
             child: Container(
               width: useAbleWidth,
-              child: Column(
+              child: Row(
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Container(
-                    width: useAbleWidth,
-                    height: (useAbleHeight - mapHeight) * 0.2,
-                    color: Colors.blue.withOpacity(0.3),
-                    child: Row(
-                      children: [
-                        _imgList((useAbleHeight - mapHeight) * 0.2),
-                        _addMoreButton((useAbleHeight - mapHeight) * 0.2),
-                      ],
-                    ),
+                    width: 100,
+                    child: _imgList((useAbleHeight - mapHeight) * 0.2),
                   ),
                   Expanded(
                     child: fileList.length != 0
                         ? _carouselSlider(useAbleHeight, useAbleWidth)
+
+                        /// Retirar
                         : Container(
                             width: useAbleWidth,
                             color: Colors.black87,
@@ -124,11 +129,26 @@ class _MapAndPhotos extends State<MapAndPhotos> {
                               ],
                             ),
                           ),
-                  ),
+                  )
                 ],
               ),
             ),
-          )
+          ),
+
+          Container(
+            color: Colors.lightBlue.withOpacity(0.35),
+            height: 45,
+            child: Row(
+              children: [
+                Container(
+                    margin: EdgeInsets.only(left: 15), child: Icon(Icons.edit)),
+                Expanded(child: Container()),
+                Container(
+                    margin: EdgeInsets.only(right: 15),
+                    child: Icon(Icons.notes_rounded)),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -152,9 +172,10 @@ class _MapAndPhotos extends State<MapAndPhotos> {
     /// Usar o valor de height para garantir os quadrado em qualquer tamanho de tela
 
     return Container(
+      color: Colors.blueGrey.withOpacity(0.5),
       width: fileList.length == 0 ? 0 : MediaQuery.of(context).size.width - 55,
       child: ListView.builder(
-        scrollDirection: Axis.horizontal,
+        scrollDirection: Axis.vertical,
         itemCount: fileList.length,
         controller: scrollController,
         itemBuilder: (BuildContext context, int index) {
@@ -204,15 +225,25 @@ class _MapAndPhotos extends State<MapAndPhotos> {
                     });
               },
               child: Container(
-                margin: EdgeInsets.all(2),
-                padding: EdgeInsets.all(2),
-                color: _imgContainerColor(),
-                width: size,
+                margin: EdgeInsets.only(bottom: 1),
+                decoration: BoxDecoration(
+                  color: _imgContainerColor().withOpacity(0.7),
+                  border: Border(
+                    bottom: BorderSide(width: 4, color: _imgContainerColor()),
+                    top: BorderSide(width: 4, color: _imgContainerColor()),
+                    left: BorderSide(width: 4, color: _imgContainerColor()),
+                    right: BorderSide(width: 4, color: _imgContainerColor()),
+                  ),
+                ),
+                height: size,
                 child: Column(
                   children: [
                     Container(
                       height: size * 0.7,
-                      child: Image.file(File(fileList[index].imgPath)),
+                      width: size,
+                      child: Image.file(File(fileList[index].imgPath),
+                          fit: BoxFit.cover),
+                      color: Colors.yellow,
                     ),
                     Expanded(
                       child: Container(
@@ -278,16 +309,33 @@ class _MapAndPhotos extends State<MapAndPhotos> {
 
   _carouselSlider(double useAbleHeight, double useAbleWidth) {
     return Container(
-      width: useAbleWidth,
-      color: Colors.black,
       child: CarouselSlider(
         carouselController: carouselController,
         items: fileList.map((item) {
           return Builder(
             builder: (BuildContext context) {
-              return Container(
-                width: useAbleWidth,
-                child: Image.file(File(item.imgPath), fit: BoxFit.contain),
+              return Stack(
+                children: [
+                  Container(
+                      height: useAbleHeight,
+                      width: useAbleWidth,
+                      color: Colors.blueGrey,
+                      child: Image.file(File(item.imgPath), fit: BoxFit.cover)),
+                  ClipRRect( // Clip it cleanly.
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                      child: Container(
+                        color: Colors.grey.withOpacity(0.1),
+                        alignment: Alignment.center,
+                      ),
+                    ),
+                  ),
+                  Center(
+                    child: Container(
+                      child: Image.file(File(item.imgPath), fit: BoxFit.contain),
+                    ),
+                  ),
+                ],
               );
             },
           );
@@ -376,7 +424,7 @@ class _MapAndPhotos extends State<MapAndPhotos> {
     if (filesList.any((element) => element.locationError == true)) {
       Fluttertoast.showToast(
           msg:
-          "Uma ou mais imagens desta lista não contém a informação de localização.",
+              "Uma ou mais imagens desta lista não contém a informação de localização.",
           toastLength: Toast.LENGTH_LONG,
           gravity: ToastGravity.CENTER,
           timeInSecForIosWeb: 2,

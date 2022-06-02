@@ -32,7 +32,7 @@ class _AppBar extends State<TrackerAppBar> {
       elevation: 0,
       title: Text(widget.title),
       titleSpacing: 0,
-      leading: widget.showDrawer ? _notificationDrawer() : Container(),
+      leading:  _notificationDrawer(),
       actions: [
         PictureContainer(),
       ],
@@ -42,7 +42,7 @@ class _AppBar extends State<TrackerAppBar> {
 
   _notificationDrawer() {
     return IconButton(
-        icon: Icon(Icons.notifications),
+        icon: widget.showDrawer ? Icon(Icons.notifications) : Icon(Icons.arrow_back_rounded),
         onPressed: () {
           widget.notificationCallback(true);
         });

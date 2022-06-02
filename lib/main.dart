@@ -9,6 +9,7 @@ import 'package:photo_tracker/classes/cacheCleaner.dart';
 import 'package:photo_tracker/classes/createListItemFromQueryResult.dart';
 import 'package:photo_tracker/classes/listItem.dart';
 import 'package:photo_tracker/classes/mainListItem.dart';
+import 'package:photo_tracker/classes/mapBoxKeyLoader.dart';
 import 'package:photo_tracker/classes/newListDialog.dart';
 import 'package:photo_tracker/layouts/Widgets/appBar.dart';
 import 'package:photo_tracker/layouts/Widgets/feedCard.dart';
@@ -293,10 +294,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   _loadMapboxKey() async {
-    String data = await DefaultAssetBundle.of(context)
-        .loadString('lib/assets/mapboxKey.json');
-    final jsonResult = jsonDecode(data);
-    mapBoxKey = jsonResult['mapboxKey'];
+    mapBoxKey = await MapBoxKeyLoader(context: context).loadKey();
   }
 
   _mainFeed() {
@@ -357,7 +355,15 @@ class _MyHomePageState extends State<MyHomePage> {
         child: ListView.builder(
             itemCount: 12,
             itemBuilder: (context, index) {
-              return FeedCard();
+              return FeedCard(
+                cardSelected: (name) {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              MapAndPhotos(listName: name, answer: (_){}, mapboxKey: mapBoxKey)));
+                },
+              );
             }),
       ),
     );
