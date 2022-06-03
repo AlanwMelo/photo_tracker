@@ -1,11 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:photo_tracker/classes/routeAnimations/pageRouterSlideUp.dart';
 import 'package:photo_tracker/layouts/Widgets/pictureContainer.dart';
+import 'package:photo_tracker/layouts/map_and_photos.dart';
 
 class FeedCard extends StatefulWidget {
-  final Function(String) cardSelected;
+  final String mapboxKey;
+  final String name;
 
-  const FeedCard({Key? key, required this.cardSelected}) : super(key: key);
+  const FeedCard({Key? key, required this.mapboxKey, required this.name}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _FeedCardState();
@@ -16,7 +19,13 @@ class _FeedCardState extends State<FeedCard> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        widget.cardSelected('teste');
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => MapAndPhotos(
+                    listName: widget.name,
+                    answer: (_) {},
+                    mapboxKey: widget.mapboxKey)));
       },
       child: Container(
         color: Colors.white,
@@ -50,6 +59,9 @@ class _FeedCardState extends State<FeedCard> {
                 'Alan Melo',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
+              Expanded(child: Container()),
+              Icon(Icons.bookmark_border_rounded),
+              SizedBox(width: 10)
             ],
           ),
           Container(
@@ -98,7 +110,9 @@ class _FeedCardState extends State<FeedCard> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           Icon(Icons.add_reaction_outlined),
-          Container(width: 230, child: Icon(Icons.notes_rounded)),
+          Container(width: 230, child: GestureDetector(
+              onTap: ()=> Navigator.of(context).push(routeSlideUp(MapAndPhotos(listName: widget.name, answer: (_){}, mapboxKey: widget.mapboxKey))),
+              child: Icon(Icons.notes_rounded))),
           Icon(Icons.send),
         ],
       ),

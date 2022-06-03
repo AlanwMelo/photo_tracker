@@ -11,6 +11,7 @@ import 'package:photo_tracker/classes/listItem.dart';
 import 'package:photo_tracker/classes/mainListItem.dart';
 import 'package:photo_tracker/classes/mapBoxKeyLoader.dart';
 import 'package:photo_tracker/classes/newListDialog.dart';
+import 'package:photo_tracker/classes/routeAnimations/pageRouterSlideUp.dart';
 import 'package:photo_tracker/layouts/Widgets/appBar.dart';
 import 'package:photo_tracker/layouts/Widgets/feedCard.dart';
 import 'package:photo_tracker/layouts/exifViewer.dart';
@@ -75,16 +76,11 @@ class _MyHomePageState extends State<MyHomePage> {
       drawer: Drawer(),
       appBar: TrackerAppBar(
         title: 'Photo Tracker',
-        showDrawer: true,
+        showDrawer: false,
         notificationCallback: (_) {
           scaffoldKey.currentState?.openDrawer();
         },
-      )
-      /*AppBar(
-        elevation: 0,
-        title: Text(widget.title),
-      )*/
-      ,
+      ),
       body: _mainFeed(),
 
       ///body: _mainListView(),
@@ -295,6 +291,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   _loadMapboxKey() async {
     mapBoxKey = await MapBoxKeyLoader(context: context).loadKey();
+    return true;
   }
 
   _mainFeed() {
@@ -303,6 +300,11 @@ class _MyHomePageState extends State<MyHomePage> {
       child: Column(
         mainAxisSize: MainAxisSize.max,
         children: [
+          Container(
+            color: Colors.lightBlue,
+            height: 50,
+            child: _mainActions(),
+          ),
           Container(
             child: feedMode(),
             color: Colors.white,
@@ -349,22 +351,64 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Container feed() {
+  feed() {
+    return FutureBuilder(
+        future: _loadMapboxKey(),
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+
+          if (snapshot.data == true) {
+            return Container(
+              child: Expanded(
+                child: ListView.builder(
+                    itemCount: 12,
+                    itemBuilder: (context, index) {
+                      return FeedCard(
+                        name: 'teste',
+                        mapboxKey: mapBoxKey,
+                      );
+                    }),
+              ),
+            );
+          } else {
+            return Container();
+          }
+        });
+  }
+
+  _mainActions() {
     return Container(
-      child: Expanded(
-        child: ListView.builder(
-            itemCount: 12,
-            itemBuilder: (context, index) {
-              return FeedCard(
-                cardSelected: (name) {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              MapAndPhotos(listName: name, answer: (_){}, mapboxKey: mapBoxKey)));
-                },
-              );
-            }),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Expanded(
+              child: Container(
+                  child: Center(
+                      child: Icon(
+            Icons.home_rounded,
+            color: Colors.white70,
+          )))),
+          Expanded(
+              child: Container(
+                  child: Center(
+                      child: Icon(
+            Icons.add_photo_alternate_rounded,
+            color: Colors.white70,
+          )))),
+          Expanded(
+              child: Container(
+                  child: Center(
+                      child: Icon(
+            Icons.search,
+            color: Colors.white70,
+          )))),
+          Expanded(
+              child: Container(
+                  child: Center(
+                      child: Icon(
+            Icons.notifications,
+            color: Colors.white70,
+          )))),
+        ],
       ),
     );
   }

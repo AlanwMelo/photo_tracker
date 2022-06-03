@@ -149,7 +149,7 @@ class NewMapTestState extends State<OpenMap> with TickerProviderStateMixin {
         setState(() {});
       },
       child: Container(
-        child: Image.file(File(marker.imgPath), fit: BoxFit.contain),
+        child: Image.file(File(marker.imgPath), fit: BoxFit.cover),
       ),
     );
   }

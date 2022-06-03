@@ -73,6 +73,7 @@ class _MapAndPhotos extends State<MapAndPhotos> {
       appBar: TrackerAppBar(
           title: 'Holambra',
           showDrawer: false,
+          location: 'Holambra - SP',
           notificationCallback: (_) {
             Navigator.of(context).pop();
           }),
@@ -243,7 +244,6 @@ class _MapAndPhotos extends State<MapAndPhotos> {
                       width: size,
                       child: Image.file(File(fileList[index].imgPath),
                           fit: BoxFit.cover),
-                      color: Colors.yellow,
                     ),
                     Expanded(
                       child: Container(

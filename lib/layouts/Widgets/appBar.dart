@@ -4,6 +4,7 @@ import 'package:photo_tracker/layouts/Widgets/pictureContainer.dart';
 class TrackerAppBar extends StatefulWidget with PreferredSizeWidget {
   final String title;
   final bool showDrawer;
+  final String? location;
   final bool? actionTwo;
   final bool? actionThree;
   final Function(bool) notificationCallback;
@@ -14,7 +15,8 @@ class TrackerAppBar extends StatefulWidget with PreferredSizeWidget {
       this.actionTwo,
       this.actionThree,
       required this.showDrawer,
-      required this.notificationCallback})
+      required this.notificationCallback,
+      this.location})
       : super(key: key);
 
   @override
@@ -30,21 +32,41 @@ class _AppBar extends State<TrackerAppBar> {
   Widget build(BuildContext context) {
     return AppBar(
       elevation: 0,
-      title: Text(widget.title),
+      title: _title(),
       titleSpacing: 0,
-      leading:  _notificationDrawer(),
+      leading: _notificationDrawer(),
       actions: [
         PictureContainer(),
       ],
     );
   }
 
-
   _notificationDrawer() {
     return IconButton(
-        icon: widget.showDrawer ? Icon(Icons.notifications) : Icon(Icons.arrow_back_rounded),
+        icon: widget.showDrawer
+            ? Icon(Icons.notifications)
+            : Icon(Icons.arrow_back_rounded),
         onPressed: () {
           widget.notificationCallback(true);
         });
+  }
+
+  _title() {
+    return Container(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          Text(widget.title),
+          widget.location != null
+              ? Text(
+                  widget.location!,
+                  style: TextStyle(color: Colors.white, fontSize: 13),
+                )
+              : Container(),
+        ],
+      ),
+    );
   }
 }
