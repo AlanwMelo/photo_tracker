@@ -15,7 +15,8 @@ import 'package:photo_tracker/classes/routeAnimations/pageRouterSlideUp.dart';
 import 'package:photo_tracker/layouts/Widgets/appBar.dart';
 import 'package:photo_tracker/layouts/Widgets/feedCard.dart';
 import 'package:photo_tracker/layouts/exifViewer.dart';
-import 'package:photo_tracker/layouts/map_and_photos.dart';
+import 'package:photo_tracker/layouts/screens/feed.dart';
+import 'package:photo_tracker/layouts/screens/map_and_photos.dart';
 import 'dart:io';
 import 'db/dbManager.dart';
 
@@ -61,6 +62,9 @@ class _MyHomePageState extends State<MyHomePage> {
   bool loading = true;
   var scaffoldKey = GlobalKey<ScaffoldState>();
 
+  String varFeedMode = 'feed';
+  bool varFeedSelected = true;
+
   @override
   void initState() {
     super.initState();
@@ -73,10 +77,9 @@ class _MyHomePageState extends State<MyHomePage> {
   build(BuildContext context) {
     return Scaffold(
       key: scaffoldKey,
-      drawer: Drawer(),
       appBar: TrackerAppBar(
         title: 'Photo Tracker',
-        showDrawer: false,
+        mainScreen: true,
         notificationCallback: (_) {
           scaffoldKey.currentState?.openDrawer();
         },
@@ -315,24 +318,22 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Container feedMode() {
+  feedMode() {
     _feedModeContainer(String text, bool selected) {
-      return Expanded(
-        child: Container(
-          decoration: BoxDecoration(
-              border: selected
-                  ? Border(
-                      bottom: BorderSide(width: 3.5, color: Colors.lightBlue),
-                    )
-                  : Border()),
-          child: Center(
-            child: Container(
-              child: Text(
-                text,
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: selected ? Colors.lightBlue : Colors.blueGrey),
-              ),
+      return Container(
+        decoration: BoxDecoration(
+            border: selected
+                ? Border(
+                    bottom: BorderSide(width: 3.5, color: Colors.lightBlue),
+                  )
+                : Border()),
+        child: Center(
+          child: Container(
+            child: Text(
+              text,
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: selected ? Colors.lightBlue : Colors.blueGrey),
             ),
           ),
         ),
@@ -344,8 +345,29 @@ class _MyHomePageState extends State<MyHomePage> {
       child: Row(
         mainAxisSize: MainAxisSize.max,
         children: [
-          _feedModeContainer('Feed', true),
-          _feedModeContainer('Favoritos', false)
+          Expanded(
+              child: GestureDetector(
+                  onTap: () {
+                    if (!varFeedSelected ? true : false) {
+                      varFeedMode = 'feed';
+                      varFeedSelected = !varFeedSelected;
+                      setState(() {});
+                    }
+                  },
+                  child: _feedModeContainer(
+                      'Feed', varFeedSelected ? true : false))),
+          Expanded(
+            child: GestureDetector(
+                onTap: () {
+                  if (varFeedSelected ? true : false) {
+                    varFeedMode = 'favorites';
+                    varFeedSelected = !varFeedSelected;
+                    setState(() {});
+                  }
+                },
+                child: _feedModeContainer(
+                    'Favoritos', !varFeedSelected ? true : false)),
+          )
         ],
       ),
     );
@@ -355,20 +377,8 @@ class _MyHomePageState extends State<MyHomePage> {
     return FutureBuilder(
         future: _loadMapboxKey(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
-
           if (snapshot.data == true) {
-            return Container(
-              child: Expanded(
-                child: ListView.builder(
-                    itemCount: 12,
-                    itemBuilder: (context, index) {
-                      return FeedCard(
-                        name: 'teste',
-                        mapboxKey: mapBoxKey,
-                      );
-                    }),
-              ),
-            );
+            return _switchFeedMode(varFeedMode);
           } else {
             return Container();
           }
@@ -411,5 +421,16 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ),
     );
+  }
+
+  _switchFeedMode(String varFeedMode) {
+    switch (varFeedMode) {
+      case 'feed':
+        return Feed(mapBoxKey: mapBoxKey, itemCount: 12);
+        break;
+      case 'favorites':
+        return Feed(mapBoxKey: mapBoxKey, itemCount: 4);
+        break;
+    }
   }
 }

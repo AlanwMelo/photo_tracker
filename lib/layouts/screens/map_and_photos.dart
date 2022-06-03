@@ -11,21 +11,25 @@ import 'package:photo_tracker/classes/alertDialog.dart';
 import 'package:photo_tracker/classes/createListItemFromQueryResult.dart';
 import 'package:photo_tracker/classes/listItem.dart';
 import 'package:photo_tracker/classes/loadPhotosToList.dart';
+import 'package:photo_tracker/classes/routeAnimations/pageRouterSlideUp.dart';
 import 'package:photo_tracker/db/dbManager.dart';
 import 'package:photo_tracker/layouts/Widgets/AppBar.dart';
-import 'package:photo_tracker/layouts/open_map.dart';
+import 'package:photo_tracker/layouts/screens/comments.dart';
+import 'package:photo_tracker/layouts/screens/open_map.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 
 class MapAndPhotos extends StatefulWidget {
   final String mapboxKey;
   final String listName;
+  final bool goToComments;
   final Function(bool) answer;
 
   const MapAndPhotos(
       {Key? key,
       required this.listName,
       required this.answer,
-      required this.mapboxKey})
+      required this.mapboxKey,
+      this.goToComments = false})
       : super(key: key);
 
   @override
@@ -51,6 +55,12 @@ class _MapAndPhotos extends State<MapAndPhotos> {
             Rect.fromLTRB(0, 0, 0, MediaQuery.of(context).padding.bottom),
         axis: Axis.vertical);
     _loadList(widget.listName);
+    WidgetsBinding.instance!.addPostFrameCallback((_) async {
+      if (widget.goToComments) {
+        await Future.delayed(Duration(seconds: 1));
+        _openComments();
+      }
+    });
     super.initState();
   }
 
@@ -72,7 +82,7 @@ class _MapAndPhotos extends State<MapAndPhotos> {
     return Scaffold(
       appBar: TrackerAppBar(
           title: 'Holambra',
-          showDrawer: false,
+          mainScreen: false,
           location: 'Holambra - SP',
           notificationCallback: (_) {
             Navigator.of(context).pop();
@@ -146,7 +156,10 @@ class _MapAndPhotos extends State<MapAndPhotos> {
                 Expanded(child: Container()),
                 Container(
                     margin: EdgeInsets.only(right: 15),
-                    child: Icon(Icons.notes_rounded)),
+                    child: GestureDetector(
+                      child: Icon(Icons.notes_rounded),
+                      onTap: () => _openComments(),
+                    )),
               ],
             ),
           ),
@@ -321,7 +334,8 @@ class _MapAndPhotos extends State<MapAndPhotos> {
                       width: useAbleWidth,
                       color: Colors.blueGrey,
                       child: Image.file(File(item.imgPath), fit: BoxFit.cover)),
-                  ClipRRect( // Clip it cleanly.
+                  ClipRRect(
+                    // Clip it cleanly.
                     child: BackdropFilter(
                       filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                       child: Container(
@@ -332,7 +346,8 @@ class _MapAndPhotos extends State<MapAndPhotos> {
                   ),
                   Center(
                     child: Container(
-                      child: Image.file(File(item.imgPath), fit: BoxFit.contain),
+                      child:
+                          Image.file(File(item.imgPath), fit: BoxFit.contain),
                     ),
                   ),
                 ],
@@ -451,6 +466,14 @@ class _MapAndPhotos extends State<MapAndPhotos> {
     int mainListIndex = fileList.indexWhere(
         (element) => element.imgPath == filesList[itemIndex].imgPath);
     _listAndCarouselSynchronizer(filesList[itemIndex], mainListIndex);
+  }
+
+  _openComments() {
+    Navigator.of(context).push(routeSlideUp(CommentsScreen(
+      location: 'Holambra - SP',
+      title: 'Holambra',
+      closeButton: (_)=> Navigator.of(context).pop(),
+    )));
   }
 
 // #### Funções - Fim ####

@@ -3,7 +3,7 @@ import 'package:photo_tracker/layouts/Widgets/pictureContainer.dart';
 
 class TrackerAppBar extends StatefulWidget with PreferredSizeWidget {
   final String title;
-  final bool showDrawer;
+  final bool mainScreen;
   final String? location;
   final bool? actionTwo;
   final bool? actionThree;
@@ -14,7 +14,7 @@ class TrackerAppBar extends StatefulWidget with PreferredSizeWidget {
       required this.title,
       this.actionTwo,
       this.actionThree,
-      required this.showDrawer,
+      required this.mainScreen,
       required this.notificationCallback,
       this.location})
       : super(key: key);
@@ -34,21 +34,21 @@ class _AppBar extends State<TrackerAppBar> {
       elevation: 0,
       title: _title(),
       titleSpacing: 0,
-      leading: _notificationDrawer(),
+      leading: _leading(),
       actions: [
         PictureContainer(),
       ],
     );
   }
 
-  _notificationDrawer() {
-    return IconButton(
-        icon: widget.showDrawer
-            ? Icon(Icons.notifications)
-            : Icon(Icons.arrow_back_rounded),
-        onPressed: () {
-          widget.notificationCallback(true);
-        });
+  _leading() {
+    return widget.mainScreen
+        ? null
+        : IconButton(
+            icon: Icon(Icons.arrow_back_rounded),
+            onPressed: () {
+              widget.notificationCallback(true);
+            });
   }
 
   _title() {
@@ -58,7 +58,11 @@ class _AppBar extends State<TrackerAppBar> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.max,
         children: [
-          Text(widget.title),
+          Container(
+              margin: widget.mainScreen
+                  ? EdgeInsets.only(left: 20)
+                  : EdgeInsets.only(left: 0),
+              child: Text(widget.title)),
           widget.location != null
               ? Text(
                   widget.location!,
