@@ -17,6 +17,9 @@ import 'package:photo_tracker/layouts/Widgets/feedCard.dart';
 import 'package:photo_tracker/layouts/exifViewer.dart';
 import 'package:photo_tracker/layouts/screens/feed.dart';
 import 'package:photo_tracker/layouts/screens/map_and_photos.dart';
+import 'package:photo_tracker/layouts/screens/new_post/new_post.dart';
+import 'package:photo_tracker/layouts/screens/notifications.dart';
+import 'package:photo_tracker/layouts/screens/searchScreen.dart';
 import 'dart:io';
 import 'db/dbManager.dart';
 
@@ -64,6 +67,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   String varFeedMode = 'feed';
   bool varFeedSelected = true;
+  int varMainMode = 0;
 
   @override
   void initState() {
@@ -84,7 +88,7 @@ class _MyHomePageState extends State<MyHomePage> {
           scaffoldKey.currentState?.openDrawer();
         },
       ),
-      body: _mainFeed(),
+      body: _mainBody(),
 
       ///body: _mainListView(),
     );
@@ -297,7 +301,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return true;
   }
 
-  _mainFeed() {
+  _mainBody() {
     return Container(
       color: Colors.blueGrey.withOpacity(0.15),
       child: Column(
@@ -308,11 +312,7 @@ class _MyHomePageState extends State<MyHomePage> {
             height: 50,
             child: _mainActions(),
           ),
-          Container(
-            child: feedMode(),
-            color: Colors.white,
-          ),
-          feed()
+          _switchMainMode(varMainMode)
         ],
       ),
     );
@@ -378,7 +378,19 @@ class _MyHomePageState extends State<MyHomePage> {
         future: _loadMapboxKey(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.data == true) {
-            return _switchFeedMode(varFeedMode);
+            return Expanded(
+              child: Container(
+                child: Column(
+                  children: [
+                    Container(
+                      child: feedMode(),
+                      color: Colors.white,
+                    ),
+                    _switchFeedMode(varFeedMode),
+                  ],
+                ),
+              ),
+            );
           } else {
             return Container();
           }
@@ -393,30 +405,60 @@ class _MyHomePageState extends State<MyHomePage> {
           Expanded(
               child: Container(
                   child: Center(
-                      child: Icon(
-            Icons.home_rounded,
-            color: Colors.white70,
+                      child: GestureDetector(
+            onTap: () {
+              if (varMainMode != 0) {
+                varMainMode = 0;
+                setState(() {});
+              }
+            },
+            child: Icon(
+              Icons.home_rounded,
+              color: Colors.white70,
+            ),
           )))),
           Expanded(
               child: Container(
-                  child: Center(
-                      child: Icon(
+                  child: GestureDetector(
+                    onTap: (){
+                      print('aaaa');
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=> NewPost() ));
+                    },
+                    child: Center(
+                        child: Icon(
             Icons.add_photo_alternate_rounded,
             color: Colors.white70,
+          )),
+                  ))),
+          Expanded(
+              child: Container(
+                  child: Center(
+                      child: GestureDetector(
+            onTap: () {
+              if (varMainMode != 1) {
+                varMainMode = 1;
+                setState(() {});
+              }
+            },
+            child: Icon(
+              Icons.search,
+              color: Colors.white70,
+            ),
           )))),
           Expanded(
               child: Container(
                   child: Center(
-                      child: Icon(
-            Icons.search,
-            color: Colors.white70,
-          )))),
-          Expanded(
-              child: Container(
-                  child: Center(
-                      child: Icon(
-            Icons.notifications,
-            color: Colors.white70,
+                      child: GestureDetector(
+            onTap: () {
+              if (varMainMode != 2) {
+                varMainMode = 2;
+                setState(() {});
+              }
+            },
+            child: Icon(
+              Icons.notifications,
+              color: Colors.white70,
+            ),
           )))),
         ],
       ),
@@ -430,6 +472,20 @@ class _MyHomePageState extends State<MyHomePage> {
         break;
       case 'favorites':
         return Feed(mapBoxKey: mapBoxKey, itemCount: 4);
+        break;
+    }
+  }
+
+  _switchMainMode(int i) {
+    switch (i) {
+      case 0:
+        return feed();
+        break;
+      case 1:
+        return SearchScreen();
+        break;
+      case 2:
+        return NotificationsScreen();
         break;
     }
   }
