@@ -7,7 +7,7 @@ class TrackerAppBar extends StatefulWidget with PreferredSizeWidget {
   final String? location;
   final bool? actionTwo;
   final bool? actionThree;
-  final Function(bool) notificationCallback;
+  final Widget? appBarAction;
 
   const TrackerAppBar(
       {Key? key,
@@ -15,8 +15,8 @@ class TrackerAppBar extends StatefulWidget with PreferredSizeWidget {
       this.actionTwo,
       this.actionThree,
       required this.mainScreen,
-      required this.notificationCallback,
-      this.location})
+      this.location,
+      this.appBarAction})
       : super(key: key);
 
   @override
@@ -34,21 +34,10 @@ class _AppBar extends State<TrackerAppBar> {
       elevation: 0,
       title: _title(),
       titleSpacing: 0,
-      leading: _leading(),
       actions: [
-        PictureContainer(),
+        widget.appBarAction == null ? PictureContainer() : widget.appBarAction!,
       ],
     );
-  }
-
-  _leading() {
-    return widget.mainScreen
-        ? null
-        : IconButton(
-            icon: Icon(Icons.arrow_back_rounded),
-            onPressed: () {
-              widget.notificationCallback(true);
-            });
   }
 
   _title() {

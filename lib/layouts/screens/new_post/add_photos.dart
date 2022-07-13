@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_tracker/layouts/Widgets/appBar.dart';
+import 'package:photo_tracker/layouts/Widgets/appBarActionButton.dart';
 import 'package:photo_tracker/layouts/Widgets/editPhotoListItem.dart';
 
 class AddPhotosScreen extends StatefulWidget {
@@ -14,8 +15,8 @@ class _AddPhotosScreen extends State<AddPhotosScreen> {
     return Scaffold(
       appBar: TrackerAppBar(
         mainScreen: false,
-        notificationCallback: (bool) {},
         title: 'Add Photos',
+        appBarAction: AppBarActionButton(text: 'Confirm', pressed: (_) {}),
       ),
       body: _body(),
     );
@@ -40,15 +41,14 @@ class _AddPhotosScreen extends State<AddPhotosScreen> {
           itemCount: 20,
           itemBuilder: (context, index) {
             return Container(
-                margin: EdgeInsets.only(top: 2),
-                child: EditPhotoListItem());
+                margin: EdgeInsets.only(top: 2), child: EditPhotoListItem());
           }),
     );
   }
 
   _bottomBar() {
     return Container(
-      height: 55,
+      height: 45,
       width: MediaQuery.of(context).size.width,
       child: ElevatedButton(
         onPressed: () {},

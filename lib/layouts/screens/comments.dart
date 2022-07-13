@@ -7,7 +7,11 @@ class CommentsScreen extends StatefulWidget {
   final String location;
   final Function(bool) closeButton;
 
-  const CommentsScreen({Key? key, required this.title, required this.location, required this.closeButton})
+  const CommentsScreen(
+      {Key? key,
+      required this.title,
+      required this.location,
+      required this.closeButton})
       : super(key: key);
 
   @override
@@ -21,10 +25,8 @@ class _CommentsScreesState extends State<CommentsScreen> {
       appBar: TrackerAppBar(
           mainScreen: false,
           title: widget.title,
-          notificationCallback: (bool) {
-            widget.closeButton(true);
-          },
-          location: widget.location),
+          location: widget.location,
+          appBarAction: Container()),
     );
   }
 }

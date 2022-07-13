@@ -13,7 +13,7 @@ import 'package:photo_tracker/classes/listItem.dart';
 import 'package:photo_tracker/classes/loadPhotosToList.dart';
 import 'package:photo_tracker/classes/routeAnimations/pageRouterSlideUp.dart';
 import 'package:photo_tracker/db/dbManager.dart';
-import 'package:photo_tracker/layouts/Widgets/AppBar.dart';
+import 'package:photo_tracker/layouts/Widgets/appBar.dart';
 import 'package:photo_tracker/layouts/screens/comments.dart';
 import 'package:photo_tracker/layouts/screens/open_map.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
@@ -81,12 +81,10 @@ class _MapAndPhotos extends State<MapAndPhotos> {
 
     return Scaffold(
       appBar: TrackerAppBar(
-          title: 'Holambra',
-          mainScreen: false,
-          location: 'Holambra - SP',
-          notificationCallback: (_) {
-            Navigator.of(context).pop();
-          }),
+        title: 'Holambra',
+        mainScreen: false,
+        location: 'Holambra - SP',
+      ),
       body: _mapAndPhotosBody(screenUsableHeight, screenUsableWidth),
     );
   }
@@ -472,7 +470,7 @@ class _MapAndPhotos extends State<MapAndPhotos> {
     Navigator.of(context).push(routeSlideUp(CommentsScreen(
       location: 'Holambra - SP',
       title: 'Holambra',
-      closeButton: (_)=> Navigator.of(context).pop(),
+      closeButton: (_) => Navigator.of(context).pop(),
     )));
   }
 

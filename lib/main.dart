@@ -84,9 +84,6 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: TrackerAppBar(
         title: 'Photo Tracker',
         mainScreen: true,
-        notificationCallback: (_) {
-          scaffoldKey.currentState?.openDrawer();
-        },
       ),
       body: _mainBody(),
 
