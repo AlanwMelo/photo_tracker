@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_tracker/layouts/Widgets/appBar.dart';
+import 'package:photo_tracker/layouts/screens/new_post/add_photos.dart';
 
 class NewPost extends StatefulWidget {
   @override
@@ -96,10 +97,12 @@ class _NewPostState extends State<NewPost> {
   _addPhotos() {
     return Stack(
       children: [
-        Container(
-          child: Image.network(
-            'https://www.melhoresdestinos.com.br/wp-content/uploads/2021/02/torre-eiffel-paris-reforma.jpg',
-            fit: BoxFit.fill,
+        Positioned.fill(
+          child: Container(
+            child: Image.network(
+              'https://www.melhoresdestinos.com.br/wp-content/uploads/2021/02/torre-eiffel-paris-reforma.jpg',
+              fit: BoxFit.fill,
+            ),
           ),
         ),
         ClipRRect(
@@ -115,7 +118,10 @@ class _NewPostState extends State<NewPost> {
         Container(
           child: Center(
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => AddPhotosScreen()));
+              },
               child: Text('Add your pictures here!'),
             ),
           ),

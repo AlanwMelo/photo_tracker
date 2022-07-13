@@ -421,7 +421,6 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Container(
                   child: GestureDetector(
                     onTap: (){
-                      print('aaaa');
                       Navigator.push(context, MaterialPageRoute(builder: (context)=> NewPost() ));
                     },
                     child: Center(
