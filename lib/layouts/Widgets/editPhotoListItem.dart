@@ -1,8 +1,17 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_tracker/layouts/Widgets/pictureContainer.dart';
 
 class EditPhotoListItem extends StatefulWidget {
+  final String imagePath;
+  final String imageName;
+
+  const EditPhotoListItem(
+      {Key? key, required this.imagePath, required this.imageName})
+      : super(key: key);
+
   @override
   State<StatefulWidget> createState() => _EditPhotoListItem();
 }
@@ -28,10 +37,7 @@ class _EditPhotoListItem extends State<EditPhotoListItem> {
     return Container(
       width: 115,
       height: 100,
-      child: Image.network(
-        'https://www.melhoresdestinos.com.br/wp-content/uploads/2021/02/torre-eiffel-paris-reforma.jpg',
-        fit: BoxFit.fill,
-      ),
+      child: Image.file(File(widget.imagePath), fit: BoxFit.cover),
     );
   }
 
@@ -45,14 +51,13 @@ class _EditPhotoListItem extends State<EditPhotoListItem> {
         children: [
           Container(
             child: Text(
-              'Image title',
+              widget.imageName,
               style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
             ),
           ),
           Container(
             child: Row(
               children: [
-
                 Text(
                   '27.173891, 78.042068',
                   style: TextStyle(fontSize: 12, color: Colors.lightBlue),

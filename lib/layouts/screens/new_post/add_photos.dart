@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:photo_tracker/classes/filePicker.dart';
 import 'package:photo_tracker/layouts/Widgets/appBar.dart';
 import 'package:photo_tracker/layouts/Widgets/appBarActionButton.dart';
 import 'package:photo_tracker/layouts/Widgets/editPhotoListItem.dart';
@@ -10,6 +11,8 @@ class AddPhotosScreen extends StatefulWidget {
 }
 
 class _AddPhotosScreen extends State<AddPhotosScreen> {
+  List<dynamic> imagesList = [];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,10 +41,14 @@ class _AddPhotosScreen extends State<AddPhotosScreen> {
   _listView() {
     return Container(
       child: ListView.builder(
-          itemCount: 20,
+          itemCount: imagesList.length,
           itemBuilder: (context, index) {
             return Container(
-                margin: EdgeInsets.only(top: 2), child: EditPhotoListItem());
+                margin: EdgeInsets.only(top: 2),
+                child: EditPhotoListItem(
+                  imagePath: imagesList[index][0], // path
+                  imageName: imagesList[index][1], // name
+                ));
           }),
     );
   }
@@ -51,7 +58,16 @@ class _AddPhotosScreen extends State<AddPhotosScreen> {
       height: 45,
       width: MediaQuery.of(context).size.width,
       child: ElevatedButton(
-        onPressed: () {},
+        onPressed: () {
+          MyFilePicker(pickedFiles: (filePickerResult) {
+            if (filePickerResult != null) {
+              for (var file in filePickerResult.files.toList()) {
+                imagesList.add([file.path, file.name]);
+                setState(() {});
+              }
+            }
+          }).pickFiles();
+        },
         child: Text('Add More'),
       ),
     );
