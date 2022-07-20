@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_tracker/layouts/screens/homePage.dart';
-import 'package:photo_tracker/layouts/screens/login/signUp.dart';
+import 'package:photo_tracker/layouts/screens/login/signIn.dart';
 
 handleAuthState() {
   return StreamBuilder(
@@ -11,7 +11,7 @@ handleAuthState() {
           return TrackerHomePage(title: 'Photo Tracker');
         }
         else {
-          return TrackerSignUpPage();
+          return TrackerSignInPage();
         }
       });
 }

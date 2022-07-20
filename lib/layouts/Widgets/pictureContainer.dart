@@ -1,8 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 class PictureContainer extends StatelessWidget {
+  final String imgPath;
+
   const PictureContainer({
     Key? key,
+    required this.imgPath,
   }) : super(key: key);
 
   @override
@@ -27,6 +32,9 @@ class PictureContainer extends StatelessWidget {
               ),
             ],
           ),
+          child: ClipRRect(
+              borderRadius: BorderRadius.circular(100.0),
+              child: Image.file(File(imgPath))),
         ),
       ),
     );

@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_tracker/classes/alertDialog.dart';
 import 'package:photo_tracker/classes/cacheCleaner.dart';
@@ -18,6 +17,7 @@ import 'package:photo_tracker/layouts/screens/map_and_photos.dart';
 import 'package:photo_tracker/layouts/screens/new_post/new_post.dart';
 import 'package:photo_tracker/layouts/screens/notifications.dart';
 import 'package:photo_tracker/layouts/screens/searchScreen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TrackerHomePage extends StatefulWidget {
   TrackerHomePage({Key? key, required this.title}) : super(key: key);
@@ -35,6 +35,7 @@ class TrackerHomePage extends StatefulWidget {
 class _TrackerHomePageState extends State<TrackerHomePage> {
   List<MainListItem> mainList = [];
   final DBManager dbManager = DBManager();
+  late SharedPreferences prefs;
   late String mapBoxKey;
   bool loading = true;
   var scaffoldKey = GlobalKey<ScaffoldState>();
@@ -49,6 +50,7 @@ class _TrackerHomePageState extends State<TrackerHomePage> {
     CacheCleaner().cleanUnusedImgs();
     _loadMapboxKey();
     _loadMainList();
+    _loadPrefs();
   }
 
   @override
@@ -68,129 +70,129 @@ class _TrackerHomePageState extends State<TrackerHomePage> {
   _mainListView() {
     return loading
         ? Container(
-      child: Center(
-        child: CircularProgressIndicator(),
-      ),
-    )
+            child: Center(
+              child: CircularProgressIndicator(),
+            ),
+          )
         : Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        _newListButton(),
-        mainList.length != 0
-            ? Expanded(
-          child: Container(
-            child: ListView.builder(
-                itemCount: mainList.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return GestureDetector(
-                    onDoubleTap: () async {
-                      FilePickerResult? result =
-                      await FilePicker.platform.pickFiles(
-                          allowMultiple: false,
-                          type: FileType.custom,
-                          allowedExtensions: ['jpg']);
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  ExifViewer(result: result)));
-                    },
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => MapAndPhotos(
-                                mapboxKey: mapBoxKey,
-                                listName: mainList[index].name,
-                                answer: (answer) async {
-                                  if (answer) {
-                                    _addItemToList(
-                                        mainList[index].name,
-                                        update: true,
-                                        updateIndex: index);
-                                    await Future.delayed(
-                                        Duration(seconds: 3));
-                                    setState(() {});
-                                  }
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              _newListButton(),
+              mainList.length != 0
+                  ? Expanded(
+                      child: Container(
+                        child: ListView.builder(
+                            itemCount: mainList.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              return GestureDetector(
+                                onDoubleTap: () async {
+                                  FilePickerResult? result =
+                                      await FilePicker.platform.pickFiles(
+                                          allowMultiple: false,
+                                          type: FileType.custom,
+                                          allowedExtensions: ['jpg']);
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              ExifViewer(result: result)));
                                 },
-                              )));
-                    },
-                    onLongPress: () {
-                      showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return MyAlertDialog(
-                                alertTitle: 'Remover',
-                                alertText:
-                                'Deseja mesmo remover esta lista?',
-                                alertButton1Text: 'Sim',
-                                alertButton2Text: 'Não',
-                                answer: (answer) {
-                                  if (answer == 1) {
-                                    dbManager.deleteList(
-                                        mainList[index].name);
-                                    mainList.removeAt(index);
-                                    setState(() {});
-                                  }
-                                });
-                          });
-                    },
-                    child: Container(
-                      margin: EdgeInsets.all(4),
-                      height: 80,
-                      color:
-                      Colors.lightBlueAccent.withOpacity(0.40),
-                      child: Row(children: [
-                        Container(
-                          height: 100,
-                          width: 100,
-                          child: Image.file(
-                              File(mainList[index]
-                                  .firstItem
-                                  .imgPath),
-                              fit: BoxFit.fill),
-                        ),
-                        Container(
-                          margin: EdgeInsets.only(left: 10),
-                          child: Column(
-                            crossAxisAlignment:
-                            CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                padding: EdgeInsets.only(top: 25),
-                                height: 55,
-                                width: MediaQuery.of(context)
-                                    .size
-                                    .width *
-                                    0.69, // 85
-                                child: Text(
-                                  '${mainList[index].name} ',
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => MapAndPhotos(
+                                                mapboxKey: mapBoxKey,
+                                                listName: mainList[index].name,
+                                                answer: (answer) async {
+                                                  if (answer) {
+                                                    _addItemToList(
+                                                        mainList[index].name,
+                                                        update: true,
+                                                        updateIndex: index);
+                                                    await Future.delayed(
+                                                        Duration(seconds: 3));
+                                                    setState(() {});
+                                                  }
+                                                },
+                                              )));
+                                },
+                                onLongPress: () {
+                                  showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return MyAlertDialog(
+                                            alertTitle: 'Remover',
+                                            alertText:
+                                                'Deseja mesmo remover esta lista?',
+                                            alertButton1Text: 'Sim',
+                                            alertButton2Text: 'Não',
+                                            answer: (answer) {
+                                              if (answer == 1) {
+                                                dbManager.deleteList(
+                                                    mainList[index].name);
+                                                mainList.removeAt(index);
+                                                setState(() {});
+                                              }
+                                            });
+                                      });
+                                },
+                                child: Container(
+                                  margin: EdgeInsets.all(4),
+                                  height: 80,
+                                  color:
+                                      Colors.lightBlueAccent.withOpacity(0.40),
+                                  child: Row(children: [
+                                    Container(
+                                      height: 100,
+                                      width: 100,
+                                      child: Image.file(
+                                          File(mainList[index]
+                                              .firstItem
+                                              .imgPath),
+                                          fit: BoxFit.fill),
+                                    ),
+                                    Container(
+                                      margin: EdgeInsets.only(left: 10),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Container(
+                                            padding: EdgeInsets.only(top: 25),
+                                            height: 55,
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.69, // 85
+                                            child: Text(
+                                              '${mainList[index].name} ',
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                          Text(
+                                            'Quantidade de imagens: ${mainList[index].itemCount}',
+                                            style: TextStyle(
+                                              color: Colors.black45,
+                                              fontStyle: FontStyle.italic,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  ]),
                                 ),
-                              ),
-                              Text(
-                                'Quantidade de imagens: ${mainList[index].itemCount}',
-                                style: TextStyle(
-                                  color: Colors.black45,
-                                  fontStyle: FontStyle.italic,
-                                ),
-                              ),
-                            ],
-                          ),
-                        )
-                      ]),
-                    ),
-                  );
-                }),
-          ),
-        )
-            : Container()
-      ],
-    );
+                              );
+                            }),
+                      ),
+                    )
+                  : Container()
+            ],
+          );
   }
 
   _newListButton() {
@@ -216,13 +218,13 @@ class _TrackerHomePageState extends State<TrackerHomePage> {
         },
         child: Center(
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('Nova lista', style: TextStyle(fontSize: 20)),
-                SizedBox(width: 8),
-                Icon(Icons.assignment_sharp),
-              ],
-            )),
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Nova lista', style: TextStyle(fontSize: 20)),
+            SizedBox(width: 8),
+            Icon(Icons.assignment_sharp),
+          ],
+        )),
       ),
     );
   }
@@ -248,7 +250,7 @@ class _TrackerHomePageState extends State<TrackerHomePage> {
   _funcAddItem(file, {bool update = false, int index = 0}) async {
     ListItem firstListItem;
     var firstItemResult =
-    await dbManager.getFirstItemOfList(file['mainListName']);
+        await dbManager.getFirstItemOfList(file['mainListName']);
     for (var element in firstItemResult) {
       firstListItem = await CreateListItemFromQueryResult().create(element);
       MainListItem addThisItem = MainListItem(
@@ -295,8 +297,8 @@ class _TrackerHomePageState extends State<TrackerHomePage> {
         decoration: BoxDecoration(
             border: selected
                 ? Border(
-              bottom: BorderSide(width: 3.5, color: Colors.lightBlue),
-            )
+                    bottom: BorderSide(width: 3.5, color: Colors.lightBlue),
+                  )
                 : Border()),
         child: Center(
           child: Container(
@@ -377,59 +379,60 @@ class _TrackerHomePageState extends State<TrackerHomePage> {
               child: Container(
                   child: Center(
                       child: GestureDetector(
-                        onTap: () {
-                          if (varMainMode != 0) {
-                            varMainMode = 0;
-                            setState(() {});
-                          }
-                        },
-                        child: Icon(
-                          Icons.home_rounded,
-                          color: Colors.white70,
-                        ),
-                      )))),
+            onTap: () {
+              if (varMainMode != 0) {
+                varMainMode = 0;
+                setState(() {});
+              }
+            },
+            child: Icon(
+              Icons.home_rounded,
+              color: Colors.white70,
+            ),
+          )))),
           Expanded(
               child: Container(
                   child: GestureDetector(
-                    onTap: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (context)=> NewPost() ));
-                    },
-                    child: Center(
-                        child: Icon(
-                          Icons.add_photo_alternate_rounded,
-                          color: Colors.white70,
-                        )),
-                  ))),
+            onTap: () {
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => NewPost()));
+            },
+            child: Center(
+                child: Icon(
+              Icons.add_photo_alternate_rounded,
+              color: Colors.white70,
+            )),
+          ))),
           Expanded(
               child: Container(
                   child: Center(
                       child: GestureDetector(
-                        onTap: () {
-                          if (varMainMode != 1) {
-                            varMainMode = 1;
-                            setState(() {});
-                          }
-                        },
-                        child: Icon(
-                          Icons.search,
-                          color: Colors.white70,
-                        ),
-                      )))),
+            onTap: () {
+              if (varMainMode != 1) {
+                varMainMode = 1;
+                setState(() {});
+              }
+            },
+            child: Icon(
+              Icons.search,
+              color: Colors.white70,
+            ),
+          )))),
           Expanded(
               child: Container(
                   child: Center(
                       child: GestureDetector(
-                        onTap: () {
-                          if (varMainMode != 2) {
-                            varMainMode = 2;
-                            setState(() {});
-                          }
-                        },
-                        child: Icon(
-                          Icons.notifications,
-                          color: Colors.white70,
-                        ),
-                      )))),
+            onTap: () {
+              if (varMainMode != 2) {
+                varMainMode = 2;
+                setState(() {});
+              }
+            },
+            child: Icon(
+              Icons.notifications,
+              color: Colors.white70,
+            ),
+          )))),
         ],
       ),
     );
@@ -453,5 +456,9 @@ class _TrackerHomePageState extends State<TrackerHomePage> {
       case 2:
         return NotificationsScreen();
     }
+  }
+
+  _loadPrefs() async {
+    prefs = await SharedPreferences.getInstance();
   }
 }

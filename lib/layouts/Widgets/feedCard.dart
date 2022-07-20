@@ -55,7 +55,7 @@ class _FeedCardState extends State<FeedCard> {
         children: [
           Row(
             children: [
-              PictureContainer(),
+              PictureContainer(imgPath: ''),
               Text(
                 'Alan Melo',
                 style: TextStyle(fontWeight: FontWeight.bold),
