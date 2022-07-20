@@ -1,9 +1,8 @@
 import 'dart:ui';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_tracker/layouts/Widgets/appBar.dart';
-import 'package:photo_tracker/layouts/Widgets/appBarActionButton.dart';
+import 'package:photo_tracker/layouts/Widgets/trackerSimpleButton.dart';
 import 'package:photo_tracker/layouts/screens/new_post/add_photos.dart';
 
 class NewPost extends StatefulWidget {
@@ -19,7 +18,7 @@ class _NewPostState extends State<NewPost> {
       appBar: TrackerAppBar(
         title: 'New Post',
         mainScreen: true,
-        appBarAction: AppBarActionButton(
+        appBarAction: TrackerSimpleButton(
           text: 'Post',
           pressed: (_) {},
         ),

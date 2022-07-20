@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_tracker/classes/filePicker.dart';
 import 'package:photo_tracker/layouts/Widgets/appBar.dart';
-import 'package:photo_tracker/layouts/Widgets/appBarActionButton.dart';
+import 'package:photo_tracker/layouts/Widgets/trackerSimpleButton.dart';
 import 'package:photo_tracker/layouts/Widgets/editPhotoListItem.dart';
 
 class AddPhotosScreen extends StatefulWidget {
@@ -19,7 +19,7 @@ class _AddPhotosScreen extends State<AddPhotosScreen> {
       appBar: TrackerAppBar(
         mainScreen: false,
         title: 'Add Photos',
-        appBarAction: AppBarActionButton(text: 'Confirm', pressed: (_) {}),
+        appBarAction: TrackerSimpleButton(text: 'Confirm', pressed: (_) {}),
       ),
       body: _body(),
     );

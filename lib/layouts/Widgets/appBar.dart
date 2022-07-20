@@ -1,5 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:photo_tracker/layouts/Widgets/pictureContainer.dart';
+import 'package:photo_tracker/layouts/screens/login/signIn.dart';
+import 'package:photo_tracker/layouts/screens/login/signUp.dart';
 
 class TrackerAppBar extends StatefulWidget with PreferredSizeWidget {
   final String title;
@@ -35,7 +39,13 @@ class _AppBar extends State<TrackerAppBar> {
       title: _title(),
       titleSpacing: 0,
       actions: [
-        widget.appBarAction == null ? PictureContainer() : widget.appBarAction!,
+        widget.appBarAction == null
+            ? GestureDetector(
+                onTap: () {
+                  _testGoogle();
+                },
+                child: PictureContainer())
+            : widget.appBarAction!,
       ],
     );
   }
@@ -61,5 +71,10 @@ class _AppBar extends State<TrackerAppBar> {
         ],
       ),
     );
+  }
+
+  Future<void> _testGoogle() async {
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => TrackerSignInPage()));
   }
 }
