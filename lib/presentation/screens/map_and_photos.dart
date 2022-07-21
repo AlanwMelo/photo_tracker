@@ -12,9 +12,9 @@ import 'package:photo_tracker/classes/listItem.dart';
 import 'package:photo_tracker/classes/loadPhotosToList.dart';
 import 'package:photo_tracker/classes/routeAnimations/pageRouterSlideUp.dart';
 import 'package:photo_tracker/db/dbManager.dart';
-import 'package:photo_tracker/layouts/Widgets/appBar.dart';
-import 'package:photo_tracker/layouts/screens/comments.dart';
-import 'package:photo_tracker/layouts/screens/open_map.dart';
+import 'package:photo_tracker/presentation/Widgets/appBar.dart';
+import 'package:photo_tracker/presentation/screens/comments.dart';
+import 'package:photo_tracker/presentation/screens/open_map.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 
 class MapAndPhotos extends StatefulWidget {

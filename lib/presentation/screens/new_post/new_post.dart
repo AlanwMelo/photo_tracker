@@ -1,9 +1,9 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:photo_tracker/layouts/Widgets/appBar.dart';
-import 'package:photo_tracker/layouts/Widgets/trackerSimpleButton.dart';
-import 'package:photo_tracker/layouts/screens/new_post/add_photos.dart';
+import 'package:photo_tracker/presentation/Widgets/appBar.dart';
+import 'package:photo_tracker/presentation/Widgets/trackerSimpleButton.dart';
+import 'package:photo_tracker/presentation/screens/new_post/add_photos.dart';
 
 class NewPost extends StatefulWidget {
   @override

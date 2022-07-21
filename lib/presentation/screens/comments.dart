@@ -1,6 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:photo_tracker/layouts/Widgets/appBar.dart';
+import 'package:photo_tracker/presentation/Widgets/appBar.dart';
 
 class CommentsScreen extends StatefulWidget {
   final String title;

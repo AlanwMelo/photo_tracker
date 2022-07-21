@@ -1,10 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:photo_tracker/layouts/Widgets/pictureContainer.dart';
-import 'package:photo_tracker/layouts/screens/login/signIn.dart';
-import 'package:photo_tracker/layouts/screens/login/signUp.dart';
+import 'package:photo_tracker/business_logic/blocs/userInfoBloc.dart';
+import 'package:photo_tracker/presentation/Widgets/pictureContainer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class TrackerAppBar extends StatefulWidget with PreferredSizeWidget {
   final String title;
@@ -28,7 +26,6 @@ class TrackerAppBar extends StatefulWidget with PreferredSizeWidget {
   State<StatefulWidget> createState() => _AppBar();
 
   @override
-  // TODO: implement preferredSize
   Size get preferredSize => Size.fromHeight(kToolbarHeight);
 }
 
@@ -45,19 +42,28 @@ class _AppBar extends State<TrackerAppBar> {
 
   @override
   Widget build(BuildContext context) {
-    return AppBar(
-      elevation: 0,
-      title: _title(),
-      titleSpacing: 0,
-      actions: [
-        widget.appBarAction == null
-            ? GestureDetector(
-                onTap: () {
-                  _testGoogle();
-                },
-                child: PictureContainer(imgPath: picPath))
-            : widget.appBarAction!,
-      ],
+    return BlocProvider<BlocUserInfo>(
+      create: (_) => BlocUserInfo(),
+      child: Builder(builder: (context) {
+        return AppBar(
+          elevation: 0,
+          title: _title(),
+          titleSpacing: 0,
+          actions: [
+            widget.appBarAction == null
+                ? GestureDetector(
+                    onTap: () {
+                      BlocProvider.of<BlocUserInfo>(context).add(UserInfoState(
+                          updateValue: 'aa',
+                          userInfoEvent: UserInfoEvent.updateProfilePic));
+
+                      _testGoogle();
+                    },
+                    child: PictureContainer(imgPath: picPath))
+                : widget.appBarAction!,
+          ],
+        );
+      }),
     );
   }
 
@@ -85,8 +91,7 @@ class _AppBar extends State<TrackerAppBar> {
   }
 
   Future<void> _testGoogle() async {
-    Navigator.push(
-        context, MaterialPageRoute(builder: (context) => TrackerSignInPage()));
+    //FirebaseAuth.instance.signOut();
   }
 
   _loadPrefs() async {

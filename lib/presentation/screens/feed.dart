@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:photo_tracker/layouts/Widgets/feedCard.dart';
+import 'package:photo_tracker/presentation/Widgets/feedCard.dart';
 
 class Feed extends StatefulWidget {
   final String mapBoxKey;

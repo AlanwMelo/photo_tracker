@@ -1,8 +1,7 @@
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:photo_tracker/layouts/Widgets/pictureContainer.dart';
+import 'package:photo_tracker/presentation/Widgets/pictureContainer.dart';
 
 class EditPhotoListItem extends StatefulWidget {
   final String imagePath;

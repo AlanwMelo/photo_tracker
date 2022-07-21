@@ -10,13 +10,13 @@ import 'package:photo_tracker/classes/mainListItem.dart';
 import 'package:photo_tracker/classes/mapBoxKeyLoader.dart';
 import 'package:photo_tracker/classes/newListDialog.dart';
 import 'package:photo_tracker/db/dbManager.dart';
-import 'package:photo_tracker/layouts/Widgets/appBar.dart';
-import 'package:photo_tracker/layouts/exifViewer.dart';
-import 'package:photo_tracker/layouts/screens/feed.dart';
-import 'package:photo_tracker/layouts/screens/map_and_photos.dart';
-import 'package:photo_tracker/layouts/screens/new_post/new_post.dart';
-import 'package:photo_tracker/layouts/screens/notifications.dart';
-import 'package:photo_tracker/layouts/screens/searchScreen.dart';
+import 'package:photo_tracker/presentation/Widgets/appBar.dart';
+import 'package:photo_tracker/presentation/exifViewer.dart';
+import 'package:photo_tracker/presentation/screens/feed.dart';
+import 'package:photo_tracker/presentation/screens/map_and_photos.dart';
+import 'package:photo_tracker/presentation/screens/new_post/new_post.dart';
+import 'package:photo_tracker/presentation/screens/notifications.dart';
+import 'package:photo_tracker/presentation/screens/searchScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class TrackerHomePage extends StatefulWidget {

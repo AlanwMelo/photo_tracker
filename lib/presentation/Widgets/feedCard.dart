@@ -1,8 +1,7 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_tracker/classes/routeAnimations/pageRouterSlideUp.dart';
-import 'package:photo_tracker/layouts/Widgets/pictureContainer.dart';
-import 'package:photo_tracker/layouts/screens/map_and_photos.dart';
+import 'package:photo_tracker/presentation/Widgets/pictureContainer.dart';
+import 'package:photo_tracker/presentation/screens/map_and_photos.dart';
 
 class FeedCard extends StatefulWidget {
   final String mapboxKey;

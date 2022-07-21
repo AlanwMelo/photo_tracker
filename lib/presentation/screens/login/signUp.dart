@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:photo_tracker/layouts/Widgets/loginScreen/divisor.dart';
-import 'package:photo_tracker/layouts/Widgets/loginScreen/loginFormField.dart';
-import 'package:photo_tracker/layouts/Widgets/trackerSimpleButton.dart';
-import 'package:photo_tracker/layouts/screens/new_post/tackerSignButton.dart';
+import 'package:photo_tracker/presentation/Widgets/loginScreen/divisor.dart';
+import 'package:photo_tracker/presentation/Widgets/loginScreen/loginFormField.dart';
+import 'package:photo_tracker/presentation/Widgets/trackerSimpleButton.dart';
+import 'package:photo_tracker/presentation/screens/new_post/tackerSignButton.dart';
 import 'package:photo_tracker/userRelated/googleSingIn.dart';
 
 class TrackerSignUpPage extends StatefulWidget {

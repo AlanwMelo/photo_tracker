@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_tracker/classes/filePicker.dart';
-import 'package:photo_tracker/layouts/Widgets/appBar.dart';
-import 'package:photo_tracker/layouts/Widgets/trackerSimpleButton.dart';
-import 'package:photo_tracker/layouts/Widgets/editPhotoListItem.dart';
+import 'package:photo_tracker/presentation/Widgets/appBar.dart';
+import 'package:photo_tracker/presentation/Widgets/editPhotoListItem.dart';
+import 'package:photo_tracker/presentation/Widgets/trackerSimpleButton.dart';
 
 class AddPhotosScreen extends StatefulWidget {
   @override

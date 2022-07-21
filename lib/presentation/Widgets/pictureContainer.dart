@@ -12,7 +12,7 @@ class PictureContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    /// Container com os layouts para a imagem circular
+    /// Container com os presentation para a imagem circular
 
     return Container(
       height: 70,
