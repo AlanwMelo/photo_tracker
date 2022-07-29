@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:photo_tracker/business_logic/blocs/authentication/authenticationHandlerBloc.dart';
 import 'package:photo_tracker/business_logic/blocs/userInfoBloc.dart';
 import 'package:photo_tracker/presentation/Widgets/pictureContainer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -53,10 +55,6 @@ class _AppBar extends State<TrackerAppBar> {
             widget.appBarAction == null
                 ? GestureDetector(
                     onTap: () {
-                      BlocProvider.of<BlocUserInfo>(context).add(UserInfoState(
-                          updateValue: 'aa',
-                          userInfoEvent: UserInfoEvent.updateProfilePic));
-
                       _testGoogle();
                     },
                     child: PictureContainer(imgPath: picPath))
@@ -91,7 +89,7 @@ class _AppBar extends State<TrackerAppBar> {
   }
 
   Future<void> _testGoogle() async {
-    //FirebaseAuth.instance.signOut();
+    FirebaseAuth.instance.signOut();
   }
 
   _loadPrefs() async {

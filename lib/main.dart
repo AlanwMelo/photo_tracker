@@ -1,8 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:photo_tracker/authenticationHandler.dart';
+import 'package:photo_tracker/business_logic/blocs/authentication/authenticationHandlerBloc.dart';
+import 'package:photo_tracker/business_logic/blocs/authentication/authenticationState.dart';
 import 'package:photo_tracker/business_logic/blocs/userInfoBloc.dart';
 
 Future<void> main() async {
@@ -21,6 +24,14 @@ class MyApp extends StatelessWidget {
         providers: [
           BlocProvider<BlocUserInfo>(
               create: (BuildContext context) => BlocUserInfo()),
+          BlocProvider<BlocOfAuthentication>(create: (BuildContext context) {
+            if (FirebaseAuth.instance.currentUser != null) {
+              return BlocOfAuthentication(
+                  const AuthenticationState.authenticated());
+            } else {
+              return BlocOfAuthentication(const AuthenticationState.unknown());
+            }
+          }),
         ],
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
@@ -28,7 +39,7 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(
             primarySwatch: Colors.blue,
           ),
-          home: handleAuthState(),
+          home: handleAuthState(context),
         ));
   }
 }
