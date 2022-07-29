@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:photo_tracker/business_logic/blocs/authentication/authenticationHandlerBloc.dart';
+import 'package:photo_tracker/business_logic/blocs/loadingCoverScreen/loadingCoverScreenBloc.dart';
+import 'package:photo_tracker/business_logic/blocs/loadingCoverScreen/loadingCoverScreenEvent.dart';
 import 'package:photo_tracker/presentation/Widgets/loginScreen/divisor.dart';
 import 'package:photo_tracker/presentation/Widgets/loginScreen/loginFormField.dart';
 import 'package:photo_tracker/presentation/Widgets/trackerSimpleButton.dart';
@@ -104,8 +106,20 @@ class _TrackerSignInPageState extends State<TrackerSignInPage> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           InkWell(
-              onTap: () {
-                TrackerGoogleSignIn().signInWithGoogle();
+              onTap: () async {
+                BlocProvider.of<BlocOfLoadingCoverScreen>(context).add(
+                    LoadingCoverScreenEventChanged(
+                        LoadingCoverScreenStatus.loading));
+                try {
+                  await TrackerGoogleSignIn().signInWithGoogle();
+                  BlocProvider.of<BlocOfLoadingCoverScreen>(context).add(
+                      LoadingCoverScreenEventChanged(
+                          LoadingCoverScreenStatus.notLoading));
+                } catch (e) {
+                  BlocProvider.of<BlocOfLoadingCoverScreen>(context).add(
+                      LoadingCoverScreenEventChanged(
+                          LoadingCoverScreenStatus.notLoading));
+                }
               },
               child: _googleButton()),
           InkWell(
