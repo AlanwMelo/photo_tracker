@@ -15,7 +15,7 @@ class BlocOfLoadingCoverScreen
 _onLoadingCoverScreenState(
   LoadingCoverScreenEventChanged event,
   Emitter<LoadingCoverScreenState> emit,
-) async {
+) {
   switch (event.status) {
     case LoadingCoverScreenStatus.notLoading:
       return emit(const LoadingCoverScreenState.notLoading());

@@ -4,6 +4,9 @@ import 'package:photo_tracker/business_logic/blocs/authentication/authentication
 import 'package:photo_tracker/business_logic/blocs/loadingCoverScreen/loadingCoverScreenBloc.dart';
 import 'package:photo_tracker/business_logic/blocs/loadingCoverScreen/loadingCoverScreenEvent.dart';
 import 'package:photo_tracker/business_logic/blocs/loadingCoverScreen/loadingCoverScreenState.dart';
+import 'package:photo_tracker/business_logic/blocs/userInfo/userInfoBloc.dart';
+import 'package:photo_tracker/business_logic/blocs/userInfo/userInfoEvent.dart';
+import 'package:photo_tracker/business_logic/blocs/userInfo/userInfoState.dart';
 import 'package:photo_tracker/business_logic/blocs/userInfoBloc.dart';
 import 'package:photo_tracker/presentation/Widgets/pictureContainer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -47,25 +50,22 @@ class _AppBar extends State<TrackerAppBar> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<BlocUserInfo>(
-      create: (_) => BlocUserInfo(),
-      child: Builder(builder: (context) {
-        return AppBar(
-          elevation: 0,
-          title: _title(),
-          titleSpacing: 0,
-          actions: [
-            widget.appBarAction == null
-                ? GestureDetector(
-                    onTap: () {
-                      _testGoogle();
-                    },
-                    child: PictureContainer(imgPath: picPath))
-                : widget.appBarAction!,
-          ],
-        );
-      }),
-    );
+    return Builder(builder: (context) {
+      return AppBar(
+        elevation: 0,
+        title: _title(),
+        titleSpacing: 0,
+        actions: [
+          widget.appBarAction == null
+              ? GestureDetector(
+                  onTap: () {
+                    _testGoogle();
+                  },
+                  child: PictureContainer(imgPath: picPath))
+              : widget.appBarAction!,
+        ],
+      );
+    });
   }
 
   _title() {
@@ -92,7 +92,11 @@ class _AppBar extends State<TrackerAppBar> {
   }
 
   Future<void> _testGoogle() async {
-    BlocProvider.of<BlocOfLoadingCoverScreen>(context)
+    BlocProvider.of<BlocOfUserInfo>(context).add(UpdateUserEventChanged(
+        UpdateUserInfoStatus.updateUserStatus, 'Alan', 'Email', 'Pic'));
+
+
+    /*BlocProvider.of<BlocOfLoadingCoverScreen>(context)
         .add(LoadingCoverScreenEventChanged(LoadingCoverScreenStatus.loading));
     try {
       await Future.delayed(Duration(seconds: 3));
@@ -102,7 +106,7 @@ class _AppBar extends State<TrackerAppBar> {
     } catch (e) {
       BlocProvider.of<BlocOfLoadingCoverScreen>(context).add(
           LoadingCoverScreenEventChanged(LoadingCoverScreenStatus.notLoading));
-    }
+    }*/
   }
 
   _loadPrefs() async {

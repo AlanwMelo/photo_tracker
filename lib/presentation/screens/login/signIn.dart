@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:photo_tracker/business_logic/blocs/authentication/authenticationHandlerBloc.dart';
 import 'package:photo_tracker/business_logic/blocs/loadingCoverScreen/loadingCoverScreenBloc.dart';
 import 'package:photo_tracker/business_logic/blocs/loadingCoverScreen/loadingCoverScreenEvent.dart';
+import 'package:photo_tracker/business_logic/userRelated/googleSingIn.dart';
 import 'package:photo_tracker/presentation/Widgets/loginScreen/divisor.dart';
 import 'package:photo_tracker/presentation/Widgets/loginScreen/loginFormField.dart';
 import 'package:photo_tracker/presentation/Widgets/trackerSimpleButton.dart';
 import 'package:photo_tracker/presentation/screens/login/signUp.dart';
-import 'package:photo_tracker/presentation/screens/new_post/tackerSignButton.dart';
-import 'package:photo_tracker/userRelated/googleSingIn.dart';
+import 'package:photo_tracker/presentation/screens/newPost/tackerSignButton.dart';
 
 class TrackerSignInPage extends StatefulWidget {
   @override

@@ -8,6 +8,8 @@ import 'package:photo_tracker/business_logic/blocs/authentication/authentication
 import 'package:photo_tracker/business_logic/blocs/authentication/authenticationState.dart';
 import 'package:photo_tracker/business_logic/blocs/loadingCoverScreen/loadingCoverScreenBloc.dart';
 import 'package:photo_tracker/business_logic/blocs/loadingCoverScreen/loadingCoverScreenState.dart';
+import 'package:photo_tracker/business_logic/blocs/userInfo/userInfoBloc.dart';
+import 'package:photo_tracker/business_logic/blocs/userInfo/userInfoState.dart';
 import 'package:photo_tracker/business_logic/blocs/userInfoBloc.dart';
 
 Future<void> main() async {
@@ -24,8 +26,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
         providers: [
-          BlocProvider<BlocUserInfo>(
-              create: (BuildContext context) => BlocUserInfo()),
+          BlocProvider<BlocOfUserInfo>(
+              create: (BuildContext context) => BlocOfUserInfo(UpdateUserInfoState.initialStatus())),
           BlocProvider<BlocOfAuthentication>(create: (BuildContext context) {
             if (FirebaseAuth.instance.currentUser != null) {
               return BlocOfAuthentication(

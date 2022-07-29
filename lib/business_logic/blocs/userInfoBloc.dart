@@ -1,3 +1,4 @@
+/*
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 enum UserInfoEvent { updateName, updateEmail, updateProfilePic }
@@ -29,3 +30,5 @@ class UserInfoState {
 
   UserInfoState({required this.updateValue, required this.userInfoEvent});
 }
+
+*/
