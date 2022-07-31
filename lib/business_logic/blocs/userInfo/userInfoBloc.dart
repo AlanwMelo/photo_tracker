@@ -20,7 +20,6 @@ _onLoadingCoverScreenState(
       emit(UpdateUserInfoState.initialStatus());
       break;
     case UpdateUserInfoStatus.updateUserStatus:
-      print('updating info....');
       emit(UpdateUserInfoState.updateUserStatus(
           event.userName, event.userEmail, event.userProfilePic));
       break;

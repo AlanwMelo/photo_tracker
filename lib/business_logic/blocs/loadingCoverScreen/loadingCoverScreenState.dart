@@ -1,7 +1,6 @@
-import 'package:equatable/equatable.dart';
 import 'package:photo_tracker/business_logic/blocs/loadingCoverScreen/loadingCoverScreenBloc.dart';
 
-class LoadingCoverScreenState extends Equatable {
+class LoadingCoverScreenState   {
   const LoadingCoverScreenState._({
     this.status = LoadingCoverScreenStatus.notLoading,
   });
@@ -13,7 +12,4 @@ class LoadingCoverScreenState extends Equatable {
 
   final LoadingCoverScreenStatus status;
 
-  @override
-  // TODO: implement props
-  List<Object?> get props => [status];
 }

@@ -94,7 +94,11 @@ class _AppBar extends State<TrackerAppBar> {
   Future<void> _testGoogle() async {
     BlocProvider.of<BlocOfUserInfo>(context).add(UpdateUserEventChanged(
         UpdateUserInfoStatus.updateUserStatus, 'Alan', 'Email', 'Pic'));
+    await Future.delayed(Duration(seconds: 3));
 
+    BlocProvider.of<BlocOfUserInfo>(context).add(UpdateUserEventChanged(
+        UpdateUserInfoStatus.updateUserStatus, 'Alan2', 'Email', 'Pic'));
+    //UpdateBlocUserInfo(context).updateName("marraum");
 
     /*BlocProvider.of<BlocOfLoadingCoverScreen>(context)
         .add(LoadingCoverScreenEventChanged(LoadingCoverScreenStatus.loading));

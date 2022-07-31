@@ -1,6 +1,4 @@
-import 'package:equatable/equatable.dart';
-
-class UpdateUserInfoState extends Equatable {
+class UpdateUserInfoState {
   const UpdateUserInfoState._({
     this.userName = '',
     this.userEmail = '',
@@ -12,11 +10,10 @@ class UpdateUserInfoState extends Equatable {
   UpdateUserInfoState.updateUserStatus(
       this.userName, this.userEmail, this.userProfilePic);
 
+  UpdateUserInfoState.updateUserName(
+      this.userName, this.userEmail, this.userProfilePic);
+
   final String userName;
   final String userEmail;
   final String userProfilePic;
-
-  @override
-  // TODO: implement props
-  List<Object?> get props => [];
 }
