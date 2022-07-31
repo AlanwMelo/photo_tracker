@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:photo_tracker/business_logic/blocs/loadingCoverScreen/loadingCoverScreenBloc.dart';
@@ -110,20 +112,15 @@ class _TrackerSignInPageState extends State<TrackerSignInPage> {
                     LoadingCoverScreenEventChanged(
                         LoadingCoverScreenStatus.loading));
                 try {
-                  await TrackerGoogleSignIn().signInWithGoogle();
-                  BlocProvider.of<BlocOfLoadingCoverScreen>(context).add(
-                      LoadingCoverScreenEventChanged(
-                          LoadingCoverScreenStatus.notLoading));
+                  await TrackerGoogleSignIn(context).signInWithGoogle();
                 } catch (e) {
-                  BlocProvider.of<BlocOfLoadingCoverScreen>(context).add(
-                      LoadingCoverScreenEventChanged(
-                          LoadingCoverScreenStatus.notLoading));
+                  print(e);
                 }
               },
               child: _googleButton()),
           InkWell(
               onTap: () {
-                TrackerGoogleSignIn().signInWithGoogle();
+                TrackerGoogleSignIn(context).signInWithGoogle();
               },
               child: _facebookButton())
         ],

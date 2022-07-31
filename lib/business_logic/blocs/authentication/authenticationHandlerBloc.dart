@@ -21,9 +21,6 @@ class BlocOfAuthentication
         add(AuthenticationStatusChanged(AuthenticationStatus.unauthenticated));
       }
     });
-    /*_authenticationStatusSubscription = _authenticationRepository.status.listen(
-          (status) => add(AuthenticationStatusChanged(status)),
-    );*/
   }
 
   late StreamSubscription _authenticationStatusSubscription;

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_tracker/business_logic/blocs/authentication/authenticationHandlerBloc.dart';
@@ -8,6 +9,7 @@ import 'package:photo_tracker/business_logic/blocs/userInfo/userInfoBloc.dart';
 import 'package:photo_tracker/business_logic/blocs/userInfo/userInfoEvent.dart';
 import 'package:photo_tracker/business_logic/blocs/userInfo/userInfoState.dart';
 import 'package:photo_tracker/business_logic/blocs/userInfoBloc.dart';
+import 'package:photo_tracker/business_logic/firebase/firebaseUser.dart';
 import 'package:photo_tracker/presentation/Widgets/pictureContainer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -92,25 +94,10 @@ class _AppBar extends State<TrackerAppBar> {
   }
 
   Future<void> _testGoogle() async {
-    BlocProvider.of<BlocOfUserInfo>(context).add(UpdateUserEventChanged(
-        UpdateUserInfoStatus.updateUserStatus, 'Alan', 'Email', 'Pic'));
-    await Future.delayed(Duration(seconds: 3));
+    FirebaseAuth.instance.signOut();
 
-    BlocProvider.of<BlocOfUserInfo>(context).add(UpdateUserEventChanged(
-        UpdateUserInfoStatus.updateUserStatus, 'Alan2', 'Email', 'Pic'));
-    //UpdateBlocUserInfo(context).updateName("marraum");
-
-    /*BlocProvider.of<BlocOfLoadingCoverScreen>(context)
-        .add(LoadingCoverScreenEventChanged(LoadingCoverScreenStatus.loading));
-    try {
-      await Future.delayed(Duration(seconds: 3));
-      FirebaseAuth.instance.signOut();
-      BlocProvider.of<BlocOfLoadingCoverScreen>(context).add(
-          LoadingCoverScreenEventChanged(LoadingCoverScreenStatus.notLoading));
-    } catch (e) {
-      BlocProvider.of<BlocOfLoadingCoverScreen>(context).add(
-          LoadingCoverScreenEventChanged(LoadingCoverScreenStatus.notLoading));
-    }*/
+    /*BlocProvider.of<BlocOfUserInfo>(context).add(UpdateUserEventChanged(
+        UpdateUserInfoStatus.updateUserStatus, 'Alan', 'Email', 'Pic'));*/
   }
 
   _loadPrefs() async {

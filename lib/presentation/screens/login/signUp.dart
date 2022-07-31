@@ -105,12 +105,12 @@ class _TrackerSignUpPageState extends State<TrackerSignUpPage> {
         children: [
           InkWell(
               onTap: () {
-                TrackerGoogleSignIn().signInWithGoogle();
+                TrackerGoogleSignIn(context).signInWithGoogle();
               },
               child: _googleButton()),
           InkWell(
               onTap: () {
-                TrackerGoogleSignIn().signInWithGoogle();
+                TrackerGoogleSignIn(context).signInWithGoogle();
               },
               child: _facebookButton())
         ],
