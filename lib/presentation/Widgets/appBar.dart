@@ -8,8 +8,7 @@ import 'package:photo_tracker/business_logic/blocs/loadingCoverScreen/loadingCov
 import 'package:photo_tracker/business_logic/blocs/userInfo/userInfoBloc.dart';
 import 'package:photo_tracker/business_logic/blocs/userInfo/userInfoEvent.dart';
 import 'package:photo_tracker/business_logic/blocs/userInfo/userInfoState.dart';
-import 'package:photo_tracker/business_logic/firebase/firebasePost.dart';
-import 'package:photo_tracker/business_logic/firebase/firebaseUser.dart';
+import 'package:photo_tracker/data/firebase/firebasePost.dart';
 import 'package:photo_tracker/presentation/Widgets/pictureContainer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

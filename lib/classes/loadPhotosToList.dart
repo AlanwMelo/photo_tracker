@@ -4,8 +4,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:photo_tracker/classes/checkAppImagesDir.dart';
-import 'package:photo_tracker/classes/listItem.dart';
+import 'package:photo_tracker/data/checkAppImagesDir.dart';
+import 'package:photo_tracker/data/listItem.dart';
 
 class LoadPhotosToList {
   final FilePickerResult result;

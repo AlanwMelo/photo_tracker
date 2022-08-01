@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:photo_tracker/classes/listItem.dart';
+import 'package:photo_tracker/data/listItem.dart';
 import 'package:photo_tracker/presentation/plugins/scale_layer_plugin_option.dart';
 import 'package:speech_balloon/speech_balloon.dart';
 

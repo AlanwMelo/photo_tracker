@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
-import 'package:photo_tracker/classes/checkAppImagesDir.dart';
+import 'package:photo_tracker/data/checkAppImagesDir.dart';
 import 'package:photo_tracker/db/dbManager.dart';
 
 class CacheCleaner {

@@ -4,8 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:photo_tracker/business_logic/blocs/loadingCoverScreen/loadingCoverScreenBloc.dart';
 import 'package:photo_tracker/business_logic/blocs/loadingCoverScreen/loadingCoverScreenEvent.dart';
-import 'package:photo_tracker/business_logic/firebase/firebaseUser.dart';
-import 'package:photo_tracker/classes/saveProfilePicture.dart';
+import 'package:photo_tracker/data/saveProfilePicture.dart';
+import 'package:photo_tracker/data/firebase/firebaseUser.dart';
 import 'package:photo_tracker/db/dbManager.dart';
 
 class TrackerGoogleSignIn {
