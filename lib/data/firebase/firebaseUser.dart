@@ -5,7 +5,6 @@ class FirebaseUser {
   CollectionReference _users = FirebaseFirestore.instance.collection('users');
 
   createUser(String? userName, String? userEmail, String? profilePicURL) async {
-    DocumentReference doc = _users.doc();
     String? userID = FirebaseAuth.instance.currentUser?.uid;
 
     bool userAlreadyCreated = await checkIfUserExistsByID(userID);

@@ -44,7 +44,6 @@ class _AppBar extends State<TrackerAppBar> {
 
   @override
   void initState() {
-    // TODO: implement initState
     _loadPrefs();
     super.initState();
   }
@@ -93,7 +92,8 @@ class _AppBar extends State<TrackerAppBar> {
   }
 
   Future<void> _testGoogle() async {
-    FirebasePost().getPostInfo('postID');
+    //FirebasePost().getPostInfo('postID');
+    //FirebasePost().createPost();
 
     //FirebaseAuth.instance.signOut();
 
