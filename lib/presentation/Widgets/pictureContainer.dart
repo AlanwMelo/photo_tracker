@@ -5,9 +5,13 @@ import 'package:flutter/material.dart';
 class PictureContainer extends StatelessWidget {
   final String imgPath;
 
+  /// True == PATH / False == URL
+  final bool pathOrURl;
+
   const PictureContainer({
     Key? key,
     required this.imgPath,
+    required this.pathOrURl,
   }) : super(key: key);
 
   @override
@@ -32,12 +36,19 @@ class PictureContainer extends StatelessWidget {
             ],
           ),
           child: ClipRRect(
-              borderRadius: BorderRadius.circular(100.0),
-              child: imgPath == ''
-                  ? Image.asset('lib/assets/Icon.png')
-                  : Image.file(File(imgPath))),
+              borderRadius: BorderRadius.circular(100.0), child: _image()),
         ),
       ),
     );
+  }
+
+  _image() {
+    if (pathOrURl) {
+      return imgPath == ''
+          ? Image.asset('lib/assets/Icon.png')
+          : Image.file(File(imgPath));
+    } else {
+      return Image.network(imgPath);
+    }
   }
 }

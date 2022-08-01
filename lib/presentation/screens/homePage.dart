@@ -63,6 +63,17 @@ class _TrackerHomePageState extends State<TrackerHomePage> {
     return true;
   }
 
+  _loadPrefs() async {
+    DBManager db = DBManager();
+    var userInfo = await db.readUserInfo();
+
+    BlocProvider.of<BlocOfUserInfo>(context).add(UpdateUserEventChanged(
+        UpdateUserInfoStatus.updateUserStatus,
+        userInfo[0]['userName'],
+        userInfo[0]['userEmail'],
+        userInfo[0]['profileImageLocation']));
+  }
+
   _mainBody() {
     return Container(
       color: Colors.blueGrey.withOpacity(0.15),
@@ -80,7 +91,7 @@ class _TrackerHomePageState extends State<TrackerHomePage> {
     );
   }
 
-  feedMode() {
+  _feedMode() {
     _feedModeContainer(String text, bool selected) {
       return Container(
         decoration: BoxDecoration(
@@ -135,7 +146,7 @@ class _TrackerHomePageState extends State<TrackerHomePage> {
     );
   }
 
-  feed() {
+  _feed() {
     return FutureBuilder(
         future: _loadMapboxKey(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
@@ -145,7 +156,7 @@ class _TrackerHomePageState extends State<TrackerHomePage> {
                 child: Column(
                   children: [
                     Container(
-                      child: feedMode(),
+                      child: _feedMode(),
                       color: Colors.white,
                     ),
                     _switchFeedMode(varFeedMode),
@@ -239,7 +250,7 @@ class _TrackerHomePageState extends State<TrackerHomePage> {
   _switchMainMode(int i) {
     switch (i) {
       case 0:
-        return feed();
+        return _feed();
       case 1:
         return SearchScreen();
       case 2:
@@ -247,14 +258,5 @@ class _TrackerHomePageState extends State<TrackerHomePage> {
     }
   }
 
-  _loadPrefs() async {
-    DBManager db = DBManager();
-    var userInfo = await db.readUserInfo();
 
-    BlocProvider.of<BlocOfUserInfo>(context).add(UpdateUserEventChanged(
-        UpdateUserInfoStatus.updateUserStatus,
-        userInfo[0]['userName'],
-        userInfo[0]['userEmail'],
-        userInfo[0]['profileImageLocation']));
-  }
 }

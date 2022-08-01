@@ -19,13 +19,13 @@ import 'package:scroll_to_index/scroll_to_index.dart';
 
 class MapAndPhotos extends StatefulWidget {
   final String mapboxKey;
-  final String listName;
+  final String postID;
   final bool goToComments;
   final Function(bool) answer;
 
   const MapAndPhotos(
       {Key? key,
-      required this.listName,
+      required this.postID,
       required this.answer,
       required this.mapboxKey,
       this.goToComments = false})
@@ -53,7 +53,7 @@ class _MapAndPhotos extends State<MapAndPhotos> {
         viewportBoundaryGetter: () =>
             Rect.fromLTRB(0, 0, 0, MediaQuery.of(context).padding.bottom),
         axis: Axis.vertical);
-    _loadList(widget.listName);
+    _loadList(widget.postID);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (widget.goToComments) {
         await Future.delayed(Duration(seconds: 1));

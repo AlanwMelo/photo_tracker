@@ -72,7 +72,7 @@ class _EditPhotoListItem extends State<EditPhotoListItem> {
   _picture() {
     return Container(
       width: 35,
-      child: PictureContainer(imgPath: ''),
+      child: PictureContainer(imgPath: '', pathOrURl: true),
     );
   }
 }

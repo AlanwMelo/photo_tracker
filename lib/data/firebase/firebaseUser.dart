@@ -21,6 +21,11 @@ class FirebaseUser {
     return true;
   }
 
+  getUserInfo(String userID) async {
+    DocumentSnapshot thisUser = await _users.doc(userID).get();
+    return thisUser;
+  }
+
   checkIfUserExistsByID(String? userID) async {
     DocumentSnapshot user = await _users.doc(userID).get();
 

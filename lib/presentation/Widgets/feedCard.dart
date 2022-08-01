@@ -1,13 +1,17 @@
+import 'package:carousel_slider/carousel_slider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:photo_tracker/data/firebase/firebasePost.dart';
+import 'package:photo_tracker/data/firebase/firebaseUser.dart';
 import 'package:photo_tracker/data/routeAnimations/pageRouterSlideUp.dart';
 import 'package:photo_tracker/presentation/Widgets/pictureContainer.dart';
 import 'package:photo_tracker/presentation/screens/map_and_photos.dart';
 
 class FeedCard extends StatefulWidget {
   final String mapboxKey;
-  final String name;
+  final String postID;
 
-  const FeedCard({Key? key, required this.mapboxKey, required this.name})
+  const FeedCard({Key? key, required this.mapboxKey, required this.postID})
       : super(key: key);
 
   @override
@@ -15,30 +19,44 @@ class FeedCard extends StatefulWidget {
 }
 
 class _FeedCardState extends State<FeedCard> {
+  late DocumentSnapshot thisPost;
+  late DocumentSnapshot postOwner;
+  late QuerySnapshot postImages;
+  List<String> postImagesURLs = [];
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      onLongPress: () {},
       onTap: () {
         Navigator.push(
             context,
             MaterialPageRoute(
                 builder: (context) => MapAndPhotos(
-                    listName: widget.name,
+                    postID: widget.postID,
                     answer: (_) {},
                     mapboxKey: widget.mapboxKey)));
       },
-      child: Container(
-        color: Colors.white,
-        margin: EdgeInsets.only(top: 15),
-        width: MediaQuery.of(context).size.width,
-        child: Column(
-          children: [
-            _publicationInfo(),
-            _publicationCoverPic(),
-            _publicationInteractionIcons(),
-          ],
-        ),
-      ),
+      child: FutureBuilder(
+          future: _getPostInfo(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return Container(
+                color: Colors.white,
+                margin: EdgeInsets.only(top: 15),
+                width: MediaQuery.of(context).size.width,
+                child: Column(
+                  children: [
+                    _publicationInfo(),
+                    _publicationCoverPic(),
+                    _publicationInteractionIcons(),
+                  ],
+                ),
+              );
+            } else {
+              return Container();
+            }
+          }),
     );
   }
 
@@ -54,9 +72,10 @@ class _FeedCardState extends State<FeedCard> {
         children: [
           Row(
             children: [
-              PictureContainer(imgPath: ''),
+              PictureContainer(
+                  imgPath: postOwner['profilePicURL'], pathOrURl: false),
               Text(
-                'Alan Melo',
+                postOwner['name'],
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               Expanded(child: Container()),
@@ -67,13 +86,13 @@ class _FeedCardState extends State<FeedCard> {
           Container(
               padding: EdgeInsets.only(left: 15),
               child: Text(
-                'Férias 2021',
+                thisPost['title'],
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
               )),
           Container(
               padding: EdgeInsets.only(left: 15, top: 5, bottom: 3),
               child: Text(
-                'Férias do ano passado',
+                thisPost['description'],
                 style: TextStyle(fontSize: 15),
               )),
           Container(
@@ -81,7 +100,7 @@ class _FeedCardState extends State<FeedCard> {
               child: Row(
                 children: [
                   Text(
-                    'Campinas - SP',
+                    thisPost['mainLocation'],
                     style: TextStyle(color: Colors.lightBlue, fontSize: 13),
                   )
                 ],
@@ -93,12 +112,27 @@ class _FeedCardState extends State<FeedCard> {
 
   _publicationCoverPic() {
     return Container(
-      height: 400,
-      child: Image.network(
-        'https://www.melhoresdestinos.com.br/wp-content/uploads/2021/02/torre-eiffel-paris-reforma.jpg',
-        fit: BoxFit.cover,
+      color: Colors.grey.withOpacity(0.05),
+      child: CarouselSlider(
+        options: CarouselOptions(
+            height: 400,
+            initialPage: 0,
+            enableInfiniteScroll: false,
+            autoPlay: true,
+            autoPlayInterval: Duration(seconds: 20),
+            viewportFraction: 1,
+            aspectRatio: 1),
+        items: postImagesURLs.map((url) {
+          return Builder(builder: (BuildContext context) {
+            return Container(
+              child: Image.network(
+                url,
+                fit: BoxFit.cover,
+              ),
+            );
+          });
+        }).toList(),
       ),
-      color: Colors.yellow,
     );
   }
 
@@ -115,7 +149,7 @@ class _FeedCardState extends State<FeedCard> {
               child: GestureDetector(
                   onTap: () => Navigator.of(context).push(routeSlideUp(
                       MapAndPhotos(
-                          listName: widget.name,
+                          postID: widget.postID,
                           answer: (_) {},
                           mapboxKey: widget.mapboxKey,
                           goToComments: true))),
@@ -124,5 +158,16 @@ class _FeedCardState extends State<FeedCard> {
         ],
       ),
     );
+  }
+
+  _getPostInfo() async {
+    postImagesURLs.clear();
+    thisPost = await FirebasePost().getPostInfo(widget.postID);
+    postImages = await FirebasePost().getPostImages(widget.postID);
+    for (var element in postImages.docs) {
+      postImagesURLs.add(element['firestorePath']);
+    }
+    postOwner = await FirebaseUser().getUserInfo(thisPost['ownerID']);
+    return true;
   }
 }

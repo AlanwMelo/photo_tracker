@@ -7,12 +7,13 @@ class FirebasePost {
 
   getPostInfo(String postID) async {
     DocumentSnapshot thisPost = await _posts.doc(postID).get();
-    QuerySnapshot thisPostPictures =
-        await _posts.doc(postID).collection('images').get();
-    print(thisPost.data());
-    thisPostPictures.docs.forEach((element) {
-      print(element.data());
-    });
+
+    return thisPost;
+  }
+
+  getPostsForFeed() async {
+    QuerySnapshot a = await _posts.get();
+    return a.docs;
   }
 
   getPostImages(String postID) async {

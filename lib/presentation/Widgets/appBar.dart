@@ -63,7 +63,7 @@ class _AppBar extends State<TrackerAppBar> {
                   _testGoogle();
                 }, child: BlocBuilder<BlocOfUserInfo, BlocOfUserInfoState>(
                   builder: (context, state) {
-                  return PictureContainer(imgPath: state.userProfilePic);
+                  return PictureContainer(imgPath: state.userProfilePic, pathOrURl: true,);
                 }))
               : widget.appBarAction!,
         ],
@@ -95,6 +95,7 @@ class _AppBar extends State<TrackerAppBar> {
   }
 
   Future<void> _testGoogle() async {
+    FirebasePost().getPostsForFeed();
     //FirebaseAuth.instance.signOut();
   }
 }
