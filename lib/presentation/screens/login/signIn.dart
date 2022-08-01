@@ -9,7 +9,7 @@ import 'package:photo_tracker/presentation/Widgets/loginScreen/divisor.dart';
 import 'package:photo_tracker/presentation/Widgets/loginScreen/loginFormField.dart';
 import 'package:photo_tracker/presentation/Widgets/trackerSimpleButton.dart';
 import 'package:photo_tracker/presentation/screens/login/signUp.dart';
-import 'package:photo_tracker/presentation/screens/newPost/tackerSignButton.dart';
+import 'package:photo_tracker/presentation/Widgets/tackerSignButton.dart';
 
 class TrackerSignInPage extends StatefulWidget {
   @override

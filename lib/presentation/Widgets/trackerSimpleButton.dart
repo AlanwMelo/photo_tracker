@@ -20,7 +20,9 @@ class _TrackerSimpleButton extends State<TrackerSimpleButton> {
         decoration: _myDecoration(),
         width: 100,
         child: InkWell(
-          onTap: () {},
+          onTap: () {
+            widget.pressed(true);
+          },
           child: Center(
               child: Text(widget.text,
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.white))),

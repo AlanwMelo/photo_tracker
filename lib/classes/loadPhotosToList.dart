@@ -12,14 +12,13 @@ class LoadPhotosToList {
 
   LoadPhotosToList(this.result);
 
-  List<ListItem> listOfItems = [];
-
   loadPhotos() async {
+    List<ListItem> listOfItems = [];
     print('result Start');
-    listOfItems.clear();
+
     List<File> files = result.paths.map((path) => File(path!)).toList();
     Directory appDir = await getApplicationDocumentsDirectory();
-    String imagesDir = '${appDir.path}/images/';
+    String imagesDir = '${appDir.path}/posts_images/';
     await CheckAppImagesDir().checkDir(imagesDir);
 
     for (var element in files) {

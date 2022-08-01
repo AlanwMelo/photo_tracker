@@ -9,7 +9,6 @@ class TrackerSignButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return Container(
       decoration: new BoxDecoration(
           color: Colors.white,

@@ -277,7 +277,7 @@ class _MapAndPhotos extends State<MapAndPhotos> {
     );
   }
 
-  _addMoreButton(double height) {
+  /*_addMoreButton(double height) {
     return Container(
       width: fileList.length == 0 ? MediaQuery.of(context).size.width : 55,
       height: height,
@@ -315,7 +315,7 @@ class _MapAndPhotos extends State<MapAndPhotos> {
         child: Center(child: Icon(Icons.add_a_photo_outlined)),
       ),
     );
-  }
+  }*/
 
   _carouselSlider(double useAbleHeight, double useAbleWidth) {
     return Container(

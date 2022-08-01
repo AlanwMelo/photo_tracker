@@ -16,15 +16,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class TrackerAppBar extends StatefulWidget with PreferredSizeWidget {
   final String title;
   final bool mainScreen;
+  final bool implyLeading;
   final String? location;
   final bool? actionTwo;
   final bool? actionThree;
   final Widget? appBarAction;
 
+
   const TrackerAppBar(
       {Key? key,
       required this.title,
       this.actionTwo,
+      this.implyLeading = true,
       this.actionThree,
       required this.mainScreen,
       this.location,
@@ -52,6 +55,7 @@ class _AppBar extends State<TrackerAppBar> {
   Widget build(BuildContext context) {
     return Builder(builder: (context) {
       return AppBar(
+        automaticallyImplyLeading: widget.implyLeading,
         elevation: 0,
         title: _title(),
         titleSpacing: 0,

@@ -3,7 +3,7 @@ import 'package:photo_tracker/business_logic/userRelated/googleSingIn.dart';
 import 'package:photo_tracker/presentation/Widgets/loginScreen/divisor.dart';
 import 'package:photo_tracker/presentation/Widgets/loginScreen/loginFormField.dart';
 import 'package:photo_tracker/presentation/Widgets/trackerSimpleButton.dart';
-import 'package:photo_tracker/presentation/screens/newPost/tackerSignButton.dart';
+import 'package:photo_tracker/presentation/Widgets/tackerSignButton.dart';
 
 class TrackerSignUpPage extends StatefulWidget {
   @override

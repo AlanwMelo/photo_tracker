@@ -1,6 +1,8 @@
 import 'dart:ui';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:photo_tracker/data/firebase/firebasePost.dart';
 import 'package:photo_tracker/presentation/Widgets/appBar.dart';
 import 'package:photo_tracker/presentation/Widgets/trackerSimpleButton.dart';
 import 'package:photo_tracker/presentation/screens/newPost/add_photos.dart';
@@ -11,6 +13,9 @@ class NewPost extends StatefulWidget {
 }
 
 class _NewPostState extends State<NewPost> {
+  TextEditingController titleController = TextEditingController();
+  TextEditingController descriptionController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,7 +25,9 @@ class _NewPostState extends State<NewPost> {
         mainScreen: true,
         appBarAction: TrackerSimpleButton(
           text: 'Post',
-          pressed: (_) {},
+          pressed: (_) {
+            _createPost();
+          },
         ),
       ),
       body: _body(),
@@ -44,10 +51,7 @@ class _NewPostState extends State<NewPost> {
           Expanded(
             child: Container(child: _addPhotos()),
           ),
-          Container(
-              height: 45,
-              color: Colors.lightBlue,
-              child: _bottomBar()),
+          Container(height: 45, color: Colors.lightBlue, child: _bottomBar()),
         ],
       ),
     );
@@ -57,6 +61,7 @@ class _NewPostState extends State<NewPost> {
     return Container(
       margin: EdgeInsets.only(left: 6),
       child: TextFormField(
+        controller: titleController,
         maxLength: 40,
         decoration: InputDecoration(
             hintText: 'Titulo da postagem',
@@ -70,6 +75,7 @@ class _NewPostState extends State<NewPost> {
     return Container(
       margin: EdgeInsets.only(left: 6),
       child: TextFormField(
+        controller: descriptionController,
         maxLines: 50,
         keyboardType: TextInputType.multiline,
         maxLength: 2500,
@@ -118,8 +124,14 @@ class _NewPostState extends State<NewPost> {
           child: Center(
             child: ElevatedButton(
               onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => AddPhotosScreen()));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => AddPhotosScreen(
+                              confirm: (imagesList) {
+                                print(imagesList.length);
+                              },
+                            )));
               },
               child: Text('Add your pictures here!'),
             ),
@@ -127,5 +139,15 @@ class _NewPostState extends State<NewPost> {
         ),
       ],
     );
+  }
+
+  _createPost() {
+    FirebasePost().createPost(
+        collaborators: [],
+        description: descriptionController.text,
+        mainLocation: '',
+        ownerID: FirebaseAuth.instance.currentUser!.uid,
+        title: titleController.text,
+        thisPostPicturesList2: []);
   }
 }

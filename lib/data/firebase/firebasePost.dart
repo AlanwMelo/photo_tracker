@@ -57,5 +57,7 @@ class FirebasePost {
         'locationText': '000000854'
       });
     }
+
+    return true;
   }
 }
