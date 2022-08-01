@@ -1,11 +1,16 @@
 import 'package:latlong2/latlong.dart';
 
-class ListItem{
+class ListItem {
   final LatLng latLng;
   final DateTime timestamp;
   final String imgPath;
   final bool locationError;
   final bool timeError;
 
-  ListItem(this.latLng, this.timestamp, this.imgPath, this.locationError, this.timeError);
+  ListItem(
+      {required this.latLng,
+      required this.timestamp,
+      required this.imgPath,
+      required this.locationError,
+      required this.timeError});
 }

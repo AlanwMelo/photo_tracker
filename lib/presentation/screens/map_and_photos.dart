@@ -252,7 +252,7 @@ class _MapAndPhotos extends State<MapAndPhotos> {
                     Container(
                       height: size * 0.7,
                       width: size,
-                      child: Image.file(File(fileList[index].imgPath),
+                      child: Image.network(fileList[index].imgPath,
                           fit: BoxFit.cover),
                     ),
                     Expanded(
@@ -330,7 +330,7 @@ class _MapAndPhotos extends State<MapAndPhotos> {
                       height: useAbleHeight,
                       width: useAbleWidth,
                       color: Colors.blueGrey,
-                      child: Image.file(File(item.imgPath), fit: BoxFit.cover)),
+                      child: Image.network(item.imgPath, fit: BoxFit.cover)),
                   ClipRRect(
                     // Clip it cleanly.
                     child: BackdropFilter(
@@ -343,8 +343,7 @@ class _MapAndPhotos extends State<MapAndPhotos> {
                   ),
                   Center(
                     child: Container(
-                      child:
-                          Image.file(File(item.imgPath), fit: BoxFit.contain),
+                      child: Image.network(item.imgPath, fit: BoxFit.contain),
                     ),
                   ),
                 ],
@@ -380,14 +379,19 @@ class _MapAndPhotos extends State<MapAndPhotos> {
 
   // #### Funções - Inicio ####
   _loadList(String listName) async {
-    ListItem listItem;
-    var result = await dbManager.getListItems(listName);
+    fileList = await CreateListItemFromQueryResult().fireTest();
+    for (var element in fileList) {
+      _addMarkerToMap(element);
+    }
+    setState(() {});
+
+    /*var result = await dbManager.getListItems(listName);
     for (var element in result) {
       listItem = await CreateListItemFromQueryResult().create(element);
       _addMarkerToMap(listItem);
       fileList.add(listItem);
     }
-    _getIndexOfFirsLocation(fileList);
+    _getIndexOfFirsLocation(fileList);*/
   }
 
   /// ###################### Debouncer ######################

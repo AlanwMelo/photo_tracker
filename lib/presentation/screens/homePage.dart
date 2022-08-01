@@ -49,7 +49,7 @@ class _TrackerHomePageState extends State<TrackerHomePage> {
     super.initState();
     CacheCleaner().cleanUnusedImgs();
     _loadMapboxKey();
-    _loadMainList();
+    //_loadMainList();
     _loadPrefs();
   }
 
@@ -67,7 +67,7 @@ class _TrackerHomePageState extends State<TrackerHomePage> {
     );
   }
 
-  _mainListView() {
+  /*_mainListView() {
     return loading
         ? Container(
             child: Center(
@@ -193,9 +193,9 @@ class _TrackerHomePageState extends State<TrackerHomePage> {
                   : Container()
             ],
           );
-  }
+  }*/
 
-  _newListButton() {
+  /*_newListButton() {
     return Container(
       height: mainList.length != 0 ? 60 : 150,
       child: ElevatedButton(
@@ -227,27 +227,27 @@ class _TrackerHomePageState extends State<TrackerHomePage> {
         )),
       ),
     );
-  }
+  }*/
 
-  _loadMainList() async {
+  /*_loadMainList() async {
     var mainListItems = await dbManager.getMainListItems();
     for (var file in mainListItems) {
       await _funcAddItem(file);
     }
     loading = !loading;
     setState(() {});
-  }
+  }*/
 
-  _addItemToList(String listName,
+  /*_addItemToList(String listName,
       {bool update = false, int updateIndex = 0}) async {
     var result = await dbManager.getListItem(listName);
     for (var element in result) {
       await _funcAddItem(element, update: update, index: updateIndex);
       setState(() {});
     }
-  }
+  }*/
 
-  _funcAddItem(file, {bool update = false, int index = 0}) async {
+  /*_funcAddItem(file, {bool update = false, int index = 0}) async {
     ListItem firstListItem;
     var firstItemResult =
         await dbManager.getFirstItemOfList(file['mainListName']);
@@ -267,7 +267,7 @@ class _TrackerHomePageState extends State<TrackerHomePage> {
       mainList.sort((a, b) => a.created.compareTo(b.created));
     }
     return true;
-  }
+  }*/
 
   _loadMapboxKey() async {
     mapBoxKey = await MapBoxKeyLoader(context: context).loadKey();

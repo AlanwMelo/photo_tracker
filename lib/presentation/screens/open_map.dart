@@ -30,9 +30,12 @@ class NewMapTestState extends State<OpenMap> with TickerProviderStateMixin {
   String? selectFileName;
 
   addMarker(LatLng latLng, DateTime timestamp, String imgPath) {
-    setState(() {
-      markerList.add(ListItem(latLng, timestamp, imgPath, false, false));
-    });
+      markerList.add(ListItem(
+          latLng: latLng,
+          timestamp: timestamp,
+          imgPath: imgPath,
+          locationError: false,
+          timeError: false));
   }
 
   rmvMarker(ListItem item) {
@@ -120,9 +123,8 @@ class NewMapTestState extends State<OpenMap> with TickerProviderStateMixin {
         ),
         layers: [
           TileLayerOptions(
-            urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-              subdomains: ['a', 'b', 'c']
-          ),
+              urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+              subdomains: ['a', 'b', 'c']),
           MarkerLayerOptions(
             markers: markers,
           ),
@@ -148,7 +150,7 @@ class NewMapTestState extends State<OpenMap> with TickerProviderStateMixin {
         setState(() {});
       },
       child: Container(
-        child: Image.file(File(marker.imgPath), fit: BoxFit.cover),
+        child: Image.network(marker.imgPath, fit: BoxFit.cover),
       ),
     );
   }

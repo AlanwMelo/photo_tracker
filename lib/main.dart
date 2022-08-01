@@ -10,7 +10,6 @@ import 'package:photo_tracker/business_logic/blocs/loadingCoverScreen/loadingCov
 import 'package:photo_tracker/business_logic/blocs/loadingCoverScreen/loadingCoverScreenState.dart';
 import 'package:photo_tracker/business_logic/blocs/userInfo/userInfoBloc.dart';
 import 'package:photo_tracker/business_logic/blocs/userInfo/userInfoState.dart';
-import 'package:photo_tracker/business_logic/blocs/userInfoBloc.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

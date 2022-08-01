@@ -39,6 +39,7 @@ class TrackerGoogleSignIn {
       /// Create firebase user based on user google info
       await FirebaseUser().createUser(
           googleUser?.displayName, googleUser?.email, googleUser?.photoUrl);
+
       return googleUser;
     } catch (error) {
       print(error);

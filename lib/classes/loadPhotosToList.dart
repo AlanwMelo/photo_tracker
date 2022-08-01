@@ -93,11 +93,11 @@ class LoadPhotosToList {
       });
 
       listOfItems.add(ListItem(
-          LatLng(latitude * latitudeRef, longitude * longitudeRef),
-          dateTime,
-          newLocation,
-          locationError,
-          dateTimeError));
+          latLng: LatLng(latitude * latitudeRef, longitude * longitudeRef),
+          timestamp: dateTime,
+          imgPath: newLocation,
+          locationError: locationError,
+          timeError: locationError));
 
       await FlutterImageCompress.compressAndGetFile(element.path, newLocation,
           quality: 25);
