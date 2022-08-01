@@ -41,15 +41,17 @@ class FirebasePost {
       'mainLocation': mainLocation,
       'ownerID': ownerID,
       'postID': thisPost.id,
-      'title': title
+      'title': title,
+      'created': DateTime.now()
     });
 
     /// Add post images
     for (var element in thisPostPicturesList) {
       DocumentReference postPicture = thisPostPicturesCollection.doc();
 
-      String imgURL = await FirestoreManager()
-          .uploadImageAndGetURL(thisPost.id, postPicture.id, element.imgPath);
+      String imgURL = await FirestoreManager().uploadImageAndGetURL(
+          firestorePath: 'posts/${thisPost.id}/${postPicture.id}.jpg',
+          imagePath: element.imgPath);
 
       postPicture.set({
         'firestorePath': imgURL,

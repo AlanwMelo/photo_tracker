@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:photo_tracker/db/dbManager.dart';
 import 'package:photo_tracker/presentation/authenticationHandler.dart';
 import 'package:photo_tracker/business_logic/blocs/authentication/authenticationHandlerBloc.dart';
 import 'package:photo_tracker/business_logic/blocs/authentication/authenticationState.dart';
@@ -16,17 +17,24 @@ Future<void> main() async {
   await Firebase.initializeApp();
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+  final DBManager dbManager = DBManager();
 
-  runApp(MyApp());
+  runApp(MyApp(dbManager: dbManager));
 }
 
 class MyApp extends StatelessWidget {
+  final DBManager dbManager;
+
+  const MyApp({Key? key, required this.dbManager}) : super(key: key);
+
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
         providers: [
           BlocProvider<BlocOfUserInfo>(
-              create: (BuildContext context) => BlocOfUserInfo(UpdateUserInfoState.initialStatus())),
+              create: (BuildContext context) =>
+                  BlocOfUserInfo(BlocOfUserInfoState.initialStatus())),
           BlocProvider<BlocOfAuthentication>(create: (BuildContext context) {
             if (FirebaseAuth.instance.currentUser != null) {
               return BlocOfAuthentication(

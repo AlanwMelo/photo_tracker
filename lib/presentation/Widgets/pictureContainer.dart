@@ -23,7 +23,6 @@ class PictureContainer extends StatelessWidget {
           width: 40,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: Colors.redAccent,
             boxShadow: [
               BoxShadow(
                 blurRadius: 2,
@@ -34,7 +33,9 @@ class PictureContainer extends StatelessWidget {
           ),
           child: ClipRRect(
               borderRadius: BorderRadius.circular(100.0),
-              child: Image.file(File(imgPath))),
+              child: imgPath == ''
+                  ? Image.asset('lib/assets/Icon.png')
+                  : Image.file(File(imgPath))),
         ),
       ),
     );

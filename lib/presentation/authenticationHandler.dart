@@ -11,7 +11,7 @@ import 'package:photo_tracker/presentation/screens/homePage.dart';
 import 'package:photo_tracker/presentation/screens/login/signIn.dart';
 
 handleAuthState(BuildContext context) {
-  return BlocListener<BlocOfUserInfo, UpdateUserInfoState>(
+  return BlocListener<BlocOfUserInfo, BlocOfUserInfoState>(
     listener: (context, state) {
       print(state.userName);
       print(state.userEmail);

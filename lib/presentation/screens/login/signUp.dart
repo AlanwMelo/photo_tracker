@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:photo_tracker/business_logic/userRelated/googleSingIn.dart';
+import 'package:photo_tracker/data/userRelated/googleSingIn.dart';
 import 'package:photo_tracker/presentation/Widgets/loginScreen/divisor.dart';
 import 'package:photo_tracker/presentation/Widgets/loginScreen/loginFormField.dart';
 import 'package:photo_tracker/presentation/Widgets/trackerSimpleButton.dart';

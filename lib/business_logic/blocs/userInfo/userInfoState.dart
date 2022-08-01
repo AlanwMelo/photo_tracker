@@ -1,16 +1,16 @@
-class UpdateUserInfoState {
-  const UpdateUserInfoState._({
+class BlocOfUserInfoState {
+  const BlocOfUserInfoState._({
     this.userName = '',
     this.userEmail = '',
     this.userProfilePic = '',
   });
 
-  UpdateUserInfoState.initialStatus() : this._();
+  BlocOfUserInfoState.initialStatus() : this._();
 
-  UpdateUserInfoState.updateUserStatus(
+  BlocOfUserInfoState.updateUserStatus(
       this.userName, this.userEmail, this.userProfilePic);
 
-  UpdateUserInfoState.updateUserName(
+  BlocOfUserInfoState.updateUserName(
       this.userName, this.userEmail, this.userProfilePic);
 
   final String userName;

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:photo_tracker/business_logic/blocs/loadingCoverScreen/loadingCoverScreenBloc.dart';
 import 'package:photo_tracker/business_logic/blocs/loadingCoverScreen/loadingCoverScreenEvent.dart';
-import 'package:photo_tracker/business_logic/userRelated/googleSingIn.dart';
+import 'package:photo_tracker/data/userRelated/googleSingIn.dart';
 import 'package:photo_tracker/presentation/Widgets/loginScreen/divisor.dart';
 import 'package:photo_tracker/presentation/Widgets/loginScreen/loginFormField.dart';
 import 'package:photo_tracker/presentation/Widgets/trackerSimpleButton.dart';

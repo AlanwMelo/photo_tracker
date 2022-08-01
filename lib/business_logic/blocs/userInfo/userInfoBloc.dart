@@ -4,9 +4,9 @@ import 'package:photo_tracker/business_logic/blocs/userInfo/userInfoState.dart';
 
 enum UpdateUserInfoStatus { initialUserStatus, updateUserStatus }
 
-class BlocOfUserInfo extends Bloc<UpdateUserEvent, UpdateUserInfoState> {
-  BlocOfUserInfo(UpdateUserInfoState initialState)
-      : super(UpdateUserInfoState.initialStatus()) {
+class BlocOfUserInfo extends Bloc<UpdateUserEvent, BlocOfUserInfoState> {
+  BlocOfUserInfo(BlocOfUserInfoState initialState)
+      : super(BlocOfUserInfoState.initialStatus()) {
     on<UpdateUserEventChanged>(_onLoadingCoverScreenState);
   }
 }
@@ -17,10 +17,10 @@ _onLoadingCoverScreenState(
 ) {
   switch (event.status) {
     case UpdateUserInfoStatus.initialUserStatus:
-      emit(UpdateUserInfoState.initialStatus());
+      emit(BlocOfUserInfoState.initialStatus());
       break;
     case UpdateUserInfoStatus.updateUserStatus:
-      emit(UpdateUserInfoState.updateUserStatus(
+      emit(BlocOfUserInfoState.updateUserStatus(
           event.userName, event.userEmail, event.userProfilePic));
       break;
   }

@@ -9,6 +9,7 @@ import 'package:photo_tracker/business_logic/blocs/userInfo/userInfoBloc.dart';
 import 'package:photo_tracker/business_logic/blocs/userInfo/userInfoEvent.dart';
 import 'package:photo_tracker/business_logic/blocs/userInfo/userInfoState.dart';
 import 'package:photo_tracker/data/firebase/firebasePost.dart';
+import 'package:photo_tracker/db/dbManager.dart';
 import 'package:photo_tracker/presentation/Widgets/pictureContainer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -21,7 +22,6 @@ class TrackerAppBar extends StatefulWidget with PreferredSizeWidget {
   final bool? actionTwo;
   final bool? actionThree;
   final Widget? appBarAction;
-
 
   const TrackerAppBar(
       {Key? key,
@@ -42,12 +42,10 @@ class TrackerAppBar extends StatefulWidget with PreferredSizeWidget {
 }
 
 class _AppBar extends State<TrackerAppBar> {
-  late var prefs;
   String picPath = '';
 
   @override
   void initState() {
-    _loadPrefs();
     super.initState();
   }
 
@@ -61,11 +59,12 @@ class _AppBar extends State<TrackerAppBar> {
         titleSpacing: 0,
         actions: [
           widget.appBarAction == null
-              ? GestureDetector(
-                  onTap: () {
-                    _testGoogle();
-                  },
-                  child: PictureContainer(imgPath: picPath))
+              ? GestureDetector(onTap: () {
+                  _testGoogle();
+                }, child: BlocBuilder<BlocOfUserInfo, BlocOfUserInfoState>(
+                  builder: (context, state) {
+                  return PictureContainer(imgPath: state.userProfilePic);
+                }))
               : widget.appBarAction!,
         ],
       );
@@ -96,18 +95,6 @@ class _AppBar extends State<TrackerAppBar> {
   }
 
   Future<void> _testGoogle() async {
-    //FirebasePost().getPostInfo('postID');
-    //FirebasePost().createPost();
-
     //FirebaseAuth.instance.signOut();
-
-    /*BlocProvider.of<BlocOfUserInfo>(context).add(UpdateUserEventChanged(
-        UpdateUserInfoStatus.updateUserStatus, 'Alan', 'Email', 'Pic'));*/
-  }
-
-  _loadPrefs() async {
-    prefs = await SharedPreferences.getInstance();
-    picPath = prefs.getString('imgPath');
-    setState(() {});
   }
 }

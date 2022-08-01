@@ -227,8 +227,7 @@ class _MapAndPhotos extends State<MapAndPhotos> {
                                 openMapController.currentState!
                                     .rmvMarker(fileList[index]);
                               }
-                              dbManager
-                                  .deleteImageItem(fileList[index].imgPath);
+
                               fileList.removeAt(index);
                               setState(() {});
                             }
