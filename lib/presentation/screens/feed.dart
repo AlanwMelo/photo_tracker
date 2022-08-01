@@ -20,7 +20,7 @@ class _FeedState extends State<Feed> {
             itemCount: widget.itemCount,
             itemBuilder: (context, index) {
               return FeedCard(
-                name: 'teste',
+                name: 'vdsCi2X1lrD7dmDDfK0r',
                 mapboxKey: widget.mapBoxKey,
               );
             }),

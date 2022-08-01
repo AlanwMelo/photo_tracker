@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_tracker/data/firebase/firebasePost.dart';
+import 'package:photo_tracker/data/listItem.dart';
 import 'package:photo_tracker/presentation/Widgets/appBar.dart';
 import 'package:photo_tracker/presentation/Widgets/trackerSimpleButton.dart';
 import 'package:photo_tracker/presentation/screens/newPost/add_photos.dart';
@@ -15,6 +16,7 @@ class NewPost extends StatefulWidget {
 class _NewPostState extends State<NewPost> {
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
+  List<ListItem> imagesList = [];
 
   @override
   Widget build(BuildContext context) {
@@ -128,8 +130,8 @@ class _NewPostState extends State<NewPost> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => AddPhotosScreen(
-                              confirm: (imagesList) {
-                                print(imagesList.length);
+                              confirm: (receivedImagesList) {
+                                imagesList = receivedImagesList;
                               },
                             )));
               },
@@ -148,6 +150,9 @@ class _NewPostState extends State<NewPost> {
         mainLocation: '',
         ownerID: FirebaseAuth.instance.currentUser!.uid,
         title: titleController.text,
-        thisPostPicturesList2: []);
+        thisPostPicturesList: imagesList);
+
+    Navigator.of(context).pop();
   }
+
 }

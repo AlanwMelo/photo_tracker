@@ -5,17 +5,19 @@ import 'package:photo_tracker/data/firebase/firebasePost.dart';
 
 /// Read firebase images list based on postID and return a List of List items to be displayed on the map
 class CreateListItemFromQueryResult {
-  fireTest() async {
+  fireTest(String postID) async {
     List<ListItem> imagesList = [];
 
-    QuerySnapshot postImages = await FirebasePost().getPostImages('postID');
+    QuerySnapshot postImages = await FirebasePost().getPostImages(postID);
     for (var element in postImages.docs) {
+      GeoPoint geoPoint = element.get('latLong');
       imagesList.add(ListItem(
-          latLng: LatLng(00, 00),
-          timestamp: DateTime.fromMicrosecondsSinceEpoch(00),
+          latLng: LatLng(geoPoint.latitude, geoPoint.longitude),
+          timestamp:
+              DateTime.fromMillisecondsSinceEpoch(element.get('timestamp')),
           imgPath: element.get('firestorePath'),
-          locationError: false,
-          timeError: true));
+          locationError: element.get('locationError'),
+          timeError: element.get('timeError')));
     }
 
     return imagesList;

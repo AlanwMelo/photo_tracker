@@ -1,12 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:photo_tracker/data/firebase/firestore.dart';
+import 'package:photo_tracker/data/listItem.dart';
 
 class FirebasePost {
   CollectionReference _posts = FirebaseFirestore.instance.collection('posts');
 
   getPostInfo(String postID) async {
-    DocumentSnapshot thisPost = await _posts.doc('9o78LZXmSJhYUMpBAFqm').get();
+    DocumentSnapshot thisPost = await _posts.doc(postID).get();
     QuerySnapshot thisPostPictures =
-        await _posts.doc('9o78LZXmSJhYUMpBAFqm').collection('images').get();
+        await _posts.doc(postID).collection('images').get();
     print(thisPost.data());
     thisPostPictures.docs.forEach((element) {
       print(element.data());
@@ -15,7 +17,7 @@ class FirebasePost {
 
   getPostImages(String postID) async {
     QuerySnapshot thisPostPictures =
-        await _posts.doc('9o78LZXmSJhYUMpBAFqm').collection('images').get();
+        await _posts.doc(postID).collection('images').get();
 
     return thisPostPictures;
   }
@@ -26,9 +28,8 @@ class FirebasePost {
     required String mainLocation,
     required String ownerID,
     required String title,
-    required List thisPostPicturesList2,
+    required List<ListItem> thisPostPicturesList,
   }) async {
-    List thisPostPicturesList = [1, 2, 3, 4, 5];
     DocumentReference thisPost = _posts.doc();
     CollectionReference thisPostPicturesCollection =
         _posts.doc(thisPost.id).collection('images');
@@ -47,14 +48,17 @@ class FirebasePost {
     for (var element in thisPostPicturesList) {
       DocumentReference postPicture = thisPostPicturesCollection.doc();
 
+      String imgURL = await FirestoreManager()
+          .uploadImageAndGetURL(thisPost.id, postPicture.id, element.imgPath);
+
       postPicture.set({
-        'firestorePath': 'aa',
+        'firestorePath': imgURL,
         'imageID': postPicture.id,
-        'latLong': '00',
-        'locationError': false,
-        'timeError': false,
-        'timestamp': '000000854',
-        'locationText': '000000854'
+        'latLong': GeoPoint(element.latLng.latitude, element.latLng.longitude),
+        'locationError': element.locationError,
+        'timeError': element.timeError,
+        'timestamp': element.timestamp.millisecondsSinceEpoch,
+        'locationText': 'Ainda nao'
       });
     }
 

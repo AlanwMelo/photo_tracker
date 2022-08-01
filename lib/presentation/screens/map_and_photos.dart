@@ -379,7 +379,7 @@ class _MapAndPhotos extends State<MapAndPhotos> {
 
   // #### Funções - Inicio ####
   _loadList(String listName) async {
-    fileList = await CreateListItemFromQueryResult().fireTest();
+    fileList = await CreateListItemFromQueryResult().fireTest(listName);
     for (var element in fileList) {
       _addMarkerToMap(element);
     }
