@@ -20,6 +20,7 @@ import 'package:scroll_to_index/scroll_to_index.dart';
 class MapAndPhotos extends StatefulWidget {
   final String mapboxKey;
   final String postID;
+  final String postTitle;
   final bool goToComments;
   final Function(bool) answer;
 
@@ -28,7 +29,8 @@ class MapAndPhotos extends StatefulWidget {
       required this.postID,
       required this.answer,
       required this.mapboxKey,
-      this.goToComments = false})
+      this.goToComments = false,
+      required this.postTitle})
       : super(key: key);
 
   @override
@@ -80,9 +82,9 @@ class _MapAndPhotos extends State<MapAndPhotos> {
 
     return Scaffold(
       appBar: TrackerAppBar(
-        title: 'Holambra',
+        title: widget.postTitle,
         mainScreen: false,
-        location: 'Holambra - SP',
+        location: 'Vai ter uma localização',
       ),
       body: _mapAndPhotosBody(screenUsableHeight, screenUsableWidth),
     );
@@ -470,8 +472,8 @@ class _MapAndPhotos extends State<MapAndPhotos> {
 
   _openComments() {
     Navigator.of(context).push(routeSlideUp(CommentsScreen(
-      location: 'Holambra - SP',
-      title: 'Holambra',
+      location: 'Vai ter uma localização',
+      title: widget.postTitle,
       closeButton: (_) => Navigator.of(context).pop(),
     )));
   }

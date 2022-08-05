@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:photo_tracker/business_logic/blocs/loadingCoverScreen/loadingCoverScreenBloc.dart';
+import 'package:photo_tracker/business_logic/blocs/loadingCoverScreen/loadingCoverScreenEvent.dart';
 import 'package:photo_tracker/business_logic/blocs/userInfo/userInfoBloc.dart';
 import 'package:photo_tracker/business_logic/blocs/userInfo/userInfoEvent.dart';
 import 'package:photo_tracker/classes/mainListItem.dart';
@@ -40,6 +42,8 @@ class _TrackerHomePageState extends State<TrackerHomePage> {
   void initState() {
     super.initState();
     //CacheCleaner().cleanUnusedImgs();
+    BlocProvider.of<BlocOfLoadingCoverScreen>(context).add(
+        LoadingCoverScreenEventChanged(LoadingCoverScreenStatus.notLoading));
     _loadMapboxKey();
     _loadPrefs();
   }
@@ -257,6 +261,4 @@ class _TrackerHomePageState extends State<TrackerHomePage> {
         return NotificationsScreen();
     }
   }
-
-
 }

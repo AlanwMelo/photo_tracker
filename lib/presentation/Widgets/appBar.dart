@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +15,7 @@ import 'package:photo_tracker/db/dbManager.dart';
 import 'package:photo_tracker/presentation/Widgets/pictureContainer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:http/http.dart' as http;
 
 class TrackerAppBar extends StatefulWidget with PreferredSizeWidget {
   final String title;
@@ -63,7 +66,10 @@ class _AppBar extends State<TrackerAppBar> {
                   _testGoogle();
                 }, child: BlocBuilder<BlocOfUserInfo, BlocOfUserInfoState>(
                   builder: (context, state) {
-                  return PictureContainer(imgPath: state.userProfilePic, pathOrURl: true,);
+                  return PictureContainer(
+                    imgPath: state.userProfilePic,
+                    pathOrURl: true,
+                  );
                 }))
               : widget.appBarAction!,
         ],
@@ -95,7 +101,17 @@ class _AppBar extends State<TrackerAppBar> {
   }
 
   Future<void> _testGoogle() async {
-    FirebasePost().getPostsForFeed();
+    final body = {
+      'image': '/posts/DzH3i1SFqyZnMIK8ikUY',
+    };
+
+    final jsonString = json.encode(body);
+    final uri = Uri.parse(
+        'https://us-central1-photo-tracker-fa162.cloudfunctions.net/helloWorld2');
+    final response = await http.post(uri, body: jsonString);
+    print(response.body);
+
+    //FirebasePost().getPostsForFeed();
     //FirebaseAuth.instance.signOut();
   }
 }

@@ -33,6 +33,7 @@ class _FeedCardState extends State<FeedCard> {
             context,
             MaterialPageRoute(
                 builder: (context) => MapAndPhotos(
+                    postTitle: thisPost['title'],
                     postID: widget.postID,
                     answer: (_) {},
                     mapboxKey: widget.mapboxKey)));
@@ -112,7 +113,6 @@ class _FeedCardState extends State<FeedCard> {
 
   _publicationCoverPic() {
     return Container(
-      color: Colors.grey.withOpacity(0.05),
       child: CarouselSlider(
         options: CarouselOptions(
             height: 400,
@@ -149,6 +149,7 @@ class _FeedCardState extends State<FeedCard> {
               child: GestureDetector(
                   onTap: () => Navigator.of(context).push(routeSlideUp(
                       MapAndPhotos(
+                          postTitle: thisPost['title'],
                           postID: widget.postID,
                           answer: (_) {},
                           mapboxKey: widget.mapboxKey,

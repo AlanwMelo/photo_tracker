@@ -47,5 +47,7 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 /android/app/google-services.json
+upload-keystore.jks
+firebase-functions
 
 ios/firebase_app_id_file.json

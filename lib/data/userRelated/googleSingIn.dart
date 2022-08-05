@@ -31,10 +31,7 @@ class TrackerGoogleSignIn {
       db.insertIntoUserInfo(
           googleUser?.displayName, googleUser?.email, picPath);
 
-      await FirebaseAuth.instance.signInWithCredential(credential).then(
-          (value) => BlocProvider.of<BlocOfLoadingCoverScreen>(context).add(
-              LoadingCoverScreenEventChanged(
-                  LoadingCoverScreenStatus.notLoading)));
+      await FirebaseAuth.instance.signInWithCredential(credential);
 
       /// Create firebase user based on user google info
       await FirebaseUser().createUser(

@@ -36,7 +36,7 @@ class _EditPhotoListItem extends State<EditPhotoListItem> {
     return Container(
       width: 115,
       height: 100,
-      child: Image.file(File(widget.imagePath), fit: BoxFit.cover),
+      child: Image.file(File(widget.imagePath), fit: BoxFit.cover,filterQuality: FilterQuality.low,),
     );
   }
 

@@ -13,6 +13,7 @@ class LoadPhotosToList {
   LoadPhotosToList(this.result);
 
   loadPhotos() async {
+
     List<ListItem> listOfItems = [];
     print('result Start');
 
@@ -36,7 +37,7 @@ class LoadPhotosToList {
       DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(0);
       bool dateTimeError = false;
 
-      await data.then((data) async {
+      /*await data.then((data) async {
         if (!data.containsKey('GPS GPSLatitude') ||
             !data.containsKey('GPS GPSLongitude') ||
             !data.containsKey('GPS GPSLatitudeRef') ||
@@ -90,19 +91,19 @@ class LoadPhotosToList {
           }
         }
       });
-
+*/
       listOfItems.add(ListItem(
-          latLng: LatLng(latitude * latitudeRef, longitude * longitudeRef),
+          latLng: LatLng(00,00),
           timestamp: dateTime,
-          imgPath: newLocation,
+          imgPath: element.path,
           locationError: locationError,
-          timeError: locationError));
+          timeError: dateTimeError));
 
-      await FlutterImageCompress.compressAndGetFile(element.path, newLocation,
-          quality: 25);
+      /*await FlutterImageCompress.compressAndGetFile(element.path, newLocation,
+          quality: 50);*/
     }
 
-    await FilePicker.platform.clearTemporaryFiles();
+    //await FilePicker.platform.clearTemporaryFiles();
     print('result done');
     return listOfItems;
   }
