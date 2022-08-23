@@ -8,9 +8,6 @@ class FirestoreManager {
   uploadImageAndGetURL({required String imagePath, required String firestorePath}) async {
     // firestorePath example: 'posts/${thisPost.id}/${postPicture.id}.jpg'
 
-
-    print(imagePath);
-    print(firestorePath);
     final imageRef = _storageRef.child(firestorePath);
     try {
       await imageRef.putFile(File(imagePath));

@@ -7,11 +7,11 @@ enum UpdateUserInfoStatus { initialUserStatus, updateUserStatus }
 class BlocOfUserInfo extends Bloc<UpdateUserEvent, BlocOfUserInfoState> {
   BlocOfUserInfo(BlocOfUserInfoState initialState)
       : super(BlocOfUserInfoState.initialStatus()) {
-    on<UpdateUserEventChanged>(_onLoadingCoverScreenState);
+    on<UpdateUserEventChanged>(_onUserInfoState);
   }
 }
 
-_onLoadingCoverScreenState(
+_onUserInfoState(
   UpdateUserEventChanged event,
   Emitter emit,
 ) {

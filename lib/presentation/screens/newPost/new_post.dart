@@ -1,7 +1,9 @@
 import 'dart:ui';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:photo_tracker/business_logic/processingFilesStream.dart';
 import 'package:photo_tracker/data/firebase/firebasePost.dart';
 import 'package:photo_tracker/data/listItem.dart';
 import 'package:photo_tracker/presentation/Widgets/appBar.dart';
@@ -9,6 +11,10 @@ import 'package:photo_tracker/presentation/Widgets/trackerSimpleButton.dart';
 import 'package:photo_tracker/presentation/screens/newPost/add_photos.dart';
 
 class NewPost extends StatefulWidget {
+  final ProcessingFilesStream processingFilesStream;
+
+  NewPost(this.processingFilesStream);
+
   @override
   State<StatefulWidget> createState() => _NewPostState();
 }
@@ -17,6 +23,14 @@ class _NewPostState extends State<NewPost> {
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   List<ListItem> imagesList = [];
+  late DocumentReference _thisPost;
+  FirebasePost firebasePost = FirebasePost();
+
+  @override
+  void initState() {
+    _thisPost = firebasePost.getNewPostId();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -130,6 +144,9 @@ class _NewPostState extends State<NewPost> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => AddPhotosScreen(
+                              postID: _thisPost.id,
+                              processingFilesStream:
+                                  widget.processingFilesStream,
                               confirm: (receivedImagesList) {
                                 imagesList = receivedImagesList;
                               },
@@ -144,15 +161,15 @@ class _NewPostState extends State<NewPost> {
   }
 
   _createPost() {
-    FirebasePost().createPost(
+    firebasePost.createPost(
         collaborators: [],
         description: descriptionController.text,
         mainLocation: '',
         ownerID: FirebaseAuth.instance.currentUser!.uid,
         title: titleController.text,
-        thisPostPicturesList: imagesList);
+        thisPostPicturesList: imagesList,
+        thisPost: _thisPost);
 
     Navigator.of(context).pop();
   }
-
 }

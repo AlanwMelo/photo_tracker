@@ -11,6 +11,10 @@ class FirebasePost {
     return thisPost;
   }
 
+  getNewPostId() {
+    return _posts.doc();
+  }
+
   getPostsForFeed() async {
     QuerySnapshot a = await _posts.get();
     return a.docs;
@@ -30,8 +34,8 @@ class FirebasePost {
     required String ownerID,
     required String title,
     required List<ListItem> thisPostPicturesList,
+    required DocumentReference thisPost,
   }) async {
-    DocumentReference thisPost = _posts.doc();
     CollectionReference thisPostPicturesCollection =
         _posts.doc(thisPost.id).collection('images');
 

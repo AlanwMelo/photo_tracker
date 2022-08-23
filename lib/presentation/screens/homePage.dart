@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:photo_tracker/business_logic/blocs/loadingCoverScreen/loadingCoverScreenBloc.dart';
 import 'package:photo_tracker/business_logic/blocs/loadingCoverScreen/loadingCoverScreenEvent.dart';
 import 'package:photo_tracker/business_logic/blocs/userInfo/userInfoBloc.dart';
 import 'package:photo_tracker/business_logic/blocs/userInfo/userInfoEvent.dart';
+import 'package:photo_tracker/business_logic/processingFilesStream.dart';
 import 'package:photo_tracker/classes/mainListItem.dart';
 import 'package:photo_tracker/data/mapBoxKeyLoader.dart';
 import 'package:photo_tracker/db/dbManager.dart';
@@ -33,6 +36,8 @@ class _TrackerHomePageState extends State<TrackerHomePage> {
   late String mapBoxKey;
   bool loading = true;
   var scaffoldKey = GlobalKey<ScaffoldState>();
+  ProcessingFilesStream processingFiles = ProcessingFilesStream();
+  late Stream processingFilesStream;
 
   String varFeedMode = 'feed';
   bool varFeedSelected = true;
@@ -44,6 +49,7 @@ class _TrackerHomePageState extends State<TrackerHomePage> {
     //CacheCleaner().cleanUnusedImgs();
     BlocProvider.of<BlocOfLoadingCoverScreen>(context).add(
         LoadingCoverScreenEventChanged(LoadingCoverScreenStatus.notLoading));
+    processingFilesStream = processingFiles.initStream();
     _loadMapboxKey();
     _loadPrefs();
   }
@@ -57,8 +63,6 @@ class _TrackerHomePageState extends State<TrackerHomePage> {
         mainScreen: true,
       ),
       body: _mainBody(),
-
-      ///body: _mainListView(),
     );
   }
 
@@ -159,6 +163,12 @@ class _TrackerHomePageState extends State<TrackerHomePage> {
               child: Container(
                 child: Column(
                   children: [
+                    StreamBuilder(
+                        stream: processingFilesStream,
+                        builder: (context, snapshot) {
+                          print('from home ${snapshot.data}');
+                          return Container(height: 20, color: Colors.redAccent);
+                        }),
                     Container(
                       child: _feedMode(),
                       color: Colors.white,
@@ -199,7 +209,7 @@ class _TrackerHomePageState extends State<TrackerHomePage> {
                   child: GestureDetector(
             onTap: () {
               Navigator.push(
-                  context, MaterialPageRoute(builder: (context) => NewPost()));
+                  context, MaterialPageRoute(builder: (context) => NewPost(processingFiles)));
             },
             child: Center(
                 child: Icon(

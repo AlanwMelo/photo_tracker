@@ -3,8 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_tracker/business_logic/addPhotos/addPhotosListItem.dart';
 import 'package:photo_tracker/business_logic/addPhotos/getFilesFromPickerResult.dart';
+import 'package:photo_tracker/business_logic/processingFilesStream.dart';
 import 'package:photo_tracker/classes/filePicker.dart';
-import 'package:photo_tracker/classes/loadPhotosToList.dart';
 import 'package:photo_tracker/data/listItem.dart';
 import 'package:photo_tracker/presentation/Widgets/appBar.dart';
 import 'package:photo_tracker/presentation/Widgets/editPhotoListItem.dart';
@@ -12,8 +12,12 @@ import 'package:photo_tracker/presentation/Widgets/trackerSimpleButton.dart';
 
 class AddPhotosScreen extends StatefulWidget {
   final Function(List<ListItem>) confirm;
+  final ProcessingFilesStream processingFilesStream;
+  final String postID;
 
-  const AddPhotosScreen({Key? key, required this.confirm}) : super(key: key);
+  const AddPhotosScreen(
+      {Key? key, required this.confirm, required this.processingFilesStream, required this.postID})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _AddPhotosScreen();
@@ -94,6 +98,13 @@ class _AddPhotosScreen extends State<AddPhotosScreen> {
     for (var element in result) {
       if (!imagesList.any((e) => e.name == element.name)) {
         imagesList.add(element);
+
+        Map<String, dynamic> fileToProcess = {
+          "fileToProcess": element.path,
+          "fileName": element.name,
+          "post": widget.postID,
+        };
+        widget.processingFilesStream.addToQueue(fileToProcess);
       }
     }
     setState(() {});
