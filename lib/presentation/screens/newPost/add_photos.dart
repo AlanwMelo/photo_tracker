@@ -38,7 +38,8 @@ class _AddPhotosScreen extends State<AddPhotosScreen> {
       if (event.toString().contains('location')) {
         if (event['location'] != 'error') {
           GeoPoint geoPoint = event['location'];
-          location = '${geoPoint.latitude.toStringAsFixed(8)}, ${geoPoint.longitude.toStringAsFixed(8)}';
+          location =
+              '${geoPoint.latitude.toStringAsFixed(8)}, ${geoPoint.longitude.toStringAsFixed(8)}';
         }
         var x =
             imagesList.indexWhere((element) => element.name == event['file']);

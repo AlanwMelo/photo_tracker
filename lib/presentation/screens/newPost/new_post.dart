@@ -168,7 +168,8 @@ class _NewPostState extends State<NewPost> {
         ownerID: FirebaseAuth.instance.currentUser!.uid,
         title: titleController.text,
         thisPostPicturesList: imagesList,
-        thisPost: _thisPost);
+        thisPost: _thisPost,
+        processingFiles: widget.processingFilesStream);
 
     Navigator.of(context).pop();
   }

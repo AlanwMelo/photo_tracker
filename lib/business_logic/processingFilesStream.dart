@@ -38,6 +38,7 @@ class ProcessingFilesStream {
         try {
           Map<String, dynamic> map = {
             "processingFile": queue.first['fileName'],
+            "posting": true,
             "post": queue.first['post']
           };
 
@@ -59,7 +60,7 @@ class ProcessingFilesStream {
         } catch (e) {}
         queue.removeFirst();
       }
-      Map<String, dynamic> map = {"finished": true};
+      Map<String, dynamic> map = {"posting": false};
       controller.add(map);
       queueRunning = false;
     }
