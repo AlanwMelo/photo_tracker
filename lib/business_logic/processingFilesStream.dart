@@ -8,7 +8,7 @@ import 'package:photo_tracker/data/imageCompressor.dart';
 import 'package:http/http.dart' as http;
 
 class ProcessingFilesStream {
-  StreamController<String> controller = StreamController<String>();
+  StreamController<Map> controller = StreamController<Map>();
   ImageCompressor imageCompressor = ImageCompressor();
   FirestoreManager firestoreManager = FirestoreManager();
   late Stream stream;
@@ -17,16 +17,18 @@ class ProcessingFilesStream {
 
   initStream() {
     stream = controller.stream.asBroadcastStream();
-    stream.listen((event) {
-      print('from stream $event');
-    });
     return stream;
   }
 
-  addToQueue(Map map) async {
-    String newLocation;
+  getStream() {
+    return stream;
+  }
 
-    controller.add(map['fileToProcess']);
+  addToStream(Map map) {
+    controller.add(map);
+  }
+
+  addToQueue(Map map) async {
     if (map.toString().contains('fileToProcess')) {
       queue.add(map);
     }
@@ -34,6 +36,12 @@ class ProcessingFilesStream {
       queueRunning = true;
       while (queue.isNotEmpty) {
         try {
+          Map<String, dynamic> map = {
+            "processingFile": queue.first['fileName'],
+            "post": queue.first['post']
+          };
+
+          controller.add(map);
           CollectionReference thisPostPicturesCollection = FirebaseFirestore
               .instance
               .collection('posts')
@@ -41,15 +49,18 @@ class ProcessingFilesStream {
               .collection('images');
 
           List<String> imgURLs;
+          String newLocation;
 
           newLocation = await imageCompressor.compress(queue.first);
           imgURLs = await _uploadCompressedFile(
               queue.first, newLocation, thisPostPicturesCollection);
-          createImgDocument(imgURLs, thisPostPicturesCollection);
-          queue.removeFirst();
-          await Future.delayed(Duration(seconds: 2));
+          await createImgDocument(
+              imgURLs, thisPostPicturesCollection, queue.first['fileName']);
         } catch (e) {}
+        queue.removeFirst();
       }
+      Map<String, dynamic> map = {"finished": true};
+      controller.add(map);
       queueRunning = false;
     }
   }
@@ -65,8 +76,8 @@ class ProcessingFilesStream {
     return imgURL;
   }
 
-  createImgDocument(
-      List imgURLs, CollectionReference thisPostPicturesCollection) async {
+  createImgDocument(List imgURLs,
+      CollectionReference thisPostPicturesCollection, String fileName) async {
     DocumentReference postPicture = thisPostPicturesCollection.doc();
     final uri = Uri.parse(
         'https://us-central1-photo-tracker-fa162.cloudfunctions.net/readImageData');
@@ -92,11 +103,15 @@ class ProcessingFilesStream {
     try {
       geoPoint = GeoPoint(
           convertedResponse['latitude'], convertedResponse['longitude']);
+      Map<String, dynamic> map = {"location": geoPoint, "file": fileName};
+      addToStream(map);
     } catch (e) {
+      Map<String, dynamic> map = {"location": "error", "file": fileName};
+      addToStream(map);
       locationError = true;
     }
 
-    postPicture.set({
+    await postPicture.set({
       'firestorePath': imgURLs[0],
       'imageID': postPicture.id,
       'latLong': geoPoint,
@@ -105,5 +120,7 @@ class ProcessingFilesStream {
       'timestamp': dateTime,
       'locationText': 'Ainda nao'
     });
+
+    return true;
   }
 }

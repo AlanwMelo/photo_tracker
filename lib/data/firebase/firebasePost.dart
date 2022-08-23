@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:photo_tracker/data/firebase/firestore.dart';
 import 'package:photo_tracker/data/listItem.dart';
 
 class FirebasePost {

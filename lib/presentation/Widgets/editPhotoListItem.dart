@@ -8,13 +8,15 @@ class EditPhotoListItem extends StatefulWidget {
   final String imageName;
   final String location;
   final String collaborator;
+  final bool processing;
 
   const EditPhotoListItem(
       {Key? key,
       required this.imagePath,
       required this.imageName,
       required this.location,
-      required this.collaborator})
+      required this.collaborator,
+      required this.processing})
       : super(key: key);
 
   @override
@@ -24,17 +26,29 @@ class EditPhotoListItem extends StatefulWidget {
 class _EditPhotoListItem extends State<EditPhotoListItem> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 70,
-      width: MediaQuery.of(context).size.width,
-      color: Colors.white,
-      child: Row(
-        children: [
-          _image(),
-          _info(),
-          _picture(),
-        ],
-      ),
+    return Stack(
+      children: [
+        Container(
+          height: 70,
+          width: MediaQuery.of(context).size.width,
+          color: Colors.white,
+          child: Row(
+            children: [
+              _image(),
+              _info(),
+              _picture(),
+            ],
+          ),
+        ),
+        widget.processing
+            ? Container(
+                height: 70,
+                width: MediaQuery.of(context).size.width,
+                color: Colors.white54,
+                child: Center(child: CircularProgressIndicator()),
+              )
+            : Container()
+      ],
     );
   }
 
@@ -93,6 +107,7 @@ class _EditPhotoListItem extends State<EditPhotoListItem> {
         break;
       case 'error':
         text = 'Não foi possivel localizar a imagem';
+        color = Colors.redAccent;
         break;
       default:
         text = widget.location;

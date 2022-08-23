@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/src/file_picker_result.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +17,10 @@ class AddPhotosScreen extends StatefulWidget {
   final String postID;
 
   const AddPhotosScreen(
-      {Key? key, required this.confirm, required this.processingFilesStream, required this.postID})
+      {Key? key,
+      required this.confirm,
+      required this.processingFilesStream,
+      required this.postID})
       : super(key: key);
 
   @override
@@ -26,6 +30,27 @@ class AddPhotosScreen extends StatefulWidget {
 class _AddPhotosScreen extends State<AddPhotosScreen> {
   List<ListItem> uploadList = [];
   List<AddPhotosListItem> imagesList = [];
+
+  @override
+  void initState() {
+    widget.processingFilesStream.stream.listen((event) {
+      String location = 'error';
+      if (event.toString().contains('location')) {
+        if (event['location'] != 'error') {
+          GeoPoint geoPoint = event['location'];
+          location = '${geoPoint.latitude.toStringAsFixed(8)}, ${geoPoint.longitude.toStringAsFixed(8)}';
+        }
+        var x =
+            imagesList.indexWhere((element) => element.name == event['file']);
+        imagesList[x] = AddPhotosListItem(
+            name: imagesList[x].name,
+            path: imagesList[x].path,
+            location: location,
+            collaborator: imagesList[x].collaborator);
+      }
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,19 +84,28 @@ class _AddPhotosScreen extends State<AddPhotosScreen> {
   }
 
   _listView() {
-    return Container(
-      child: ListView.builder(
-          itemCount: imagesList.length,
-          itemBuilder: (context, index) {
-            return Container(
-                margin: EdgeInsets.only(top: 2),
-                child: EditPhotoListItem(
-                  imagePath: imagesList[index].path, // path
-                  imageName: imagesList[index].name,
-                  location: imagesList[index].location,
-                  collaborator: imagesList[index].collaborator, // name
-                ));
-          }),
+    return StreamBuilder(
+      stream: widget.processingFilesStream.stream,
+      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+        return Container(
+          child: ListView.builder(
+              itemCount: imagesList.length,
+              itemBuilder: (context, index) {
+                return Container(
+                    margin: EdgeInsets.only(top: 2),
+                    child: EditPhotoListItem(
+                      imagePath: imagesList[index].path,
+                      imageName: imagesList[index].name,
+                      location: imagesList[index].location,
+                      collaborator: imagesList[index].collaborator,
+                      processing: snapshot.data['processingFile'] ==
+                              imagesList[index].name
+                          ? true
+                          : false, // name
+                    ));
+              }),
+        );
+      },
     );
   }
 
