@@ -50,25 +50,6 @@ class FirebasePost {
       'created': DateTime.now()
     });
 
-    /// Add post images
-    for (var element in thisPostPicturesList) {
-      DocumentReference postPicture = thisPostPicturesCollection.doc();
-
-      String imgURL = await FirestoreManager().uploadImageAndGetURL(
-          firestorePath: 'posts/${thisPost.id}/${postPicture.id}.jpg',
-          imagePath: element.imgPath);
-
-      postPicture.set({
-        'firestorePath': imgURL,
-        'imageID': postPicture.id,
-        'latLong': GeoPoint(element.latLng.latitude, element.latLng.longitude),
-        'locationError': element.locationError,
-        'timeError': element.timeError,
-        'timestamp': element.timestamp.millisecondsSinceEpoch,
-        'locationText': 'Ainda nao'
-      });
-    }
-
     return true;
   }
 }

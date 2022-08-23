@@ -101,15 +101,7 @@ class _AppBar extends State<TrackerAppBar> {
   }
 
   Future<void> _testGoogle() async {
-    final body = {
-      'image': 'posts/yauZTZ05xS33hFYLhcUg/aSpF2A9zvxwDHkLlx5NM.jpg',
-    };
 
-    final jsonString = json.encode(body);
-    final uri = Uri.parse(
-        'https://us-central1-photo-tracker-fa162.cloudfunctions.net/readImageData');
-    final response = await http.post(uri, body: jsonString);
-    print(response.body);
 
     //FirebasePost().getPostsForFeed();
     //FirebaseAuth.instance.signOut();
