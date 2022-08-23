@@ -6,9 +6,15 @@ import 'package:photo_tracker/presentation/Widgets/pictureContainer.dart';
 class EditPhotoListItem extends StatefulWidget {
   final String imagePath;
   final String imageName;
+  final String location;
+  final String collaborator;
 
   const EditPhotoListItem(
-      {Key? key, required this.imagePath, required this.imageName})
+      {Key? key,
+      required this.imagePath,
+      required this.imageName,
+      required this.location,
+      required this.collaborator})
       : super(key: key);
 
   @override
@@ -36,7 +42,8 @@ class _EditPhotoListItem extends State<EditPhotoListItem> {
     return Container(
       width: 115,
       height: 100,
-      child: Image.file(File(widget.imagePath), fit: BoxFit.cover,filterQuality: FilterQuality.low,),
+      child: Image.file(File(widget.imagePath),
+          fit: BoxFit.cover, filterQuality: FilterQuality.low),
     );
   }
 
@@ -57,10 +64,7 @@ class _EditPhotoListItem extends State<EditPhotoListItem> {
           Container(
             child: Row(
               children: [
-                Text(
-                  '27.173891, 78.042068',
-                  style: TextStyle(fontSize: 12, color: Colors.lightBlue),
-                ),
+                _locationText(),
               ],
             ),
           ),
@@ -70,9 +74,35 @@ class _EditPhotoListItem extends State<EditPhotoListItem> {
   }
 
   _picture() {
-    return Container(
-      width: 35,
-      child: PictureContainer(imgPath: '', pathOrURl: true),
+    return widget.collaborator == 'user'
+        ? Container()
+        : Container(
+            width: 35,
+            child: PictureContainer(imgPath: '', pathOrURl: true),
+          );
+  }
+
+  _locationText() {
+    String text;
+    Color? color;
+
+    switch (widget.location) {
+      case 'not processed':
+        text = 'Aguardando processamento';
+        color = Colors.orange;
+        break;
+      case 'error':
+        text = 'Não foi possivel localizar a imagem';
+        break;
+      default:
+        text = widget.location;
+        color = Colors.lightBlue;
+        break;
+    }
+
+    return Text(
+      text,
+      style: TextStyle(fontSize: 12, color: color),
     );
   }
 }

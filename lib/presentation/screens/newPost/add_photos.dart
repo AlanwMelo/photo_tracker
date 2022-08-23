@@ -1,5 +1,8 @@
+import 'package:file_picker/src/file_picker_result.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:photo_tracker/business_logic/addPhotos/addPhotosListItem.dart';
+import 'package:photo_tracker/business_logic/addPhotos/getFilesFromPickerResult.dart';
 import 'package:photo_tracker/classes/filePicker.dart';
 import 'package:photo_tracker/classes/loadPhotosToList.dart';
 import 'package:photo_tracker/data/listItem.dart';
@@ -17,7 +20,8 @@ class AddPhotosScreen extends StatefulWidget {
 }
 
 class _AddPhotosScreen extends State<AddPhotosScreen> {
-  List<ListItem> imagesList = [];
+  List<ListItem> uploadList = [];
+  List<AddPhotosListItem> imagesList = [];
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +33,7 @@ class _AddPhotosScreen extends State<AddPhotosScreen> {
         appBarAction: TrackerSimpleButton(
             text: 'Confirm',
             pressed: (_) {
-              widget.confirm(imagesList);
+              widget.confirm(uploadList);
               Navigator.of(context).pop();
             }),
       ),
@@ -58,8 +62,10 @@ class _AddPhotosScreen extends State<AddPhotosScreen> {
             return Container(
                 margin: EdgeInsets.only(top: 2),
                 child: EditPhotoListItem(
-                  imagePath: imagesList[index].imgPath, // path
-                  imageName: 'img name', // name
+                  imagePath: imagesList[index].path, // path
+                  imageName: imagesList[index].name,
+                  location: imagesList[index].location,
+                  collaborator: imagesList[index].collaborator, // name
                 ));
           }),
     );
@@ -73,17 +79,23 @@ class _AddPhotosScreen extends State<AddPhotosScreen> {
         onPressed: () {
           MyFilePicker(pickedFiles: (filePickerResult) async {
             if (filePickerResult != null) {
-              List<ListItem> pickerImageList =
-                  await LoadPhotosToList(filePickerResult).loadPhotos();
-              for (ListItem element in pickerImageList) {
-                imagesList.add(element);
-                setState(() {});
-              }
+              _addImagerToList(filePickerResult);
             }
           }).pickFiles();
         },
         child: Text('Add More'),
       ),
     );
+  }
+
+  _addImagerToList(FilePickerResult filePickerResult) async {
+    List<AddPhotosListItem> result =
+        await GetFilesFromPickerResult(filePickerResult).getFilesPathAndNames();
+    for (var element in result) {
+      if (!imagesList.any((e) => e.name == element.name)) {
+        imagesList.add(element);
+      }
+    }
+    setState(() {});
   }
 }

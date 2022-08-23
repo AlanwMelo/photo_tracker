@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:exif/exif.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:photo_tracker/data/checkAppImagesDir.dart';
@@ -13,7 +12,6 @@ class LoadPhotosToList {
   LoadPhotosToList(this.result);
 
   loadPhotos() async {
-
     List<ListItem> listOfItems = [];
     print('result Start');
 
@@ -28,7 +26,7 @@ class LoadPhotosToList {
 
       ///Realiza a conversao da localização do padrao DMM para double, salva o Timestamp e localização das fotos
       Future<Map<String, IfdTag>> data =
-          readExifFromBytes(await element.readAsBytes());
+          readExifFromBytes(element.readAsBytesSync());
       double latitude = 0;
       double latitudeRef = 1;
       double longitude = 0;
@@ -37,7 +35,7 @@ class LoadPhotosToList {
       DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(0);
       bool dateTimeError = false;
 
-      /*await data.then((data) async {
+      await data.then((data) async {
         if (!data.containsKey('GPS GPSLatitude') ||
             !data.containsKey('GPS GPSLongitude') ||
             !data.containsKey('GPS GPSLatitudeRef') ||
@@ -91,16 +89,17 @@ class LoadPhotosToList {
           }
         }
       });
-*/
+
+      print(latitude);
       listOfItems.add(ListItem(
-          latLng: LatLng(00,00),
+          latLng: LatLng(latitude * latitudeRef, longitude * longitudeRef),
           timestamp: dateTime,
           imgPath: element.path,
           locationError: locationError,
           timeError: dateTimeError));
 
       /*await FlutterImageCompress.compressAndGetFile(element.path, newLocation,
-          quality: 50);*/
+          keepExif: true, quality: 50);*/
     }
 
     //await FilePicker.platform.clearTemporaryFiles();
