@@ -13,8 +13,8 @@ class CreateListItemFromQueryResult {
       GeoPoint geoPoint = element.get('latLong');
       imagesList.add(ListItem(
           latLng: LatLng(geoPoint.latitude, geoPoint.longitude),
-          timestamp:
-              DateTime.fromMillisecondsSinceEpoch(element.get('timestamp')),
+          timestamp: DateTime.fromMillisecondsSinceEpoch(
+              element.get('timestamp').millisecondsSinceEpoch),
           imgPath: element.get('firestorePath'),
           locationError: element.get('locationError'),
           timeError: element.get('timeError')));
