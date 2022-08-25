@@ -24,7 +24,8 @@ class FeedCard extends StatefulWidget {
   State<StatefulWidget> createState() => _FeedCardState();
 }
 
-class _FeedCardState extends State<FeedCard> with AutomaticKeepAliveClientMixin {
+class _FeedCardState extends State<FeedCard>
+    with AutomaticKeepAliveClientMixin {
   late DocumentSnapshot thisPost;
   late DocumentSnapshot postOwner;
   late QuerySnapshot postImages;
@@ -39,6 +40,10 @@ class _FeedCardState extends State<FeedCard> with AutomaticKeepAliveClientMixin 
   }
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
+  // ignore: must_call_super
   Widget build(BuildContext context) {
     return GestureDetector(
       onLongPress: () {},
@@ -113,11 +118,7 @@ class _FeedCardState extends State<FeedCard> with AutomaticKeepAliveClientMixin 
       children: [
         CarouselSlider(
           options: CarouselOptions(
-              onPageChanged: (index, reason) {
-                setState(() {
-                  imgIndex = index;
-                });
-              },
+              onPageChanged: (index, reason) => _dotsController(index),
               height: height,
               initialPage: 0,
               enableInfiniteScroll: false,
@@ -178,33 +179,6 @@ class _FeedCardState extends State<FeedCard> with AutomaticKeepAliveClientMixin 
     postLoaded = true;
     setState(() {});
     return true;
-  }
-
-  _dotsContainer(double width) {
-    return postImagesURLs.length > 0
-        ? Container(
-            color: Colors.grey.withOpacity(0.05),
-            height: 20,
-            width: width,
-            child: Center(
-              child: ListView.builder(
-                itemCount: 7,
-                shrinkWrap: true,
-                scrollDirection: Axis.horizontal,
-                itemBuilder: (BuildContext context, int index) {
-                  return Container(
-                    width: index == imgIndex ? 6.0 : 4.0,
-                    height: 6.0,
-                    margin: EdgeInsets.all(2),
-                    decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: index == imgIndex ? Colors.blue : Colors.black),
-                  );
-                },
-              ),
-            ),
-          )
-        : Container();
   }
 
   _postLoaded() {
@@ -306,7 +280,78 @@ class _FeedCardState extends State<FeedCard> with AutomaticKeepAliveClientMixin 
     );
   }
 
-  @override
-  // TODO: implement wantKeepAlive
-  bool get wantKeepAlive => true;
+  _dotsContainer(double width) {
+    int imgsLength = postImagesURLs.length;
+    return imgsLength > 0
+        ? Container(
+            color: Colors.grey.withOpacity(0.05),
+            height: 20,
+            width: width,
+            child: Center(
+              child: ListView.builder(
+                itemCount: imgsLength > 6 ? 6 : imgsLength,
+                shrinkWrap: true,
+                scrollDirection: Axis.horizontal,
+                itemBuilder: (BuildContext context, int index) {
+                  return Container(
+                    width: _dotSize(index),
+                    height: 6.0,
+                    margin: EdgeInsets.all(2),
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle, color: _dotsColor(index)),
+                  );
+                },
+              ),
+            ),
+          )
+        : Container();
+  }
+
+  _dotsController(int index) {
+    imgIndex = index;
+    setState(() {});
+  }
+
+  _dotSize(int index) {
+    double small = 2.5;
+    double normal = 4.0;
+    double big = 8.0;
+
+    if (index == 0 && imgIndex >= 5) {
+      return small;
+    } else if (index == 5 && imgIndex < (postImagesURLs.length - 1)) {
+      return small;
+    } else if (index == 5 && imgIndex == (postImagesURLs.length - 1)) {
+      return big;
+    } else if (index >= 5) {
+      return small;
+    } else if (index == imgIndex) {
+      return big;
+    } else if (index == 4 &&
+        imgIndex >= 5 &&
+        imgIndex != (postImagesURLs.length - 1)) {
+      return big;
+    } else {
+      return normal;
+    }
+  }
+
+  _dotsColor(int index) {
+    Color blue = Colors.blue;
+    Color black = Colors.black;
+
+    if (index == 4 && imgIndex >= 5 && imgIndex < (postImagesURLs.length - 1)) {
+      return blue;
+    } else if (index == 5 && imgIndex == (postImagesURLs.length - 1)) {
+      return blue;
+    } else if (index == 5 &&
+        imgIndex == 5 &&
+        imgIndex != (postImagesURLs.length - 1)) {
+      return black;
+    } else if (index == imgIndex) {
+      return blue;
+    } else {
+      return black;
+    }
+  }
 }
