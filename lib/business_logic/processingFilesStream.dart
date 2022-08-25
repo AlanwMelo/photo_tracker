@@ -78,6 +78,7 @@ class ProcessingFilesStream {
         }
         queue.removeFirst();
       }
+      firebasePost.setPostAsReady(post: map['post']);
       Map<String, dynamic> conclusionMap = {"posting": false};
       controller.add(conclusionMap);
       queueRunning = false;

@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:photo_tracker/data/firebase/firebasePost.dart';
 import 'package:photo_tracker/presentation/Widgets/feedCard.dart';
@@ -15,9 +18,18 @@ class Feed extends StatefulWidget {
 
 class _FeedState extends State<Feed> {
   List<dynamic> posts = [];
+  CollectionReference _posts = FirebaseFirestore.instance.collection('posts');
 
   @override
   void initState() {
+    _posts.snapshots().listen((event) {
+      event.docChanges.forEach((element) async {
+        if(await element.doc.get('postReady')){
+          posts.clear();
+          _loadFeed();
+        }
+      });
+    });
     _loadFeed();
     super.initState();
   }

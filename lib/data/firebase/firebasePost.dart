@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:photo_tracker/business_logic/processingFilesStream.dart';
 import 'package:photo_tracker/data/firebase/firestore.dart';
-import 'package:photo_tracker/data/listItem.dart';
 
 class FirebasePost {
   CollectionReference _posts = FirebaseFirestore.instance.collection('posts');
@@ -38,7 +37,7 @@ class FirebasePost {
       required String title,
       required DocumentReference thisPost,
       required ProcessingFilesStream processingFiles}) async {
-    Map<String, dynamic> mapA = {"posting": true};
+    Map<String, dynamic> mapA = {"posting": true, "post": thisPost};
     processingFiles.addToQueue(mapA);
 
     /// Create post
@@ -49,9 +48,15 @@ class FirebasePost {
       'ownerID': ownerID,
       'postID': thisPost.id,
       'title': title,
-      'created': DateTime.now()
+      'created': DateTime.now(),
+      'postReady': false
     });
     return true;
+  }
+
+  setPostAsReady({required String post}) {
+    DocumentReference doc = _posts.doc(post);
+    doc.set({'postReady': true});
   }
 
   deletePost({required DocumentReference thisPost}) {
