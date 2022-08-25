@@ -14,7 +14,8 @@ class ImageCompressor {
 
     print(newLocation);
 
-    await FlutterImageCompress.compressAndGetFile(map['fileToProcess'], newLocation,
+    await FlutterImageCompress.compressAndGetFile(
+        map['fileToProcess'], newLocation,
         keepExif: true, quality: 50);
 
     return newLocation;

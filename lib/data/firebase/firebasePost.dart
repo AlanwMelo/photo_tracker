@@ -37,7 +37,7 @@ class FirebasePost {
       required DocumentReference thisPost,
       required ProcessingFilesStream processingFiles}) async {
     Map<String, dynamic> mapA = {"posting": true};
-    processingFiles.addToStream(mapA);
+    processingFiles.addToQueue(mapA);
 
     /// Create post
     await thisPost.set({
@@ -49,9 +49,6 @@ class FirebasePost {
       'title': title,
       'created': DateTime.now()
     });
-
-    Map<String, dynamic> mapB = {"posting": false};
-    processingFiles.addToStream(mapB);
     return true;
   }
 }

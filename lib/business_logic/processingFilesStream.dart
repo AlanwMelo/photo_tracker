@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:photo_tracker/data/firebase/firestore.dart';
 import 'package:photo_tracker/data/imageCompressor.dart';
 import 'package:http/http.dart' as http;
@@ -29,35 +30,41 @@ class ProcessingFilesStream {
   }
 
   addToQueue(Map map) async {
-    if (map.toString().contains('fileToProcess')) {
+    bool fileToProcess = map.toString().contains('fileToProcess');
+    bool posting = map.toString().contains('posting');
+
+    if (fileToProcess || posting) {
       queue.add(map);
     }
     if (!queueRunning) {
       queueRunning = true;
+
       while (queue.isNotEmpty) {
-        try {
-          Map<String, dynamic> map = {
-            "processingFile": queue.first['fileName'],
-            "posting": true,
-            "post": queue.first['post']
-          };
+        if (fileToProcess) {
+          try {
+            Map<String, dynamic> map = {
+              "processingFile": queue.first['fileName'],
+              "posting": true,
+              "post": queue.first['post']
+            };
 
-          controller.add(map);
-          CollectionReference thisPostPicturesCollection = FirebaseFirestore
-              .instance
-              .collection('posts')
-              .doc(map['post'])
-              .collection('images');
+            controller.add(map);
+            CollectionReference thisPostPicturesCollection = FirebaseFirestore
+                .instance
+                .collection('posts')
+                .doc(map['post'])
+                .collection('images');
 
-          List<String> imgURLs;
-          String newLocation;
+            List<String> imgURLs;
+            String newLocation;
 
-          newLocation = await imageCompressor.compress(queue.first);
-          imgURLs = await _uploadCompressedFile(
-              queue.first, newLocation, thisPostPicturesCollection);
-          await createImgDocument(
-              imgURLs, thisPostPicturesCollection, queue.first['fileName']);
-        } catch (e) {}
+            newLocation = await imageCompressor.compress(queue.first);
+            imgURLs = await _uploadCompressedFile(
+                queue.first, newLocation, thisPostPicturesCollection);
+            await createImgDocument(
+                imgURLs, thisPostPicturesCollection, queue.first['fileName']);
+          } catch (e) {}
+        }
         queue.removeFirst();
       }
       Map<String, dynamic> map = {"posting": false};
