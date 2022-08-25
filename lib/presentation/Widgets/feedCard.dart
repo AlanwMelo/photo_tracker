@@ -127,6 +127,9 @@ class _FeedCardState extends State<FeedCard> {
           items: postImagesURLs.map((url) {
             return Builder(builder: (BuildContext context) {
               return Container(
+                height: 500,
+                width: MediaQuery.of(context).size.width,
+                color: Colors.grey.withOpacity(0.05),
                 child: Image.network(
                   url,
                   fit: BoxFit.cover,
@@ -222,83 +225,84 @@ class _FeedCardState extends State<FeedCard> {
   }
 
   _postLoading() {
-    return Stack(children: [
-      Container(
-        height: 600,
-        color: Colors.white,
-        margin: widget.index == 0
-            ? EdgeInsets.only(top: 0)
-            : EdgeInsets.only(top: 15),
-        width: MediaQuery.of(context).size.width,
-        child: Column(
-          children: [
-            Container(
-              constraints: BoxConstraints(
-                maxHeight: 200,
+    return Stack(
+      children: [
+        Container(
+          height: 600,
+          margin: widget.index == 0
+              ? EdgeInsets.only(top: 0)
+              : EdgeInsets.only(top: 15),
+          width: MediaQuery.of(context).size.width,
+          child: Column(
+            children: [
+              Container(
+                constraints: BoxConstraints(
+                  maxHeight: 200,
+                ),
+                color: Colors.grey.withOpacity(0.05),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                            margin: EdgeInsets.all(16),
+                            height: 40,
+                            width: 40,
+                            decoration: const BoxDecoration(
+                              color: Colors.blue,
+                              shape: BoxShape.circle,
+                            )),
+                        Container(
+                          color: Colors.blue,
+                          width: 120,
+                          height: 25,
+                        ),
+                        Expanded(child: Container()),
+                        Icon(Icons.bookmark_border_rounded),
+                        SizedBox(width: 10)
+                      ],
+                    ),
+                    Container(
+                        padding: EdgeInsets.only(left: 15),
+                        child: Container(
+                          color: Colors.blue,
+                          width: 230,
+                          height: 25,
+                        )),
+                    Container(
+                        padding: EdgeInsets.only(left: 15, top: 5, bottom: 3),
+                        child: Container(
+                          color: Colors.blue,
+                          width: 270,
+                          height: 25,
+                        )),
+                    SizedBox(height: 15),
+                  ],
+                ),
               ),
-              color: Colors.grey.withOpacity(0.05),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                          margin: EdgeInsets.all(16),
-                          height: 40,
-                          width: 40,
-                          decoration: const BoxDecoration(
-                            color: Colors.blue,
-                            shape: BoxShape.circle,
-                          )),
-                      Container(
-                        color: Colors.blue,
-                        width: 120,
-                        height: 25,
-                      ),
-                      Expanded(child: Container()),
-                      Icon(Icons.bookmark_border_rounded),
-                      SizedBox(width: 10)
-                    ],
-                  ),
-                  Container(
-                      padding: EdgeInsets.only(left: 15),
-                      child: Container(
-                        color: Colors.blue,
-                        width: 230,
-                        height: 25,
-                      )),
-                  Container(
-                      padding: EdgeInsets.only(left: 15, top: 5, bottom: 3),
-                      child: Container(
-                        color: Colors.blue,
-                        width: 270,
-                        height: 25,
-                      )),
-                  SizedBox(height: 15),
-                ],
+              Container(
+                height: 400,
+                color: Colors.blue,
               ),
-            ),
-            Container(
-              height: 400,
-              color: Colors.blue,
-            ),
-          ],
-        ),
-      ),
-      Container(
-        child: Shimmer.fromColors(
-          highlightColor: Colors.white.withOpacity(0.2),
-          baseColor: Colors.blueAccent.withOpacity(0.2),
-          child: Container(
-            margin: widget.index == 0
-                ? EdgeInsets.only(top: 0)
-                : EdgeInsets.only(top: 15),
-            color: Colors.white,
-            height: 600,
+            ],
           ),
         ),
-      )
-    ],);
+        Container(
+          child: Shimmer.fromColors(
+            highlightColor: Colors.white.withOpacity(0.2),
+            baseColor: Colors.blueAccent.withOpacity(0.2),
+            child: Container(
+              margin: widget.index == 0
+                  ? EdgeInsets.only(top: 0)
+                  : EdgeInsets.only(top: 15),
+              color: Colors.white,
+              height: 600,
+            ),
+          ),
+        )
+      ],
+    );
   }
 }
