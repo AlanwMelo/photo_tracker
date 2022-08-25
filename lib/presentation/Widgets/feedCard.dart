@@ -24,7 +24,7 @@ class FeedCard extends StatefulWidget {
   State<StatefulWidget> createState() => _FeedCardState();
 }
 
-class _FeedCardState extends State<FeedCard> {
+class _FeedCardState extends State<FeedCard> with AutomaticKeepAliveClientMixin {
   late DocumentSnapshot thisPost;
   late DocumentSnapshot postOwner;
   late QuerySnapshot postImages;
@@ -305,4 +305,8 @@ class _FeedCardState extends State<FeedCard> {
       ],
     );
   }
+
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 }
