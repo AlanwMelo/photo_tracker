@@ -32,6 +32,7 @@ class _FeedState extends State<Feed> {
               return FeedCard(
                 postID: posts[index]['postID'],
                 mapboxKey: widget.mapBoxKey,
+                index: index,
               );
             }),
       ),

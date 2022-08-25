@@ -1,14 +1,11 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:ui';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:photo_tracker/classes/alertDialog.dart';
 import 'package:photo_tracker/data/listItem.dart';
-import 'package:photo_tracker/classes/loadPhotosToList.dart';
 import 'package:photo_tracker/data/firebase/createListItemFromQueryResult.dart';
 import 'package:photo_tracker/data/routeAnimations/pageRouterSlideUp.dart';
 import 'package:photo_tracker/db/dbManager.dart';

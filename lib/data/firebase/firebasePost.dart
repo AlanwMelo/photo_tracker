@@ -16,8 +16,9 @@ class FirebasePost {
   }
 
   getPostsForFeed() async {
-    QuerySnapshot a = await _posts.get();
-    return a.docs;
+    QuerySnapshot posts =
+        await _posts.orderBy('created', descending: true).get();
+    return posts.docs;
   }
 
   getPostImages(String postID) async {

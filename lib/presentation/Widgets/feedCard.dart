@@ -6,12 +6,18 @@ import 'package:photo_tracker/data/firebase/firebaseUser.dart';
 import 'package:photo_tracker/data/routeAnimations/pageRouterSlideUp.dart';
 import 'package:photo_tracker/presentation/Widgets/pictureContainer.dart';
 import 'package:photo_tracker/presentation/screens/map_and_photos.dart';
+import 'package:shimmer/shimmer.dart';
 
 class FeedCard extends StatefulWidget {
   final String mapboxKey;
   final String postID;
+  final int index;
 
-  const FeedCard({Key? key, required this.mapboxKey, required this.postID})
+  const FeedCard(
+      {Key? key,
+      required this.mapboxKey,
+      required this.postID,
+      required this.index})
       : super(key: key);
 
   @override
@@ -22,7 +28,15 @@ class _FeedCardState extends State<FeedCard> {
   late DocumentSnapshot thisPost;
   late DocumentSnapshot postOwner;
   late QuerySnapshot postImages;
+  bool postLoaded = false;
+  int imgIndex = 0;
   List<String> postImagesURLs = [];
+
+  @override
+  void initState() {
+    _getPostInfo();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,26 +52,7 @@ class _FeedCardState extends State<FeedCard> {
                     answer: (_) {},
                     mapboxKey: widget.mapboxKey)));
       },
-      child: FutureBuilder(
-          future: _getPostInfo(),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return Container(
-                color: Colors.white,
-                margin: EdgeInsets.only(top: 15),
-                width: MediaQuery.of(context).size.width,
-                child: Column(
-                  children: [
-                    _publicationInfo(),
-                    _publicationCoverPic(),
-                    _publicationInteractionIcons(),
-                  ],
-                ),
-              );
-            } else {
-              return Container();
-            }
-          }),
+      child: postLoaded ? _postLoaded() : _postLoading(),
     );
   }
 
@@ -112,27 +107,36 @@ class _FeedCardState extends State<FeedCard> {
   }
 
   _publicationCoverPic() {
-    return Container(
-      child: CarouselSlider(
-        options: CarouselOptions(
-            height: 400,
-            initialPage: 0,
-            enableInfiniteScroll: false,
-            autoPlay: true,
-            autoPlayInterval: Duration(seconds: 20),
-            viewportFraction: 1,
-            aspectRatio: 1),
-        items: postImagesURLs.map((url) {
-          return Builder(builder: (BuildContext context) {
-            return Container(
-              child: Image.network(
-                url,
-                fit: BoxFit.cover,
-              ),
-            );
-          });
-        }).toList(),
-      ),
+    double height = 400;
+    double width = MediaQuery.of(context).size.width;
+    return Column(
+      children: [
+        CarouselSlider(
+          options: CarouselOptions(
+              onPageChanged: (index, reason) {
+                setState(() {
+                  imgIndex = index;
+                });
+              },
+              height: height,
+              initialPage: 0,
+              enableInfiniteScroll: false,
+              autoPlay: false,
+              viewportFraction: 1,
+              aspectRatio: 1),
+          items: postImagesURLs.map((url) {
+            return Builder(builder: (BuildContext context) {
+              return Container(
+                child: Image.network(
+                  url,
+                  fit: BoxFit.cover,
+                ),
+              );
+            });
+          }).toList(),
+        ),
+        _dotsContainer(width),
+      ],
     );
   }
 
@@ -162,13 +166,139 @@ class _FeedCardState extends State<FeedCard> {
   }
 
   _getPostInfo() async {
-    postImagesURLs.clear();
     thisPost = await FirebasePost().getPostInfo(widget.postID);
     postImages = await FirebasePost().getPostImages(widget.postID);
     for (var element in postImages.docs) {
       postImagesURLs.add(element['firestorePath']);
     }
     postOwner = await FirebaseUser().getUserInfo(thisPost['ownerID']);
+    postLoaded = true;
+    setState(() {});
     return true;
+  }
+
+  _dotsContainer(double width) {
+    return postImagesURLs.length > 0
+        ? Container(
+            color: Colors.grey.withOpacity(0.05),
+            height: 20,
+            width: width,
+            child: Center(
+              child: ListView.builder(
+                itemCount: 7,
+                shrinkWrap: true,
+                scrollDirection: Axis.horizontal,
+                itemBuilder: (BuildContext context, int index) {
+                  return Container(
+                    width: index == imgIndex ? 6.0 : 4.0,
+                    height: 6.0,
+                    margin: EdgeInsets.all(2),
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: index == imgIndex ? Colors.blue : Colors.black),
+                  );
+                },
+              ),
+            ),
+          )
+        : Container();
+  }
+
+  _postLoaded() {
+    return Container(
+      color: Colors.white,
+      margin: widget.index == 0
+          ? EdgeInsets.only(top: 0)
+          : EdgeInsets.only(top: 15),
+      width: MediaQuery.of(context).size.width,
+      child: Column(
+        children: [
+          _publicationInfo(),
+          _publicationCoverPic(),
+          _publicationInteractionIcons(),
+        ],
+      ),
+    );
+  }
+
+  _postLoading() {
+    return Stack(children: [
+      Container(
+        height: 600,
+        color: Colors.white,
+        margin: widget.index == 0
+            ? EdgeInsets.only(top: 0)
+            : EdgeInsets.only(top: 15),
+        width: MediaQuery.of(context).size.width,
+        child: Column(
+          children: [
+            Container(
+              constraints: BoxConstraints(
+                maxHeight: 200,
+              ),
+              color: Colors.grey.withOpacity(0.05),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                          margin: EdgeInsets.all(16),
+                          height: 40,
+                          width: 40,
+                          decoration: const BoxDecoration(
+                            color: Colors.blue,
+                            shape: BoxShape.circle,
+                          )),
+                      Container(
+                        color: Colors.blue,
+                        width: 120,
+                        height: 25,
+                      ),
+                      Expanded(child: Container()),
+                      Icon(Icons.bookmark_border_rounded),
+                      SizedBox(width: 10)
+                    ],
+                  ),
+                  Container(
+                      padding: EdgeInsets.only(left: 15),
+                      child: Container(
+                        color: Colors.blue,
+                        width: 230,
+                        height: 25,
+                      )),
+                  Container(
+                      padding: EdgeInsets.only(left: 15, top: 5, bottom: 3),
+                      child: Container(
+                        color: Colors.blue,
+                        width: 270,
+                        height: 25,
+                      )),
+                  SizedBox(height: 15),
+                ],
+              ),
+            ),
+            Container(
+              height: 400,
+              color: Colors.blue,
+            ),
+          ],
+        ),
+      ),
+      Container(
+        child: Shimmer.fromColors(
+          highlightColor: Colors.white.withOpacity(0.2),
+          baseColor: Colors.blueAccent.withOpacity(0.2),
+          child: Container(
+            margin: widget.index == 0
+                ? EdgeInsets.only(top: 0)
+                : EdgeInsets.only(top: 15),
+            color: Colors.white,
+            height: 600,
+          ),
+        ),
+      )
+    ],);
   }
 }
