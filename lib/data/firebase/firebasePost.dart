@@ -36,7 +36,6 @@ class FirebasePost {
       required String mainLocation,
       required String ownerID,
       required String title,
-      required List<ListItem> thisPostPicturesList,
       required DocumentReference thisPost,
       required ProcessingFilesStream processingFiles}) async {
     Map<String, dynamic> mapA = {"posting": true};
@@ -56,6 +55,7 @@ class FirebasePost {
   }
 
   deletePost({required DocumentReference thisPost}) {
+    print('lost id ${thisPost.id}');
     firestoreManager.deleteFolder('posts/${thisPost.id}/');
     thisPost.delete();
   }

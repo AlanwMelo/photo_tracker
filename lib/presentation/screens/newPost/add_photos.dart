@@ -6,20 +6,21 @@ import 'package:photo_tracker/business_logic/posts/addPhotos/addPhotosListItem.d
 import 'package:photo_tracker/business_logic/posts/addPhotos/getFilesFromPickerResult.dart';
 import 'package:photo_tracker/business_logic/processingFilesStream.dart';
 import 'package:photo_tracker/classes/filePicker.dart';
-import 'package:photo_tracker/data/listItem.dart';
 import 'package:photo_tracker/presentation/Widgets/appBar.dart';
 import 'package:photo_tracker/presentation/Widgets/editPhotoListItem.dart';
 import 'package:photo_tracker/presentation/Widgets/trackerSimpleButton.dart';
 
 class AddPhotosScreen extends StatefulWidget {
-  final Function(List<ListItem>) confirm;
+  final Function(List<AddPhotosListItem>) confirm;
   final ProcessingFilesStream processingFilesStream;
   final String postID;
+  final List<AddPhotosListItem> receivedList;
 
   const AddPhotosScreen(
       {Key? key,
       required this.confirm,
       required this.processingFilesStream,
+      required this.receivedList,
       required this.postID})
       : super(key: key);
 
@@ -28,11 +29,11 @@ class AddPhotosScreen extends StatefulWidget {
 }
 
 class _AddPhotosScreen extends State<AddPhotosScreen> {
-  List<ListItem> uploadList = [];
   List<AddPhotosListItem> imagesList = [];
 
   @override
   void initState() {
+    imagesList = widget.receivedList;
     widget.processingFilesStream.stream.listen((event) {
       String location = 'error';
       if (event.toString().contains('location')) {
@@ -55,19 +56,21 @@ class _AddPhotosScreen extends State<AddPhotosScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: TrackerAppBar(
-        mainScreen: false,
-        implyLeading: false,
-        title: '    Add Photos',
-        appBarAction: TrackerSimpleButton(
-            text: 'Confirm',
-            pressed: (_) {
-              widget.confirm(uploadList);
-              Navigator.of(context).pop();
-            }),
+    return WillPopScope(
+      onWillPop: () => _willPop(),
+      child: Scaffold(
+        appBar: TrackerAppBar(
+          mainScreen: false,
+          implyLeading: false,
+          title: '    Add Photos',
+          appBarAction: TrackerSimpleButton(
+              text: 'Confirm',
+              pressed: (_) {
+                Navigator.of(context).pop();
+              }),
+        ),
+        body: _body(),
       ),
-      body: _body(),
     );
   }
 
@@ -99,9 +102,11 @@ class _AddPhotosScreen extends State<AddPhotosScreen> {
                       imageName: imagesList[index].name,
                       location: imagesList[index].location,
                       collaborator: imagesList[index].collaborator,
-                      processing: snapshot.data['processingFile'] ==
-                              imagesList[index].name
-                          ? true
+                      processing: snapshot.hasData
+                          ? snapshot.data['processingFile'] ==
+                                  imagesList[index].name
+                              ? true
+                              : false
                           : false, // name
                     ));
               }),
@@ -143,5 +148,10 @@ class _AddPhotosScreen extends State<AddPhotosScreen> {
       }
     }
     setState(() {});
+  }
+
+  Future<bool> _willPop() async {
+    await widget.confirm(imagesList);
+    return true;
   }
 }

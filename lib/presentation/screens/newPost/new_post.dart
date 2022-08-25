@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:photo_tracker/business_logic/posts/addPhotos/addPhotosListItem.dart';
 import 'package:photo_tracker/business_logic/processingFilesStream.dart';
 import 'package:photo_tracker/data/firebase/firebasePost.dart';
 import 'package:photo_tracker/data/listItem.dart';
@@ -22,7 +23,7 @@ class NewPost extends StatefulWidget {
 class _NewPostState extends State<NewPost> {
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
-  List<ListItem> imagesList = [];
+  List<AddPhotosListItem> imagesList = [];
   late DocumentReference _thisPost;
   bool confirmPost = false;
   FirebasePost firebasePost = FirebasePost();
@@ -148,6 +149,7 @@ class _NewPostState extends State<NewPost> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => AddPhotosScreen(
+                              receivedList: imagesList,
                               postID: _thisPost.id,
                               processingFilesStream:
                                   widget.processingFilesStream,
@@ -171,7 +173,6 @@ class _NewPostState extends State<NewPost> {
         mainLocation: '',
         ownerID: FirebaseAuth.instance.currentUser!.uid,
         title: titleController.text,
-        thisPostPicturesList: imagesList,
         thisPost: _thisPost,
         processingFiles: widget.processingFilesStream);
 
@@ -180,8 +181,12 @@ class _NewPostState extends State<NewPost> {
   }
 
   Future<bool> _leavePage() async {
-    if(!confirmPost){}
-    firebasePost.deletePost(thisPost: _thisPost);
+    if (!confirmPost) {
+      Map<String, dynamic> map = {
+        "deletePost": _thisPost,
+      };
+      widget.processingFilesStream.addToQueue(map);
+    }
     return true;
   }
 }

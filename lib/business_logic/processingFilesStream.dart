@@ -3,7 +3,7 @@ import 'dart:collection';
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
+import 'package:photo_tracker/data/firebase/firebasePost.dart';
 import 'package:photo_tracker/data/firebase/firestore.dart';
 import 'package:photo_tracker/data/imageCompressor.dart';
 import 'package:http/http.dart' as http;
@@ -12,6 +12,7 @@ class ProcessingFilesStream {
   StreamController<Map> controller = StreamController<Map>();
   ImageCompressor imageCompressor = ImageCompressor();
   FirestoreManager firestoreManager = FirestoreManager();
+  FirebasePost firebasePost = FirebasePost();
   late Stream stream;
   final queue = Queue<Map>();
   bool queueRunning = false;
@@ -32,27 +33,37 @@ class ProcessingFilesStream {
   addToQueue(Map map) async {
     bool fileToProcess = map.toString().contains('fileToProcess');
     bool posting = map.toString().contains('posting');
+    bool deletePost = map.toString().contains('deletePost');
 
-    if (fileToProcess || posting) {
+    if (deletePost) {
+      while (queueRunning) {
+        await Future.delayed(Duration(seconds: 5));
+      }
+      queue.add(map);
+    }
+    if (fileToProcess || posting || deletePost) {
       queue.add(map);
     }
     if (!queueRunning) {
       queueRunning = true;
 
       while (queue.isNotEmpty) {
+        if (deletePost) {
+          firebasePost.deletePost(thisPost: map['deletePost']);
+        }
         if (fileToProcess) {
           try {
-            Map<String, dynamic> map = {
+            Map<String, dynamic> processMap = {
               "processingFile": queue.first['fileName'],
               "posting": true,
               "post": queue.first['post']
             };
 
-            controller.add(map);
+            controller.add(processMap);
             CollectionReference thisPostPicturesCollection = FirebaseFirestore
                 .instance
                 .collection('posts')
-                .doc(map['post'])
+                .doc(processMap['post'])
                 .collection('images');
 
             List<String> imgURLs;
@@ -67,8 +78,8 @@ class ProcessingFilesStream {
         }
         queue.removeFirst();
       }
-      Map<String, dynamic> map = {"posting": false};
-      controller.add(map);
+      Map<String, dynamic> conclusionMap = {"posting": false};
+      controller.add(conclusionMap);
       queueRunning = false;
     }
   }
