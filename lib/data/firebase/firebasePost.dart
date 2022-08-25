@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:photo_tracker/business_logic/processingFilesStream.dart';
+import 'package:photo_tracker/data/firebase/firestore.dart';
 import 'package:photo_tracker/data/listItem.dart';
 
 class FirebasePost {
   CollectionReference _posts = FirebaseFirestore.instance.collection('posts');
+  FirestoreManager firestoreManager = FirestoreManager();
 
   getPostInfo(String postID) async {
     DocumentSnapshot thisPost = await _posts.doc(postID).get();
@@ -51,5 +53,10 @@ class FirebasePost {
       'created': DateTime.now()
     });
     return true;
+  }
+
+  deletePost({required DocumentReference thisPost}) {
+    firestoreManager.deleteFolder('posts/${thisPost.id}/');
+    thisPost.delete();
   }
 }

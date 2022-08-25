@@ -24,6 +24,7 @@ class _NewPostState extends State<NewPost> {
   TextEditingController descriptionController = TextEditingController();
   List<ListItem> imagesList = [];
   late DocumentReference _thisPost;
+  bool confirmPost = false;
   FirebasePost firebasePost = FirebasePost();
 
   @override
@@ -34,19 +35,22 @@ class _NewPostState extends State<NewPost> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: TrackerAppBar(
-        title: 'New Post',
-        mainScreen: true,
-        appBarAction: TrackerSimpleButton(
-          text: 'Post',
-          pressed: (_) {
-            _createPost();
-          },
+    return WillPopScope(
+      onWillPop: () => _leavePage(),
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        appBar: TrackerAppBar(
+          title: 'New Post',
+          mainScreen: true,
+          appBarAction: TrackerSimpleButton(
+            text: 'Post',
+            pressed: (_) {
+              _createPost();
+            },
+          ),
         ),
+        body: _body(),
       ),
-      body: _body(),
     );
   }
 
@@ -171,6 +175,13 @@ class _NewPostState extends State<NewPost> {
         thisPost: _thisPost,
         processingFiles: widget.processingFilesStream);
 
+    confirmPost = true;
     Navigator.of(context).pop();
+  }
+
+  Future<bool> _leavePage() async {
+    if(!confirmPost){}
+    firebasePost.deletePost(thisPost: _thisPost);
+    return true;
   }
 }

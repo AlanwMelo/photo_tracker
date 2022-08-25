@@ -90,12 +90,14 @@ class _FeedCardState extends State<FeedCard>
                 thisPost['title'],
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
               )),
-          Container(
-              padding: EdgeInsets.only(left: 15, top: 5, bottom: 3),
-              child: Text(
-                thisPost['description'],
-                style: TextStyle(fontSize: 15),
-              )),
+          thisPost['description'] == ''
+              ? Container()
+              : Container(
+                  padding: EdgeInsets.only(left: 15, top: 5, bottom: 3),
+                  child: Text(
+                    thisPost['description'],
+                    style: TextStyle(fontSize: 15),
+                  )),
           Container(
               padding: EdgeInsets.only(left: 15, bottom: 5),
               child: Row(
