@@ -167,7 +167,7 @@ class _AddPhotosScreen extends State<AddPhotosScreen> {
                 });
                 MyFilePicker(pickedFiles: (filePickerResult) async {
                   if (filePickerResult != null) {
-                    _addImagerToList(filePickerResult);
+                    _addImagesToList(filePickerResult);
                   } else {
                     loading = false;
                     setState(() {});
@@ -179,7 +179,7 @@ class _AddPhotosScreen extends State<AddPhotosScreen> {
           );
   }
 
-  _addImagerToList(FilePickerResult filePickerResult) async {
+  _addImagesToList(FilePickerResult filePickerResult) async {
     List<AddPhotosListItem> result =
         await GetFilesFromPickerResult(filePickerResult)
             .getFilesPathAndNames(tempDir: widget.postID);

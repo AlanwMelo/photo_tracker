@@ -28,7 +28,7 @@ class FirebasePost {
 
   getPostImages(String postID) async {
     QuerySnapshot thisPostPictures =
-        await _posts.doc(postID).collection('images').get();
+        await _posts.doc(postID).collection('images').orderBy('timestamp').get();
 
     return thisPostPictures;
   }

@@ -211,28 +211,6 @@ class _MapAndPhotos extends State<MapAndPhotos> {
               onTap: () {
                 _listAndCarouselSynchronizer(fileList[index], index);
               },
-              onLongPress: () {
-                showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return MyAlertDialog(
-                          alertTitle: 'Remover',
-                          alertText: 'Deseja mesmo remover esta imagem?',
-                          alertButton1Text: 'Sim',
-                          alertButton2Text: 'Não',
-                          answer: (answer) {
-                            if (answer == 1) {
-                              if (!fileList[index].locationError) {
-                                openMapController.currentState!
-                                    .rmvMarker(fileList[index]);
-                              }
-
-                              fileList.removeAt(index);
-                              setState(() {});
-                            }
-                          });
-                    });
-              },
               child: Container(
                 margin: EdgeInsets.only(bottom: 1),
                 decoration: BoxDecoration(
@@ -422,11 +400,6 @@ class _MapAndPhotos extends State<MapAndPhotos> {
       openMapController.currentState!
           .addMarker(element.latLng, element.timestamp, element.imgPath);
     }
-  }
-
-  _addItemToList(ListItem element) {
-    fileList.add(element);
-    _addMarkerToMap(element);
   }
 
   _getIndexOfFirsLocation(List<ListItem> filesList) {

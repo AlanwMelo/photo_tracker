@@ -23,7 +23,7 @@ class OpenMap extends StatefulWidget {
   State<StatefulWidget> createState() => NewMapTestState();
 }
 
-class NewMapTestState extends State<OpenMap> with TickerProviderStateMixin {
+class NewMapTestState extends State<OpenMap> with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   late final MapController mapController;
   List<ListItem> markerList = [];
   var markers;
@@ -38,11 +38,6 @@ class NewMapTestState extends State<OpenMap> with TickerProviderStateMixin {
           timeError: false));
   }
 
-  rmvMarker(ListItem item) {
-    markerList.removeAt(
-        markerList.indexWhere((element) => element.imgPath == item.imgPath));
-    setState(() {});
-  }
 
   @override
   void initState() {
@@ -164,4 +159,7 @@ class NewMapTestState extends State<OpenMap> with TickerProviderStateMixin {
     markerList.add(item);
     setState(() {});
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
