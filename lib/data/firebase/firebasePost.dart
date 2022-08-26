@@ -1,6 +1,10 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:photo_tracker/business_logic/posts/addPhotos/addPhotosListItem.dart';
 import 'package:photo_tracker/business_logic/processingFilesStream.dart';
 import 'package:photo_tracker/data/firebase/firestore.dart';
+import 'package:http/http.dart' as http;
 
 class FirebasePost {
   CollectionReference _posts = FirebaseFirestore.instance.collection('posts');
@@ -54,6 +58,53 @@ class FirebasePost {
     return true;
   }
 
+  createImgDocument(
+      List imgURLs,
+      DocumentReference postPicture,
+      String fileName,
+      String collaborator) async {
+    final uri = Uri.parse(
+        'https://us-central1-photo-tracker-fa162.cloudfunctions.net/readImageData');
+    final body = {
+      'image': imgURLs[1],
+    };
+    final jsonString = json.encode(body);
+
+    final response = await http.post(uri, body: jsonString);
+    var convertedResponse = jsonDecode(response.body);
+
+    DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(0);
+    bool timeError = false;
+    bool locationError = false;
+    GeoPoint geoPoint = GeoPoint(0, 0);
+
+    try {
+      dateTime = DateTime.parse(convertedResponse['dateTime']);
+    } catch (e) {
+      timeError = true;
+    }
+
+    try {
+      geoPoint = GeoPoint(
+          convertedResponse['latitude'], convertedResponse['longitude']);
+    } catch (e) {
+      locationError = true;
+    }
+
+    await postPicture.set({
+      'firestorePath': imgURLs[0],
+      'imageID': postPicture.id,
+      'latLong': geoPoint,
+      'locationError': locationError,
+      'timeError': timeError,
+      'timestamp': dateTime,
+      'collaborator': collaborator,
+      'locationText': 'Ainda nao'
+    });
+
+    return postPicture;
+  }
+
   setPostAsReady({required String post}) {
     DocumentReference doc = _posts.doc(post);
     doc.update({'postReady': true});
@@ -79,5 +130,12 @@ class FirebasePost {
       print(e);
     }
     return true;
+  }
+
+  deleteImages(List<AddPhotosListItem> images){
+    print(images[0].location);
+    print(images[0].path);
+    print(images[0].collaborator);
+    print(images[0].name);
   }
 }

@@ -9,13 +9,16 @@ class EditPhotoListItem extends StatefulWidget {
   final String location;
   final String collaborator;
   final bool processing;
+  final String user;
 
   const EditPhotoListItem(
       {Key? key,
       required this.imagePath,
       required this.imageName,
+      required this.user,
       required this.location,
       required this.collaborator,
+
       required this.processing})
       : super(key: key);
 
@@ -88,7 +91,7 @@ class _EditPhotoListItem extends State<EditPhotoListItem> {
   }
 
   _picture() {
-    return widget.collaborator == 'user'
+    return widget.collaborator == widget.user
         ? Container()
         : Container(
             width: 35,

@@ -26,6 +26,7 @@ class GetFilesFromPickerResult {
           name: element.path.substring(nameHelper),
           path: newLocation,
           location: 'not processed',
+          processing: false,
           collaborator: FirebaseAuth.instance.currentUser!.uid));
     }
     return list;

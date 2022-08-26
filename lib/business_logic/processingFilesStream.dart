@@ -34,8 +34,9 @@ class ProcessingFilesStream {
     bool fileToProcess = map.toString().contains('fileToProcess');
     bool posting = map.toString().contains('posting');
     bool deletePost = map.toString().contains('deletePost');
+    bool deleteFiles = map.toString().contains('filesToBeDeleted');
 
-    if (deletePost) {
+    if (deletePost || deleteFiles) {
       while (queueRunning) {
         await Future.delayed(Duration(seconds: 2));
       }
@@ -50,6 +51,9 @@ class ProcessingFilesStream {
       while (queue.isNotEmpty) {
         if (deletePost) {
           await firebasePost.deletePost(thisPost: map['deletePost']);
+        }
+        if(deleteFiles){
+          firebasePost.deleteImages(queue.first['filesToBeDeleted']);
         }
         if (fileToProcess) {
           try {
@@ -67,7 +71,7 @@ class ProcessingFilesStream {
                 .collection('images');
 
             List<String> imgURLs;
-            imgURLs = await _uploadCompressedFile(
+            imgURLs = await uploadCompressedFile(
                 queue.first, queue.first['fileToProcess'], thisPostPicturesCollection);
             await createImgDocument(imgURLs, thisPostPicturesCollection,
                 queue.first['fileName'], queue.first['collaborator']);
@@ -87,7 +91,7 @@ class ProcessingFilesStream {
     }
   }
 
-  _uploadCompressedFile(Map map, String newLocation,
+  uploadCompressedFile(Map map, String newLocation,
       CollectionReference thisPostPicturesCollection) async {
     DocumentReference postPicture = thisPostPicturesCollection.doc();
 

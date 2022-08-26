@@ -31,4 +31,8 @@ class FirestoreManager {
       print(e);
     }
   }
+
+  deleteFiles({required List<String> filesPaths}){
+
+  }
 }
