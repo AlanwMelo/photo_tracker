@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:photo_tracker/business_logic/posts/addPhotos/addPhotosListItem.dart';
 
 class GetFilesFromPickerResult {
@@ -17,7 +18,7 @@ class GetFilesFromPickerResult {
           name: element.path.substring(nameHelper),
           path: element.path,
           location: 'not processed',
-          collaborator: 'user'));
+          collaborator: FirebaseAuth.instance.currentUser!.uid));
     }
     return list;
   }

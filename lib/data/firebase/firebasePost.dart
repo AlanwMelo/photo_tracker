@@ -56,12 +56,28 @@ class FirebasePost {
 
   setPostAsReady({required String post}) {
     DocumentReference doc = _posts.doc(post);
-    doc.set({'postReady': true});
+    doc.update({'postReady': true});
   }
 
-  deletePost({required DocumentReference thisPost}) {
+  deletePost({required DocumentReference thisPost}) async {
     print('lost id ${thisPost.id}');
-    firestoreManager.deleteFolder('posts/${thisPost.id}/');
-    thisPost.delete();
+    try {
+      WriteBatch batch = FirebaseFirestore.instance.batch();
+      QuerySnapshot imagesToDelete = await thisPost.collection('images').get();
+
+      imagesToDelete.docs.forEach((image) {
+        batch.delete(image.reference);
+      });
+      for (var image in imagesToDelete.docs) {
+        await thisPost.collection('images').doc(image.id).delete();
+      }
+      await firestoreManager.deleteFolder('/posts/${thisPost.id}/');
+      batch.delete(thisPost);
+
+      batch.commit();
+    } catch (e) {
+      print(e);
+    }
+    return true;
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/src/file_picker_result.dart';
 import 'package:flutter/cupertino.dart';
@@ -30,11 +32,18 @@ class AddPhotosScreen extends StatefulWidget {
 
 class _AddPhotosScreen extends State<AddPhotosScreen> {
   List<AddPhotosListItem> imagesList = [];
+  late StreamSubscription stream;
+
+  @override
+  void dispose() {
+    stream.cancel();
+    super.dispose();
+  }
 
   @override
   void initState() {
     imagesList = widget.receivedList;
-    widget.processingFilesStream.stream.listen((event) {
+    stream = widget.processingFilesStream.stream.listen((event) {
       String location = 'error';
       if (event.toString().contains('location')) {
         if (event['location'] != 'error') {
@@ -142,6 +151,7 @@ class _AddPhotosScreen extends State<AddPhotosScreen> {
         Map<String, dynamic> fileToProcess = {
           "fileToProcess": element.path,
           "fileName": element.name,
+          "collaborator": element.collaborator,
           "post": widget.postID,
         };
         widget.processingFilesStream.addToQueue(fileToProcess);

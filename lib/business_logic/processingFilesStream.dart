@@ -37,11 +37,11 @@ class ProcessingFilesStream {
 
     if (deletePost) {
       while (queueRunning) {
-        await Future.delayed(Duration(seconds: 5));
+        await Future.delayed(Duration(seconds: 2));
       }
       queue.add(map);
     }
-    if (fileToProcess || posting || deletePost) {
+    if (fileToProcess || posting) {
       queue.add(map);
     }
     if (!queueRunning) {
@@ -49,7 +49,7 @@ class ProcessingFilesStream {
 
       while (queue.isNotEmpty) {
         if (deletePost) {
-          firebasePost.deletePost(thisPost: map['deletePost']);
+          await firebasePost.deletePost(thisPost: map['deletePost']);
         }
         if (fileToProcess) {
           try {
@@ -72,13 +72,18 @@ class ProcessingFilesStream {
             newLocation = await imageCompressor.compress(queue.first);
             imgURLs = await _uploadCompressedFile(
                 queue.first, newLocation, thisPostPicturesCollection);
-            await createImgDocument(
-                imgURLs, thisPostPicturesCollection, queue.first['fileName']);
+            await createImgDocument(imgURLs, thisPostPicturesCollection,
+                queue.first['fileName'], queue.first['collaborator']);
           } catch (e) {}
         }
         queue.removeFirst();
       }
-      firebasePost.setPostAsReady(post: map['post']);
+      try {
+        firebasePost.setPostAsReady(post: map['post']);
+      } catch (e) {
+        print(e);
+      }
+
       Map<String, dynamic> conclusionMap = {"posting": false};
       controller.add(conclusionMap);
       queueRunning = false;
@@ -96,8 +101,11 @@ class ProcessingFilesStream {
     return imgURL;
   }
 
-  createImgDocument(List imgURLs,
-      CollectionReference thisPostPicturesCollection, String fileName) async {
+  createImgDocument(
+      List imgURLs,
+      CollectionReference thisPostPicturesCollection,
+      String fileName,
+      String collaborator) async {
     DocumentReference postPicture = thisPostPicturesCollection.doc();
     final uri = Uri.parse(
         'https://us-central1-photo-tracker-fa162.cloudfunctions.net/readImageData');
@@ -138,6 +146,7 @@ class ProcessingFilesStream {
       'locationError': locationError,
       'timeError': timeError,
       'timestamp': dateTime,
+      'collaborator': collaborator,
       'locationText': 'Ainda nao'
     });
 
