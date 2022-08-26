@@ -148,26 +148,35 @@ class _AddPhotosScreen extends State<AddPhotosScreen> {
   }
 
   _bottomBar() {
-    return Container(
-      height: 45,
-      width: MediaQuery.of(context).size.width,
-      child: ElevatedButton(
-        onPressed: () {
-          setState(() {
-            loading = true;
-          });
-          MyFilePicker(pickedFiles: (filePickerResult) async {
-            if (filePickerResult != null) {
-              _addImagerToList(filePickerResult);
-            } else {
-              loading = false;
-              setState(() {});
-            }
-          }).pickFiles();
-        },
-        child: Text('Add More'),
-      ),
-    );
+    return processingFiles
+        ? Container(
+            height: 45,
+            width: MediaQuery.of(context).size.width,
+            child: ElevatedButton(
+              onPressed: () {},
+              child: Text('Processando...'),
+            ),
+          )
+        : Container(
+            height: 45,
+            width: MediaQuery.of(context).size.width,
+            child: ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  loading = true;
+                });
+                MyFilePicker(pickedFiles: (filePickerResult) async {
+                  if (filePickerResult != null) {
+                    _addImagerToList(filePickerResult);
+                  } else {
+                    loading = false;
+                    setState(() {});
+                  }
+                }).pickFiles();
+              },
+              child: Text('Add More'),
+            ),
+          );
   }
 
   _addImagerToList(FilePickerResult filePickerResult) async {
@@ -185,13 +194,18 @@ class _AddPhotosScreen extends State<AddPhotosScreen> {
   }
 
   Future<bool> _willPop() async {
-    if (!processingFiles) {
-      await widget.confirm(imagesList);
+    print(processingFiles);
+    if (!processingFiles && !loading) {
+      List<AddPhotosListItem> finalList = imagesList
+          .where((element) => element.location != 'not processed')
+          .toList();
+      await widget.confirm(finalList);
       if (filesToBeDeleted.isNotEmpty) {
-        Map<String, dynamic> deleteList = {
-          'filesToBeDeleted': filesToBeDeleted
-        };
-        widget.processingFilesStream.addToQueue(deleteList);
+        try {
+          firebasePost.deleteImages(filesToBeDeleted);
+        } catch (e) {
+          print('Erro ao deletar arquivos (add_photos 193): $e');
+        }
       }
       return true;
     } else {
@@ -204,10 +218,10 @@ class _AddPhotosScreen extends State<AddPhotosScreen> {
       if (imagesList[index].location == 'not processed') {
         imagesList.removeAt(index);
       } else {
-        //filesToBeDeleted.add(imagesList[index]);
+        filesToBeDeleted.add(imagesList[index]);
+        imagesList.removeAt(index);
       }
     }
-
     setState(() {});
   }
 
@@ -215,66 +229,66 @@ class _AddPhotosScreen extends State<AddPhotosScreen> {
     if (imagesList.isEmpty) {
       return Container();
     } else if (processingFiles) {
-      return Container(
-          margin: EdgeInsets.only(right: 8),
-          child: Center(
-              child: Text('Processando...',
-                  style: TextStyle(color: Colors.white, fontSize: 12))));
+      return Container();
     } else if (imagesList
         .any((element) => element.location == 'not processed')) {
       return TrackerSimpleButton(
           text: 'Processar',
           pressed: (_) async {
             processingFiles = true;
+            print('so funciona por causa desse print add_photos 230');
 
             for (var element in imagesList) {
-              int index = imagesList.indexWhere((helper) => element == helper);
-              imagesList[index] = AddPhotosListItem(
-                  name: imagesList[index].name,
-                  path: imagesList[index].path,
-                  location: imagesList[index].location,
-                  collaborator: imagesList[index].collaborator,
-                  processing: true);
-              setState(() {});
+              if (element.location == 'not processed') {
+                int index =
+                    imagesList.indexWhere((helper) => element == helper);
+                imagesList[index] = AddPhotosListItem(
+                    name: imagesList[index].name,
+                    path: imagesList[index].path,
+                    location: imagesList[index].location,
+                    collaborator: imagesList[index].collaborator,
+                    processing: true);
+                setState(() {});
 
-              DocumentReference postPicture = FirebaseFirestore.instance
-                  .collection('posts')
-                  .doc(widget.postID)
-                  .collection('images')
-                  .doc();
+                DocumentReference postPicture = FirebaseFirestore.instance
+                    .collection('posts')
+                    .doc(widget.postID)
+                    .collection('images')
+                    .doc();
 
-              List<String> imgURLs =
-                  await firestoreManager.uploadImageAndGetURL(
-                imagePath: element.path,
-                firestorePath: 'posts/${widget.postID}/${postPicture.id}.jpg',
-              );
+                List<String> imgURLs =
+                    await firestoreManager.uploadImageAndGetURL(
+                  imagePath: element.path,
+                  firestorePath: 'posts/${widget.postID}/${postPicture.id}.jpg',
+                );
 
-              DocumentReference imageDoc = await firebasePost.createImgDocument(
-                  imgURLs, postPicture, element.name, element.collaborator);
+                DocumentReference imageDoc =
+                    await firebasePost.createImgDocument(imgURLs, postPicture,
+                        element.name, element.collaborator);
 
-              GeoPoint? geoPoint;
-              bool? locationError;
+                GeoPoint? geoPoint;
+                bool? locationError;
 
-              await imageDoc.get().then((value) {
-                geoPoint = value['latLong'];
-                locationError = value['locationError'];
-              });
+                await imageDoc.get().then((value) {
+                  geoPoint = value['latLong'];
+                  locationError = value['locationError'];
+                });
 
-              imagesList[index] = AddPhotosListItem(
-                  name: imagesList[index].name,
-                  path: imagesList[index].path,
-                  location: locationError!
-                      ? 'error'
-                      : '${geoPoint?.latitude.toStringAsFixed(6)}, ${geoPoint?.longitude.toStringAsFixed(6)}',
-                  collaborator: imagesList[index].collaborator,
-                  processing: false,
-                  firebasePath: imageDoc.path);
-              print(imageDoc.path);
-              setState(() {});
+                imagesList[index] = AddPhotosListItem(
+                    name: imagesList[index].name,
+                    path: imagesList[index].path,
+                    location: locationError!
+                        ? 'error'
+                        : '${geoPoint?.latitude.toStringAsFixed(6)}, ${geoPoint?.longitude.toStringAsFixed(6)}',
+                    collaborator: imagesList[index].collaborator,
+                    processing: false,
+                    firebasePath: imageDoc.path);
+                print(imageDoc.path);
+                setState(() {});
+              }
             }
-            setState(() {
-              processingFiles = false;
-            });
+            processingFiles = false;
+            setState(() {});
           });
     } else {
       return TrackerSimpleButton(

@@ -58,11 +58,8 @@ class FirebasePost {
     return true;
   }
 
-  createImgDocument(
-      List imgURLs,
-      DocumentReference postPicture,
-      String fileName,
-      String collaborator) async {
+  createImgDocument(List imgURLs, DocumentReference postPicture,
+      String fileName, String collaborator) async {
     final uri = Uri.parse(
         'https://us-central1-photo-tracker-fa162.cloudfunctions.net/readImageData');
     final body = {
@@ -132,10 +129,16 @@ class FirebasePost {
     return true;
   }
 
-  deleteImages(List<AddPhotosListItem> images){
-    print(images[0].location);
-    print(images[0].path);
-    print(images[0].collaborator);
-    print(images[0].name);
+  deleteImages(List<AddPhotosListItem> images) {
+    WriteBatch batch = FirebaseFirestore.instance.batch();
+
+    images.forEach((image) {
+      DocumentReference doc =
+          FirebaseFirestore.instance.doc(image.firebasePath!);
+
+      batch.delete(doc);
+    });
+    batch.commit();
+    firestoreManager.deleteFiles(images: images);
   }
 }
