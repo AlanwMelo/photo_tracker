@@ -67,11 +67,8 @@ class ProcessingFilesStream {
                 .collection('images');
 
             List<String> imgURLs;
-            String newLocation;
-
-            newLocation = await imageCompressor.compress(queue.first);
             imgURLs = await _uploadCompressedFile(
-                queue.first, newLocation, thisPostPicturesCollection);
+                queue.first, queue.first['fileToProcess'], thisPostPicturesCollection);
             await createImgDocument(imgURLs, thisPostPicturesCollection,
                 queue.first['fileName'], queue.first['collaborator']);
           } catch (e) {}
@@ -79,7 +76,7 @@ class ProcessingFilesStream {
         queue.removeFirst();
       }
       try {
-        firebasePost.setPostAsReady(post: map['post']);
+        firebasePost.setPostAsReady(post: map['post'].id);
       } catch (e) {
         print(e);
       }

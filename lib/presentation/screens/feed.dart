@@ -24,6 +24,7 @@ class _FeedState extends State<Feed> {
   void initState() {
     _posts.snapshots().listen((event) {
       event.docChanges.forEach((element) async {
+        print(await element.doc.get('postReady'));
         if (await element.doc.get('postReady')) {
           posts.clear();
           await Future.delayed(Duration(microseconds: 500));

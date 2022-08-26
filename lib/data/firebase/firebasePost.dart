@@ -37,9 +37,6 @@ class FirebasePost {
       required String title,
       required DocumentReference thisPost,
       required ProcessingFilesStream processingFiles}) async {
-    Map<String, dynamic> mapA = {"posting": true, "post": thisPost};
-    processingFiles.addToQueue(mapA);
-
     /// Create post
     await thisPost.set({
       'collaborators': collaborators,
@@ -51,6 +48,9 @@ class FirebasePost {
       'created': DateTime.now(),
       'postReady': false
     });
+
+    Map<String, dynamic> mapA = {"posting": true, "post": thisPost};
+    processingFiles.addToQueue(mapA);
     return true;
   }
 

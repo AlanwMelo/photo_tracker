@@ -143,7 +143,7 @@ class _AddPhotosScreen extends State<AddPhotosScreen> {
 
   _addImagerToList(FilePickerResult filePickerResult) async {
     List<AddPhotosListItem> result =
-        await GetFilesFromPickerResult(filePickerResult).getFilesPathAndNames();
+        await GetFilesFromPickerResult(filePickerResult).getFilesPathAndNames(tempDir: widget.postID);
     for (var element in result) {
       if (!imagesList.any((e) => e.name == element.name)) {
         imagesList.add(element);
