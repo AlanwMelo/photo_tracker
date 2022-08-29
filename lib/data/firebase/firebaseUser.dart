@@ -14,6 +14,7 @@ class FirebaseUser {
         'name': userName,
         'email': userEmail,
         'userID': userID,
+        'userBio': '',
         'profilePicURL': profilePicURL
       });
     }

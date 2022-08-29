@@ -94,7 +94,6 @@ class _TrackerHomePageState extends State<TrackerHomePage> {
 
   _mainBody() {
     return Container(
-      color: Colors.blueGrey.withOpacity(0.15),
       child: Column(
         mainAxisSize: MainAxisSize.max,
         children: [
@@ -277,9 +276,9 @@ class _TrackerHomePageState extends State<TrackerHomePage> {
   _switchFeedMode(String varFeedMode) {
     switch (varFeedMode) {
       case 'feed':
-        return Feed(mapBoxKey: mapBoxKey);
+        return Feed(mapBoxKey: mapBoxKey, queryMode: 'default');
       case 'favorites':
-        return Feed(mapBoxKey: mapBoxKey);
+        return Feed(mapBoxKey: mapBoxKey, queryMode: 'default');
     }
   }
 

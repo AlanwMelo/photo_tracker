@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:photo_tracker/data/firebase/firebaseUser.dart';
 import 'package:photo_tracker/data/mapBoxKeyLoader.dart';
 import 'package:photo_tracker/presentation/feedModeContainer.dart';
 import 'package:photo_tracker/presentation/screens/feed.dart';
@@ -13,11 +15,24 @@ class UserProfile extends StatefulWidget {
 }
 
 class _UserProfile extends State<UserProfile> {
-  late String mapBoxKey;
+  String mapBoxKey = '';
+  String userName = '';
+  String userBio = '';
+  String picURL = '';
+  int? userFollowers;
+  int? userFollowing;
+  FirebaseUser firebaseUser = FirebaseUser();
+  late DocumentSnapshot thisUser;
+
+  @override
+  void initState() {
+    _loadUserInfo();
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    print(widget.userID);
     return Scaffold(
       body: _body(),
     );
@@ -112,9 +127,9 @@ class _UserProfile extends State<UserProfile> {
       ),
       child: ClipRRect(
           borderRadius: BorderRadius.circular(100.0),
-          child: Image.network(
-              'https://lh3.googleusercontent.com/a-/AFdZucp2juMBhxTq35bUeKVAdDKng3qwJ-hkyoK5qDb2=s96-c',
-              fit: BoxFit.fill)),
+          child: picURL != ''
+              ? Image.network(picURL, fit: BoxFit.fill)
+              : Container()),
     );
   }
 
@@ -147,7 +162,7 @@ class _UserProfile extends State<UserProfile> {
           Container(
             margin: EdgeInsets.only(left: 12),
             child: Text(
-              'Alan Willian',
+              userName,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 20,
@@ -162,11 +177,15 @@ class _UserProfile extends State<UserProfile> {
   _bio() {
     return Container(
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            margin: EdgeInsets.only(right: 12, left: 12, top: 8),
-            child: Text('\${informacoes_pessoais}\n'
-                '\${texto_legal}'),
+          ConstrainedBox(
+            constraints: BoxConstraints(
+                minHeight: 0, maxHeight: 150, minWidth: 285, maxWidth: 285),
+            child: Container(
+              margin: EdgeInsets.only(right: 12, left: 12, top: 8),
+              child: Text(userBio),
+            ),
           )
         ],
       ),
@@ -218,13 +237,20 @@ class _UserProfile extends State<UserProfile> {
   }
 
   _feed() {
-    return Container(
-      child: Feed(mapBoxKey: mapBoxKey),
-    );
+    return Feed(
+        mapBoxKey: mapBoxKey, queryMode: 'userPosts', userID: widget.userID);
   }
 
   _loadMapboxKey() async {
     mapBoxKey = await MapBoxKeyLoader(context: context).loadKey();
     return true;
+  }
+
+  _loadUserInfo() async {
+    thisUser = await firebaseUser.getUserInfo(widget.userID);
+    userName = thisUser.get('name');
+    userBio = thisUser.get('userBio');
+    picURL = thisUser.get('profilePicURL');
+    setState(() {});
   }
 }

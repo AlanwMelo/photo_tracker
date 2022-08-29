@@ -26,9 +26,18 @@ class FirebasePost {
     return posts.docs;
   }
 
+  getPostsFromProfile(String userID) async {
+    QuerySnapshot posts =
+        await _posts.where('ownerID', isEqualTo: userID).get();
+    return posts.docs;
+  }
+
   getPostImages(String postID) async {
-    QuerySnapshot thisPostPictures =
-        await _posts.doc(postID).collection('images').orderBy('timestamp').get();
+    QuerySnapshot thisPostPictures = await _posts
+        .doc(postID)
+        .collection('images')
+        .orderBy('timestamp')
+        .get();
 
     return thisPostPictures;
   }
