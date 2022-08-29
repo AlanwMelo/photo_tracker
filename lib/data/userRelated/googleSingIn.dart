@@ -32,12 +32,12 @@ class TrackerGoogleSignIn {
 
       await FirebaseAuth.instance.signInWithCredential(credential);
 
+      db.insertIntoUserInfo(googleUser?.displayName, googleUser?.email, picPath,
+          FirebaseAuth.instance.currentUser!.uid);
+
       /// Create firebase user based on user google info
       await FirebaseUser().createUser(
           googleUser?.displayName, googleUser?.email, googleUser?.photoUrl);
-
-      db.insertIntoUserInfo(googleUser?.displayName, googleUser?.email, picPath,
-          FirebaseAuth.instance.currentUser!.uid);
 
       return googleUser;
     } catch (error) {
