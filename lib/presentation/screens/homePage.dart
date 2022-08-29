@@ -83,12 +83,15 @@ class _TrackerHomePageState extends State<TrackerHomePage> {
   _loadPrefs() async {
     DBManager db = DBManager();
     var userInfo = await db.readUserInfo();
+    print(userInfo);
 
     BlocProvider.of<BlocOfUserInfo>(context).add(UpdateUserEventChanged(
         UpdateUserInfoStatus.updateUserStatus,
         userInfo[0]['userName'],
         userInfo[0]['userEmail'],
-        userInfo[0]['profileImageLocation']));
+        userInfo[0]['profileImageLocation'],
+        userInfo[0]['userID']
+    ));
   }
 
   _mainBody() {

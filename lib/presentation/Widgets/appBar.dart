@@ -66,9 +66,10 @@ class _AppBar extends State<TrackerAppBar> {
                   _testGoogle();
                 }, child: BlocBuilder<BlocOfUserInfo, BlocOfUserInfoState>(
                   builder: (context, state) {
+                    print(state.userProfilePic);
                   return PictureContainer(
                     imgPath: state.userProfilePic,
-                    pathOrURl: true,
+                    pathOrURl: true, profileID: '',
                   );
                 }))
               : widget.appBarAction!,

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 class PictureContainer extends StatelessWidget {
   final String imgPath;
+  final String profileID;
 
   /// True == PATH / False == URL
   final bool pathOrURl;
@@ -12,6 +13,7 @@ class PictureContainer extends StatelessWidget {
     Key? key,
     required this.imgPath,
     required this.pathOrURl,
+    required this.profileID,
   }) : super(key: key);
 
   @override

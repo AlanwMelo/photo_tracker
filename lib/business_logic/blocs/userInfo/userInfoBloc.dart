@@ -21,7 +21,7 @@ _onUserInfoState(
       break;
     case UpdateUserInfoStatus.updateUserStatus:
       emit(BlocOfUserInfoState.updateUserStatus(
-          event.userName, event.userEmail, event.userProfilePic));
+          event.userName, event.userEmail, event.userProfilePic, event.userID));
       break;
   }
 }

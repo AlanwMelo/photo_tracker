@@ -18,6 +18,7 @@ class DBManager {
             "Id INTEGER PRIMARY KEY AUTOINCREMENT,"
             "userName TEXT,"
             "userEmail TEXT,"
+            "userID TEXT,"
             "profileImageLocation TEXT"
             ")");
       },
@@ -42,13 +43,14 @@ class DBManager {
     db.rawQuery('UPDATE userInfo SET ');
   }
 
-  insertIntoUserInfo(String? userName, String? email, String? imgPath) async {
+  insertIntoUserInfo(String? userName, String? email, String? imgPath, String userID) async {
     Database db = await _startDB();
 
     Map<String, dynamic> _newUser = {
       "userName": userName,
       "userEmail": email,
       "profileImageLocation": imgPath,
+      "userID": userID,
     };
 
     await db.insert('userInfo', _newUser,
@@ -66,11 +68,12 @@ class DBManager {
   }
 
   _test(Database db) async {
+    /*await db.execute("ALTER TABLE userInfo ADD COLUMN userID INTEGER DEFAULT 0");
     await db.execute("CREATE TABLE IF NOT EXISTS userInfo ("
         "Id INTEGER PRIMARY KEY AUTOINCREMENT,"
         "userName TEXT,"
         "userEmail TEXT,"
         "profileImageLocation TEXT"
-        ")");
+        ")");*/
   }
 }

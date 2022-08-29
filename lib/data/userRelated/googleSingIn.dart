@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -28,14 +30,14 @@ class TrackerGoogleSignIn {
       String picPath =
           await SaveProfilePicture(googleUser?.photoUrl).savePicture();
 
-      db.insertIntoUserInfo(
-          googleUser?.displayName, googleUser?.email, picPath);
-
       await FirebaseAuth.instance.signInWithCredential(credential);
 
       /// Create firebase user based on user google info
       await FirebaseUser().createUser(
           googleUser?.displayName, googleUser?.email, googleUser?.photoUrl);
+
+      db.insertIntoUserInfo(googleUser?.displayName, googleUser?.email, picPath,
+          FirebaseAuth.instance.currentUser!.uid);
 
       return googleUser;
     } catch (error) {

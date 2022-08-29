@@ -74,7 +74,9 @@ class _FeedCardState extends State<FeedCard>
           Row(
             children: [
               PictureContainer(
-                  imgPath: postOwner['profilePicURL'], pathOrURl: false),
+                  profileID: postOwner['userID'],
+                  imgPath: postOwner['profilePicURL'],
+                  pathOrURl: false),
               Text(
                 postOwner['name'],
                 style: TextStyle(fontWeight: FontWeight.bold),

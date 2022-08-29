@@ -18,7 +18,6 @@ class EditPhotoListItem extends StatefulWidget {
       required this.user,
       required this.location,
       required this.collaborator,
-
       required this.processing})
       : super(key: key);
 
@@ -95,7 +94,11 @@ class _EditPhotoListItem extends State<EditPhotoListItem> {
         ? Container()
         : Container(
             width: 35,
-            child: PictureContainer(imgPath: '', pathOrURl: true),
+            child: PictureContainer(
+              imgPath: '',
+              pathOrURl: true,
+              profileID: '',
+            ),
           );
   }
 

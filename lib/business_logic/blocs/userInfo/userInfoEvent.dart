@@ -6,10 +6,11 @@ abstract class UpdateUserEvent {
 
 class UpdateUserEventChanged extends UpdateUserEvent {
   const UpdateUserEventChanged(
-      this.status, this.userName, this.userEmail, this.userProfilePic);
+      this.status, this.userName, this.userEmail, this.userProfilePic, this.userID);
 
   final UpdateUserInfoStatus status;
   final String userName;
   final String userEmail;
   final String userProfilePic;
+  final String userID;
 }
