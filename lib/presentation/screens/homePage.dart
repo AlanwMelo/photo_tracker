@@ -83,15 +83,13 @@ class _TrackerHomePageState extends State<TrackerHomePage> {
   _loadPrefs() async {
     DBManager db = DBManager();
     var userInfo = await db.readUserInfo();
-    print(userInfo);
 
     BlocProvider.of<BlocOfUserInfo>(context).add(UpdateUserEventChanged(
         UpdateUserInfoStatus.updateUserStatus,
         userInfo[0]['userName'],
         userInfo[0]['userEmail'],
         userInfo[0]['profileImageLocation'],
-        userInfo[0]['userID']
-    ));
+        userInfo[0]['userID']));
   }
 
   _mainBody() {
@@ -279,9 +277,9 @@ class _TrackerHomePageState extends State<TrackerHomePage> {
   _switchFeedMode(String varFeedMode) {
     switch (varFeedMode) {
       case 'feed':
-        return Feed(mapBoxKey: mapBoxKey, itemCount: 12);
+        return Feed(mapBoxKey: mapBoxKey);
       case 'favorites':
-        return Feed(mapBoxKey: mapBoxKey, itemCount: 4);
+        return Feed(mapBoxKey: mapBoxKey);
     }
   }
 

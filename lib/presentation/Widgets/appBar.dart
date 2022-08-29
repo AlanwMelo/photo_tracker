@@ -69,7 +69,7 @@ class _AppBar extends State<TrackerAppBar> {
                     print(state.userProfilePic);
                   return PictureContainer(
                     imgPath: state.userProfilePic,
-                    pathOrURl: true, profileID: '',
+                    pathOrURl: true, profileID: state.userID,
                   );
                 }))
               : widget.appBarAction!,

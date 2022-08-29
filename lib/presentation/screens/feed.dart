@@ -7,10 +7,8 @@ import 'package:photo_tracker/presentation/Widgets/feedCard.dart';
 
 class Feed extends StatefulWidget {
   final String mapBoxKey;
-  final int itemCount;
 
-  const Feed({Key? key, required this.mapBoxKey, required this.itemCount})
-      : super(key: key);
+  const Feed({Key? key, required this.mapBoxKey}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _FeedState();

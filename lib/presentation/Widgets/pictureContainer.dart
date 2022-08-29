@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:photo_tracker/presentation/screens/userProfile.dart';
 
 class PictureContainer extends StatelessWidget {
   final String imgPath;
@@ -20,25 +21,31 @@ class PictureContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     /// Container com os presentation para a imagem circular
 
-    return Container(
-      height: 70,
-      width: 70,
-      child: Center(
-        child: Container(
-          height: 40,
-          width: 40,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                blurRadius: 2,
-                spreadRadius: 2,
-                color: Colors.black26,
-              ),
-            ],
+    return GestureDetector(
+      onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => UserProfile(userID: profileID))),
+      child: Container(
+        height: 70,
+        width: 70,
+        child: Center(
+          child: Container(
+            height: 40,
+            width: 40,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  blurRadius: 2,
+                  spreadRadius: 2,
+                  color: Colors.black26,
+                ),
+              ],
+            ),
+            child: ClipRRect(
+                borderRadius: BorderRadius.circular(100.0), child: _image()),
           ),
-          child: ClipRRect(
-              borderRadius: BorderRadius.circular(100.0), child: _image()),
         ),
       ),
     );
