@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_tracker/data/firebase/firebaseUser.dart';
 import 'package:photo_tracker/data/mapBoxKeyLoader.dart';
@@ -19,8 +20,11 @@ class _UserProfile extends State<UserProfile> {
   String userName = '';
   String userBio = '';
   String picURL = '';
+  bool followingThisUser = false;
   QuerySnapshot? userFollowers;
   QuerySnapshot? userFollowing;
+  double userFollowersAmount = 0;
+  double userFollowingAmount = 0;
   FirebaseUser firebaseUser = FirebaseUser();
   late DocumentSnapshot thisUser;
 
@@ -106,11 +110,11 @@ class _UserProfile extends State<UserProfile> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           _info(
-            upperText: _calculateFollow(userFollowers),
+            upperText: _calculateFollow(userFollowersAmount),
             downText: 'Followers',
           ),
           _info(
-            upperText: _calculateFollow(userFollowing),
+            upperText: _calculateFollow(userFollowingAmount),
             downText: 'Following',
           ),
         ],
@@ -118,18 +122,16 @@ class _UserProfile extends State<UserProfile> {
     );
   }
 
-  _calculateFollow(QuerySnapshot? querySnapshot) {
+  _calculateFollow(double? amount) {
     String value = '';
-    if (querySnapshot != null) {
-      double total = querySnapshot.docs.length.toDouble();
-
-      if (total < 1000) {
-        value = total.toInt().toString();
-      } else if (total < 1000000) {
-        value = '${(total / 1000).toStringAsFixed(1)}K';
+    if (amount != null) {
+      if (amount < 1000) {
+        value = amount.toInt().toString();
+      } else if (amount < 1000000) {
+        value = '${(amount / 1000).toStringAsFixed(1)}K';
       } else {
-        print(total / 1000000);
-        value = '${(total / 1000000).toStringAsFixed(2)}M';
+        print(amount / 1000000);
+        value = '${(amount / 1000000).toStringAsFixed(2)}M';
       }
     } else {
       value = '0';
@@ -213,31 +215,66 @@ class _UserProfile extends State<UserProfile> {
   }
 
   _midButton() {
-    return Container(
-      margin: EdgeInsets.all(8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8.0),
-            child: Container(
-              width: 300,
-              height: 25,
-              color: Colors.black54,
-              child: Center(
-                child: Text(
-                  'Edit Profile',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
-                      color: Colors.white),
+    String buttonText = '';
+    if (widget.userID == FirebaseAuth.instance.currentUser!.uid) {
+      buttonText = 'Edit Profile';
+    } else if (followingThisUser) {
+      buttonText = 'Unfollow';
+    } else {
+      buttonText = 'Follow';
+    }
+
+    return GestureDetector(
+      onTap: () {
+        if (followingThisUser) {
+          firebaseUser.stopFollowing(userID: widget.userID);
+          userFollowersAmount = userFollowersAmount - 1;
+          followingThisUser = false;
+          setState(() {});
+        } else {
+          firebaseUser.startFollowing(userID: widget.userID);
+          followingThisUser = true;
+          userFollowersAmount = userFollowersAmount + 1;
+          setState(() {});
+        }
+      },
+      child: Container(
+        margin: EdgeInsets.all(8),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8.0),
+              child: Container(
+                width: 300,
+                height: 25,
+                color: Colors.black54,
+                child: Center(
+                  child: _midButtonChild(buttonText),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
+  }
+
+  _midButtonChild(String text) {
+    if (text == '') {
+      return Container(
+          height: 10,
+          width: 10,
+          child: Center(
+              child: CircularProgressIndicator(
+                  color: Colors.white, strokeWidth: 2)));
+    } else {
+      return Text(
+        text,
+        style: TextStyle(
+            fontWeight: FontWeight.bold, fontSize: 15, color: Colors.white),
+      );
+    }
   }
 
   _feedMode() {
@@ -269,11 +306,15 @@ class _UserProfile extends State<UserProfile> {
   _loadUserInfo() async {
     thisUser = await firebaseUser.getUserInfo(widget.userID);
     userFollowing = await firebaseUser.getUserFollowing(widget.userID);
+    userFollowingAmount = userFollowing!.docs.length.toDouble();
+    userFollowers = await firebaseUser.getUserFollowers(widget.userID);
+    userFollowersAmount = userFollowing!.docs.length.toDouble();
+    followingThisUser =
+        await firebaseUser.checkIfFollowingThisUSer(userID: widget.userID);
     userName = thisUser.get('name');
     userBio = thisUser.get('userBio');
     picURL = thisUser.get('profilePicURL');
+
     setState(() {});
   }
-
-
 }
