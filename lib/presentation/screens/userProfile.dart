@@ -21,6 +21,7 @@ class _UserProfile extends State<UserProfile> {
   String userBio = '';
   String picURL = '';
   bool followingThisUser = false;
+  bool infoLoaded = false;
   QuerySnapshot? userFollowers;
   QuerySnapshot? userFollowing;
   double userFollowersAmount = 0;
@@ -218,20 +219,20 @@ class _UserProfile extends State<UserProfile> {
     String buttonText = '';
     if (widget.userID == FirebaseAuth.instance.currentUser!.uid) {
       buttonText = 'Edit Profile';
-    } else if (followingThisUser) {
+    } else if (followingThisUser && infoLoaded) {
       buttonText = 'Unfollow';
-    } else {
+    } else if (!followingThisUser && infoLoaded) {
       buttonText = 'Follow';
     }
 
     return GestureDetector(
       onTap: () {
-        if (followingThisUser) {
+        if (followingThisUser && infoLoaded) {
           firebaseUser.stopFollowing(userID: widget.userID);
           userFollowersAmount = userFollowersAmount - 1;
           followingThisUser = false;
           setState(() {});
-        } else {
+        } else if(!followingThisUser && infoLoaded) {
           firebaseUser.startFollowing(userID: widget.userID);
           followingThisUser = true;
           userFollowersAmount = userFollowersAmount + 1;
@@ -306,14 +307,15 @@ class _UserProfile extends State<UserProfile> {
   _loadUserInfo() async {
     thisUser = await firebaseUser.getUserInfo(widget.userID);
     userFollowing = await firebaseUser.getUserFollowing(widget.userID);
-    userFollowingAmount = userFollowing!.docs.length.toDouble();
     userFollowers = await firebaseUser.getUserFollowers(widget.userID);
-    userFollowersAmount = userFollowing!.docs.length.toDouble();
+    userFollowingAmount = userFollowing!.docs.length.toDouble();
+    userFollowersAmount = userFollowers!.docs.length.toDouble();
     followingThisUser =
         await firebaseUser.checkIfFollowingThisUSer(userID: widget.userID);
     userName = thisUser.get('name');
     userBio = thisUser.get('userBio');
     picURL = thisUser.get('profilePicURL');
+    infoLoaded = true;
 
     setState(() {});
   }
