@@ -19,8 +19,8 @@ class _UserProfile extends State<UserProfile> {
   String userName = '';
   String userBio = '';
   String picURL = '';
-  int? userFollowers;
-  int? userFollowing;
+  QuerySnapshot? userFollowers;
+  QuerySnapshot? userFollowing;
   FirebaseUser firebaseUser = FirebaseUser();
   late DocumentSnapshot thisUser;
 
@@ -106,16 +106,36 @@ class _UserProfile extends State<UserProfile> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           _info(
-            upperText: "1000",
+            upperText: _calculateFollow(userFollowers),
             downText: 'Followers',
           ),
           _info(
-            upperText: "10K",
+            upperText: _calculateFollow(userFollowing),
             downText: 'Following',
           ),
         ],
       ),
     );
+  }
+
+  _calculateFollow(QuerySnapshot? querySnapshot) {
+    String value = '';
+    if (querySnapshot != null) {
+      double total = querySnapshot.docs.length.toDouble();
+
+      if (total < 1000) {
+        value = total.toInt().toString();
+      } else if (total < 1000000) {
+        value = '${(total / 1000).toStringAsFixed(1)}K';
+      } else {
+        print(total / 1000000);
+        value = '${(total / 1000000).toStringAsFixed(2)}M';
+      }
+    } else {
+      value = '0';
+    }
+
+    return value;
   }
 
   _pic() {
@@ -248,9 +268,12 @@ class _UserProfile extends State<UserProfile> {
 
   _loadUserInfo() async {
     thisUser = await firebaseUser.getUserInfo(widget.userID);
+    userFollowing = await firebaseUser.getUserFollowing(widget.userID);
     userName = thisUser.get('name');
     userBio = thisUser.get('userBio');
     picURL = thisUser.get('profilePicURL');
     setState(() {});
   }
+
+
 }

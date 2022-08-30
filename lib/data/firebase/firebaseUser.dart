@@ -27,6 +27,16 @@ class FirebaseUser {
     return thisUser;
   }
 
+  getUserFollowers(String userID) async {
+    QuerySnapshot thisUserFollowers = await _users.doc(userID).collection('followers').get();
+    return thisUserFollowers;
+  }
+
+  getUserFollowing(String userID) async {
+    QuerySnapshot thisUserFollowing = await _users.doc(userID).collection('following').get();
+    return thisUserFollowing;
+  }
+
   checkIfUserExistsByID(String? userID) async {
     DocumentSnapshot user = await _users.doc(userID).get();
 

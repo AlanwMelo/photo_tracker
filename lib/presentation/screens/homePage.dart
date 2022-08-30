@@ -11,6 +11,7 @@ import 'package:photo_tracker/classes/mainListItem.dart';
 import 'package:photo_tracker/data/mapBoxKeyLoader.dart';
 import 'package:photo_tracker/db/dbManager.dart';
 import 'package:photo_tracker/presentation/Widgets/appBar.dart';
+import 'package:photo_tracker/presentation/feedModeContainer.dart';
 import 'package:photo_tracker/presentation/screens/feed.dart';
 import 'package:photo_tracker/presentation/screens/newPost/new_post.dart';
 import 'package:photo_tracker/presentation/screens/notifications.dart';
@@ -109,27 +110,6 @@ class _TrackerHomePageState extends State<TrackerHomePage> {
   }
 
   _feedMode() {
-    _feedModeContainer(String text, bool selected) {
-      return Container(
-        decoration: BoxDecoration(
-            border: selected
-                ? Border(
-                    bottom: BorderSide(width: 3.5, color: Colors.lightBlue),
-                  )
-                : Border()),
-        child: Center(
-          child: Container(
-            child: Text(
-              text,
-              style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: selected ? Colors.lightBlue : Colors.blueGrey),
-            ),
-          ),
-        ),
-      );
-    }
-
     return Container(
       height: 50,
       child: Row(
@@ -144,8 +124,8 @@ class _TrackerHomePageState extends State<TrackerHomePage> {
                       setState(() {});
                     }
                   },
-                  child: _feedModeContainer(
-                      'Feed', varFeedSelected ? true : false))),
+                  child: FeedModeContainer(
+                      text: 'Feed', selected: varFeedSelected ? true : false))),
           Expanded(
             child: GestureDetector(
                 onTap: () {
@@ -155,8 +135,9 @@ class _TrackerHomePageState extends State<TrackerHomePage> {
                     setState(() {});
                   }
                 },
-                child: _feedModeContainer(
-                    'Favoritos', !varFeedSelected ? true : false)),
+                child: FeedModeContainer(
+                    text: 'Favoritos',
+                    selected: !varFeedSelected ? true : false)),
           )
         ],
       ),
