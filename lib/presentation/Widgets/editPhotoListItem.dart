@@ -8,7 +8,9 @@ class EditPhotoListItem extends StatefulWidget {
   final String imageName;
   final String location;
   final String collaborator;
+  final String? firebasePath;
   final bool processing;
+  final bool fromFirebase;
   final String user;
 
   const EditPhotoListItem(
@@ -18,7 +20,9 @@ class EditPhotoListItem extends StatefulWidget {
       required this.user,
       required this.location,
       required this.collaborator,
-      required this.processing})
+      required this.processing,
+      required this.fromFirebase,
+      this.firebasePath})
       : super(key: key);
 
   @override
@@ -58,8 +62,10 @@ class _EditPhotoListItem extends State<EditPhotoListItem> {
     return Container(
       width: 115,
       height: 100,
-      child: Image.file(File(widget.imagePath),
-          fit: BoxFit.cover, filterQuality: FilterQuality.low),
+      child: widget.fromFirebase
+          ? Image.network(widget.firebasePath!, fit: BoxFit.cover)
+          : Image.file(File(widget.imagePath),
+              fit: BoxFit.cover, filterQuality: FilterQuality.low),
     );
   }
 

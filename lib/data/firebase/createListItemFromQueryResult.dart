@@ -5,7 +5,7 @@ import 'package:photo_tracker/data/firebase/firebasePost.dart';
 
 /// Read firebase images list based on postID and return a List of List items to be displayed on the map
 class CreateListItemFromQueryResult {
-  fireTest(String postID) async {
+  createFromFirebase(String postID) async {
     List<ListItem> imagesList = [];
 
     QuerySnapshot postImages = await FirebasePost().getPostImages(postID);

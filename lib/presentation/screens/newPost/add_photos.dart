@@ -39,20 +39,21 @@ class _AddPhotosScreen extends State<AddPhotosScreen> {
   List<AddPhotosListItem> filesToBeDeleted = [];
   FirestoreManager firestoreManager = FirestoreManager();
   FirebasePost firebasePost = FirebasePost();
-  late StreamSubscription stream;
+
+  //late StreamSubscription stream;
   bool loading = false;
   bool processingFiles = false;
 
   @override
   void dispose() {
-    stream.cancel();
+    //stream.cancel();
     super.dispose();
   }
 
   @override
   void initState() {
     imagesList = widget.receivedList;
-    stream = widget.processingFilesStream.stream.listen((event) {
+    /*stream = widget.processingFilesStream.stream.listen((event) {
       String location = 'error';
       if (event.toString().contains('location')) {
         if (event['location'] != 'error') {
@@ -73,7 +74,7 @@ class _AddPhotosScreen extends State<AddPhotosScreen> {
           print(e);
         }
       }
-    });
+    });*/
     super.initState();
   }
 
@@ -112,38 +113,27 @@ class _AddPhotosScreen extends State<AddPhotosScreen> {
   }
 
   _listView() {
-    return StreamBuilder(
-      stream: widget.processingFilesStream.stream,
-      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-        return Container(
-          child: ListView.builder(
-              itemCount: imagesList.length,
-              itemBuilder: (context, index) {
-                return Container(
-                    margin: EdgeInsets.only(top: 2),
-                    child: GestureDetector(
-                      onLongPress: () => _removeItemFromPost(index),
-                      child: EditPhotoListItem(
-                        user: FirebaseAuth.instance.currentUser!.uid,
-                        imagePath: imagesList[index].path,
-                        imageName: imagesList[index].name,
-                        location: imagesList[index].location,
-                        collaborator: imagesList[index].collaborator,
-                        processing: imagesList[index]
-                            .processing /*snapshot.hasData
-                            ? snapshot.data['processingFile'] ==
-                                    imagesList[index].name
-                                ? true
-                                : false
-                            : false*/
-                        ,
-
-                        // name
-                      ),
-                    ));
-              }),
-        );
-      },
+    return Container(
+      child: ListView.builder(
+          itemCount: imagesList.length,
+          itemBuilder: (context, index) {
+            return Container(
+                margin: EdgeInsets.only(top: 2),
+                child: GestureDetector(
+                  onLongPress: () => _removeItemFromPost(index),
+                  child: EditPhotoListItem(
+                    fromFirebase: imagesList[index].fromFirebase,
+                    user: FirebaseAuth.instance.currentUser!.uid,
+                    imagePath: imagesList[index].path,
+                    imageName: imagesList[index].name,
+                    location: imagesList[index].location,
+                    collaborator: imagesList[index].collaborator,
+                    processing: imagesList[index].processing,
+                    firebasePath: imagesList[index].firebasePath,
+                    // name
+                  ),
+                ));
+          }),
     );
   }
 
@@ -243,6 +233,7 @@ class _AddPhotosScreen extends State<AddPhotosScreen> {
                 int index =
                     imagesList.indexWhere((helper) => element == helper);
                 imagesList[index] = AddPhotosListItem(
+                    fromFirebase: false,
                     name: imagesList[index].name,
                     path: imagesList[index].path,
                     location: imagesList[index].location,
@@ -275,6 +266,7 @@ class _AddPhotosScreen extends State<AddPhotosScreen> {
                 });
 
                 imagesList[index] = AddPhotosListItem(
+                    fromFirebase: false,
                     name: imagesList[index].name,
                     path: imagesList[index].path,
                     location: locationError!

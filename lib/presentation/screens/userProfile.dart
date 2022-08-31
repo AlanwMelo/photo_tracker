@@ -316,8 +316,7 @@ class _UserProfile extends State<UserProfile> {
     followingThisUser =
         await firebaseUser.checkIfFollowingThisUSer(userID: widget.userID);
 
-    var userDataHelper = jsonEncode(thisUser.data());
-    var userData = jsonDecode(userDataHelper);
+    Map userData = thisUser.data()! as Map<String, dynamic>;
 
     userName = userData['name'];
     userBio = userData['userBio'];

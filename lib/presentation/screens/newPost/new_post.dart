@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -6,15 +7,15 @@ import 'package:flutter/material.dart';
 import 'package:photo_tracker/business_logic/posts/addPhotos/addPhotosListItem.dart';
 import 'package:photo_tracker/business_logic/processingFilesStream.dart';
 import 'package:photo_tracker/data/firebase/firebasePost.dart';
-import 'package:photo_tracker/data/listItem.dart';
 import 'package:photo_tracker/presentation/Widgets/appBar.dart';
 import 'package:photo_tracker/presentation/Widgets/trackerSimpleButton.dart';
 import 'package:photo_tracker/presentation/screens/newPost/add_photos.dart';
 
 class NewPost extends StatefulWidget {
   final ProcessingFilesStream processingFilesStream;
+  final String? postID;
 
-  NewPost(this.processingFilesStream);
+  NewPost({required this.processingFilesStream, this.postID});
 
   @override
   State<StatefulWidget> createState() => _NewPostState();
@@ -24,13 +25,20 @@ class _NewPostState extends State<NewPost> {
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   List<AddPhotosListItem> imagesList = [];
+  String title = 'New Post';
   late DocumentReference _thisPost;
   bool confirmPost = false;
+  bool editingPost = false;
+  bool loadingPost = true;
   FirebasePost firebasePost = FirebasePost();
 
   @override
   void initState() {
     _thisPost = firebasePost.getNewPostId();
+    if (widget.postID != null) {
+      title = 'Edit Post';
+      _loadPostInfo();
+    }
     super.initState();
   }
 
@@ -41,12 +49,16 @@ class _NewPostState extends State<NewPost> {
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: TrackerAppBar(
-          title: 'New Post',
+          title: title,
           mainScreen: true,
           appBarAction: TrackerSimpleButton(
             text: 'Post',
             pressed: (_) {
-              _createPost();
+              if (!editingPost) {
+                _createPost();
+              } else if (editingPost && !loadingPost) {
+                _createPost(editingPost: editingPost);
+              }
             },
           ),
         ),
@@ -150,7 +162,9 @@ class _NewPostState extends State<NewPost> {
                     MaterialPageRoute(
                         builder: (context) => AddPhotosScreen(
                               receivedList: imagesList,
-                              postID: _thisPost.id,
+                              postID: widget.postID != null
+                                  ? widget.postID!
+                                  : _thisPost.id,
                               processingFilesStream:
                                   widget.processingFilesStream,
                               confirm: (receivedImagesList) {
@@ -166,15 +180,27 @@ class _NewPostState extends State<NewPost> {
     );
   }
 
-  _createPost() {
-    firebasePost.createPost(
-        collaborators: [],
-        description: descriptionController.text,
-        mainLocation: '',
-        ownerID: FirebaseAuth.instance.currentUser!.uid,
-        title: titleController.text,
-        thisPost: _thisPost,
-        processingFiles: widget.processingFilesStream);
+  _createPost({bool editingPost = false}) {
+    if (editingPost) {
+      firebasePost.createPost(
+          updating: true,
+          updatingID: widget.postID,
+          collaborators: [],
+          description: descriptionController.text,
+          mainLocation: '',
+          ownerID: FirebaseAuth.instance.currentUser!.uid,
+          title: titleController.text,
+          processingFiles: widget.processingFilesStream);
+    } else {
+      firebasePost.createPost(
+          collaborators: [],
+          description: descriptionController.text,
+          mainLocation: '',
+          ownerID: FirebaseAuth.instance.currentUser!.uid,
+          title: titleController.text,
+          thisPost: _thisPost,
+          processingFiles: widget.processingFilesStream);
+    }
 
     confirmPost = true;
     Navigator.of(context).pop();
@@ -188,5 +214,37 @@ class _NewPostState extends State<NewPost> {
       widget.processingFilesStream.addToQueue(map);
     }
     return true;
+  }
+
+  _loadPostInfo() async {
+    DocumentSnapshot _post = await firebasePost.getPostInfo(widget.postID!);
+    editingPost = true;
+
+    Map postInfo = _post.data()! as Map<String, dynamic>;
+
+    titleController.text = postInfo['title'];
+    descriptionController.text = postInfo['description'];
+
+    QuerySnapshot postImages = await firebasePost.getPostImages(widget.postID!);
+
+    postImages.docs.forEach((image) {
+      Map imageInfo = image.data() as Map<String, dynamic>;
+
+      GeoPoint geoPoint = imageInfo['latLong'];
+
+      imagesList.add(AddPhotosListItem(
+          fromFirebase: true,
+          name: imageInfo['imageID'],
+          processing: false,
+          path: 'firebase',
+          firebasePath: imageInfo['firestorePath'],
+          location:
+              '${geoPoint.latitude.toStringAsFixed(6)}, ${geoPoint.longitude.toStringAsFixed(6)}',
+          collaborator: imageInfo['collaborator']));
+    });
+
+    loadingPost = false;
+
+    setState(() {});
   }
 }

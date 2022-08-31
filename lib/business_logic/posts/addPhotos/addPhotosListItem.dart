@@ -4,14 +4,15 @@ class AddPhotosListItem {
   final String location;
   final String collaborator;
   final bool processing;
+  final bool fromFirebase;
   String? firebasePath;
 
-  AddPhotosListItem({
-    required this.name,
-    required this.processing,
-    required this.path,
-    required this.location,
-    required this.collaborator,
-    this.firebasePath
-  });
+  AddPhotosListItem(
+      {required this.name,
+      required this.fromFirebase,
+      required this.processing,
+      required this.path,
+      required this.location,
+      required this.collaborator,
+      this.firebasePath});
 }

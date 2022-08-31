@@ -211,7 +211,7 @@ class _TrackerHomePageState extends State<TrackerHomePage> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => NewPost(processingFiles)));
+                      builder: (context) => NewPost(processingFilesStream: processingFiles)));
             },
             child: Center(
                 child: Icon(

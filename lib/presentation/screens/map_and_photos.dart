@@ -1,16 +1,18 @@
 import 'dart:async';
 import 'dart:ui';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:photo_tracker/classes/alertDialog.dart';
+import 'package:photo_tracker/business_logic/processingFilesStream.dart';
 import 'package:photo_tracker/data/listItem.dart';
 import 'package:photo_tracker/data/firebase/createListItemFromQueryResult.dart';
 import 'package:photo_tracker/data/routeAnimations/pageRouterSlideUp.dart';
 import 'package:photo_tracker/db/dbManager.dart';
 import 'package:photo_tracker/presentation/Widgets/appBar.dart';
 import 'package:photo_tracker/presentation/screens/comments.dart';
+import 'package:photo_tracker/presentation/screens/newPost/new_post.dart';
 import 'package:photo_tracker/presentation/screens/open_map.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 
@@ -18,6 +20,7 @@ class MapAndPhotos extends StatefulWidget {
   final String mapboxKey;
   final String postID;
   final String postTitle;
+  final String ownerID;
   final bool goToComments;
   final Function(bool) answer;
 
@@ -27,7 +30,8 @@ class MapAndPhotos extends StatefulWidget {
       required this.answer,
       required this.mapboxKey,
       this.goToComments = false,
-      required this.postTitle})
+      required this.postTitle,
+      required this.ownerID})
       : super(key: key);
 
   @override
@@ -147,8 +151,18 @@ class _MapAndPhotos extends State<MapAndPhotos> {
             height: 45,
             child: Row(
               children: [
-                Container(
-                    margin: EdgeInsets.only(left: 15), child: Icon(Icons.edit)),
+                GestureDetector(
+                    onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => NewPost(
+                                processingFilesStream: ProcessingFilesStream(),
+                                postID: widget.postID))),
+                    child:
+                        widget.ownerID == FirebaseAuth.instance.currentUser?.uid
+                            ? Container(
+                                height: 40, width: 40, child: Icon(Icons.edit))
+                            : Container()),
                 Expanded(child: Container()),
                 Container(
                     margin: EdgeInsets.only(right: 15),
@@ -253,46 +267,6 @@ class _MapAndPhotos extends State<MapAndPhotos> {
     );
   }
 
-  /*_addMoreButton(double height) {
-    return Container(
-      width: fileList.length == 0 ? MediaQuery.of(context).size.width : 55,
-      height: height,
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-            primary: Colors.lightBlue,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero)),
-        onPressed: () async {
-          FilePickerResult? result = await FilePicker.platform.pickFiles(
-              allowMultiple: true,
-              type: FileType.custom,
-              allowedExtensions: ['jpg']);
-
-          if (result != null) {
-            List<ListItem> loadToListItems =
-                await LoadPhotosToList(result).loadPhotos();
-
-            for (var element in loadToListItems) {
-              dbManager.createNewImageItem(
-                  widget.listName,
-                  element.imgPath,
-                  element.latLng.latitude,
-                  element.latLng.longitude,
-                  double.parse(
-                      element.timestamp.millisecondsSinceEpoch.toString()),
-                  element.locationError,
-                  element.timeError);
-              _addItemToList(element);
-            }
-            _getIndexOfFirsLocation(loadToListItems);
-          } else {
-            // User canceled the picker
-          }
-        },
-        child: Center(child: Icon(Icons.add_a_photo_outlined)),
-      ),
-    );
-  }*/
-
   _carouselSlider(double useAbleHeight, double useAbleWidth) {
     return Container(
       child: CarouselSlider(
@@ -355,19 +329,14 @@ class _MapAndPhotos extends State<MapAndPhotos> {
 
   // #### Funções - Inicio ####
   _loadList(String listName) async {
-    fileList = await CreateListItemFromQueryResult().fireTest(listName);
+    fileList =
+        await CreateListItemFromQueryResult().createFromFirebase(listName);
     for (var element in fileList) {
       _addMarkerToMap(element);
     }
     setState(() {});
 
-    /*var result = await dbManager.getListItems(listName);
-    for (var element in result) {
-      listItem = await CreateListItemFromQueryResult().create(element);
-      _addMarkerToMap(listItem);
-      fileList.add(listItem);
-    }
-    _getIndexOfFirsLocation(fileList);*/
+    _getIndexOfFirsLocation(fileList);
   }
 
   /// ###################### Debouncer ######################

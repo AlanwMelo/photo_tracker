@@ -52,6 +52,7 @@ class _FeedCardState extends State<FeedCard>
             context,
             MaterialPageRoute(
                 builder: (context) => MapAndPhotos(
+                  ownerID: thisPost['ownerID'],
                     postTitle: thisPost['title'],
                     postID: widget.postID,
                     answer: (_) {},
@@ -161,6 +162,7 @@ class _FeedCardState extends State<FeedCard>
               child: GestureDetector(
                   onTap: () => Navigator.of(context).push(routeSlideUp(
                       MapAndPhotos(
+                          ownerID: thisPost['ownerID'],
                           postTitle: thisPost['title'],
                           postID: widget.postID,
                           answer: (_) {},

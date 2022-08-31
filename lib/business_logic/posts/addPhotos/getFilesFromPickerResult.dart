@@ -27,7 +27,8 @@ class GetFilesFromPickerResult {
           path: newLocation,
           location: 'not processed',
           processing: false,
-          collaborator: FirebaseAuth.instance.currentUser!.uid));
+          collaborator: FirebaseAuth.instance.currentUser!.uid,
+          fromFirebase: false));
     }
     return list;
   }

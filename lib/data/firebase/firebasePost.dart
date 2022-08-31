@@ -42,31 +42,6 @@ class FirebasePost {
     return thisPostPictures;
   }
 
-  createPost(
-      {required List<String> collaborators,
-      required String description,
-      required String mainLocation,
-      required String ownerID,
-      required String title,
-      required DocumentReference thisPost,
-      required ProcessingFilesStream processingFiles}) async {
-    /// Create post
-    await thisPost.set({
-      'collaborators': collaborators,
-      'description': description,
-      'mainLocation': mainLocation,
-      'ownerID': ownerID,
-      'postID': thisPost.id,
-      'title': title,
-      'created': DateTime.now(),
-      'postReady': false
-    });
-
-    Map<String, dynamic> mapA = {"posting": true, "post": thisPost};
-    processingFiles.addToQueue(mapA);
-    return true;
-  }
-
   createImgDocument(List imgURLs, DocumentReference postPicture,
       String fileName, String collaborator) async {
     final uri = Uri.parse(
@@ -114,6 +89,49 @@ class FirebasePost {
   setPostAsReady({required String post}) {
     DocumentReference doc = _posts.doc(post);
     doc.update({'postReady': true});
+  }
+
+  createPost({
+    required List<String> collaborators,
+    required String description,
+    required String mainLocation,
+    required String ownerID,
+    required String title,
+    required ProcessingFilesStream processingFiles,
+    bool? updating,
+    String? updatingID,
+    DocumentReference? thisPost,
+  }) async {
+    if (updating != null && updating) {
+      /// Update post
+      await _posts.doc(updatingID).update({
+        'collaborators': collaborators,
+        'description': description,
+        'mainLocation': mainLocation,
+        'ownerID': ownerID,
+        'title': title,
+      });
+
+      Map<String, dynamic> mapA = {"posting": true, "post": thisPost};
+      processingFiles.addToQueue(mapA);
+    } else {
+      /// Create post
+      await thisPost?.set({
+        'collaborators': collaborators,
+        'description': description,
+        'mainLocation': mainLocation,
+        'ownerID': ownerID,
+        'postID': thisPost.id,
+        'title': title,
+        'created': DateTime.now(),
+        'postReady': false
+      });
+
+      Map<String, dynamic> mapA = {"posting": true, "post": thisPost};
+      processingFiles.addToQueue(mapA);
+    }
+
+    return true;
   }
 
   deletePost({required DocumentReference thisPost}) async {
