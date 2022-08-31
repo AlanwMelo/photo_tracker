@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +22,7 @@ class _UserProfile extends State<UserProfile> {
   String userName = '';
   String userBio = '';
   String picURL = '';
+  String hexCode = '';
   bool followingThisUser = false;
   bool infoLoaded = false;
   QuerySnapshot? userFollowers;
@@ -72,7 +75,7 @@ class _UserProfile extends State<UserProfile> {
           Expanded(
               child: Container(
             child: Text(
-              'Tracker#8739f7ba',
+              'Tracker#$hexCode',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
             ),
           )),
@@ -232,7 +235,7 @@ class _UserProfile extends State<UserProfile> {
           userFollowersAmount = userFollowersAmount - 1;
           followingThisUser = false;
           setState(() {});
-        } else if(!followingThisUser && infoLoaded) {
+        } else if (!followingThisUser && infoLoaded) {
           firebaseUser.startFollowing(userID: widget.userID);
           followingThisUser = true;
           userFollowersAmount = userFollowersAmount + 1;
@@ -312,9 +315,14 @@ class _UserProfile extends State<UserProfile> {
     userFollowersAmount = userFollowers!.docs.length.toDouble();
     followingThisUser =
         await firebaseUser.checkIfFollowingThisUSer(userID: widget.userID);
-    userName = thisUser.get('name');
-    userBio = thisUser.get('userBio');
-    picURL = thisUser.get('profilePicURL');
+
+    var userDataHelper = jsonEncode(thisUser.data());
+    var userData = jsonDecode(userDataHelper);
+
+    userName = userData['name'];
+    userBio = userData['userBio'];
+    picURL = userData['profilePicURL'];
+    hexCode = userData['hexCode'];
     infoLoaded = true;
 
     setState(() {});
