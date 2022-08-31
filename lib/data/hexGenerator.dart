@@ -8,7 +8,6 @@ class HexGenerator {
     for (var i = 0; i < length; i++) {
       sb.write(_random.nextInt(16).toRadixString(16));
     }
-    print(sb.toString());
     return sb.toString();
   }
 }

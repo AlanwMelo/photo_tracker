@@ -184,7 +184,6 @@ class _AddPhotosScreen extends State<AddPhotosScreen> {
   }
 
   Future<bool> _willPop() async {
-    print(processingFiles);
     if (!processingFiles && !loading) {
       List<AddPhotosListItem> finalList = imagesList
           .where((element) => element.location != 'not processed')
@@ -192,9 +191,9 @@ class _AddPhotosScreen extends State<AddPhotosScreen> {
       await widget.confirm(finalList);
       if (filesToBeDeleted.isNotEmpty) {
         try {
-          firebasePost.deleteImages(filesToBeDeleted);
+          firebasePost.deleteImages(filesToBeDeleted, post: widget.postID);
         } catch (e) {
-          print('Erro ao deletar arquivos (add_photos 193): $e');
+          print('Erro ao deletar arquivos (add_photos 197): $e');
         }
       }
       return true;
@@ -275,7 +274,6 @@ class _AddPhotosScreen extends State<AddPhotosScreen> {
                     collaborator: imagesList[index].collaborator,
                     processing: false,
                     firebasePath: imageDoc.path);
-                print(imageDoc.path);
                 setState(() {});
               }
             }
@@ -285,8 +283,10 @@ class _AddPhotosScreen extends State<AddPhotosScreen> {
     } else {
       return TrackerSimpleButton(
           text: 'Confirmar',
-          pressed: (_) {
-            Navigator.of(context).pop();
+          pressed: (_) async {
+            if (await _willPop()) {
+              Navigator.of(context).pop();
+            }
           });
     }
   }

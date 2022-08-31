@@ -33,14 +33,19 @@ class FirestoreManager {
     }
   }
 
-  deleteFiles({required List<AddPhotosListItem> images}) {
+  deleteFiles({required List<AddPhotosListItem> images, String? post}) {
     images.forEach((image) {
-      String path = image.firebasePath!.replaceAll('/images', '');
-      path = '$path.jpg';
+      late String path;
 
-      try{
+      if (image.fromFirebase) {
+        path = 'posts/$post/${image.name}.jpg';
+      } else {
+        path = image.firebasePath!.replaceAll('/images', '');
+        path = '$path.jpg';
+      }
+      try {
         _storageRef.child(path).delete();
-      }catch(e){
+      } catch (e) {
         print('Error on delete (firestore): $e');
       }
     });

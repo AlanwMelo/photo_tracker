@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:photo_tracker/business_logic/posts/addPhotos/addPhotosListItem.dart';
 import 'package:photo_tracker/business_logic/processingFilesStream.dart';
 import 'package:photo_tracker/data/firebase/firestore.dart';
@@ -156,16 +157,24 @@ class FirebasePost {
     return true;
   }
 
-  deleteImages(List<AddPhotosListItem> images) {
+  deleteImages(List<AddPhotosListItem> images, {String? post}) {
     WriteBatch batch = FirebaseFirestore.instance.batch();
 
     images.forEach((image) {
-      DocumentReference doc =
-          FirebaseFirestore.instance.doc(image.firebasePath!);
+      late DocumentReference doc;
+
+      if (image.fromFirebase) {
+        doc =
+            FirebaseFirestore.instance.doc('posts/$post/images/${image.name}');
+        batch.delete(doc);
+      } else {
+        print(image.firebasePath!);
+        doc = FirebaseFirestore.instance.doc(image.firebasePath!);
+      }
 
       batch.delete(doc);
     });
     batch.commit();
-    firestoreManager.deleteFiles(images: images);
+    firestoreManager.deleteFiles(images: images, post: post);
   }
 }
