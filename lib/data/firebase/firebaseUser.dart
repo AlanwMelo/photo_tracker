@@ -1,13 +1,23 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:photo_tracker/data/hexGenerator.dart';
 
 class FirebaseUser {
   CollectionReference _users = FirebaseFirestore.instance.collection('users');
+  HexGenerator _hexGenerator = HexGenerator();
 
   createUser(String? userName, String? userEmail, String? profilePicURL) async {
     String? userID = FirebaseAuth.instance.currentUser?.uid;
 
     bool userAlreadyCreated = await checkIfUserExistsByID(userID);
+
+    bool hexInUse = false;
+    String? hexCode;
+
+    while (!hexInUse) {
+      hexCode = _hexGenerator.generateRandomHex(8);
+      hexInUse = await checkIfHexIsInUe(hexCode!);
+    }
 
     if (!userAlreadyCreated) {
       await _users.doc(userID).set({
@@ -15,11 +25,23 @@ class FirebaseUser {
         'email': userEmail,
         'userID': userID,
         'userBio': '',
+        'hexCode': hexCode,
         'profilePicURL': profilePicURL
       });
     }
 
     return true;
+  }
+
+  checkIfHexIsInUe(String hexCode) async {
+    QuerySnapshot hexExists =
+        await _users.where('hexCode', isEqualTo: hexCode).get();
+
+    if (hexExists.docs.length == 0) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   getUserInfo(String userID) async {

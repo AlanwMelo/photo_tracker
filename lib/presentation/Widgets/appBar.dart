@@ -11,10 +11,12 @@ import 'package:photo_tracker/business_logic/blocs/userInfo/userInfoBloc.dart';
 import 'package:photo_tracker/business_logic/blocs/userInfo/userInfoEvent.dart';
 import 'package:photo_tracker/business_logic/blocs/userInfo/userInfoState.dart';
 import 'package:photo_tracker/data/firebase/firebasePost.dart';
+import 'package:photo_tracker/data/firebase/firebaseUser.dart';
 import 'package:photo_tracker/db/dbManager.dart';
 import 'package:photo_tracker/presentation/Widgets/pictureContainer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'dart:math';
 import 'package:http/http.dart' as http;
 
 class TrackerAppBar extends StatefulWidget with PreferredSizeWidget {
@@ -62,16 +64,17 @@ class _AppBar extends State<TrackerAppBar> {
         titleSpacing: 0,
         actions: [
           widget.appBarAction == null
-              ? GestureDetector(onTap: () {
-                  _testGoogle();
-                }, child: BlocBuilder<BlocOfUserInfo, BlocOfUserInfoState>(
-                  builder: (context, state) {
+              ? GestureDetector(
+                  onLongPress: () {},
+                  child: BlocBuilder<BlocOfUserInfo, BlocOfUserInfoState>(
+                      builder: (context, state) {
                     print(state.userProfilePic);
-                  return PictureContainer(
-                    imgPath: state.userProfilePic,
-                    pathOrURl: true, profileID: state.userID,
-                  );
-                }))
+                    return PictureContainer(
+                      imgPath: state.userProfilePic,
+                      pathOrURl: true,
+                      profileID: state.userID,
+                    );
+                  }))
               : widget.appBarAction!,
         ],
       );
@@ -102,8 +105,6 @@ class _AppBar extends State<TrackerAppBar> {
   }
 
   Future<void> _testGoogle() async {
-
-
     //FirebasePost().getPostsForFeed();
     //FirebaseAuth.instance.signOut();
   }
