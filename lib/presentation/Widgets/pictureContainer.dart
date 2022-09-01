@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:photo_tracker/presentation/screens/userProfile.dart';
+import 'package:photo_tracker/presentation/screens/userProfile/userProfile.dart';
 
 class PictureContainer extends StatelessWidget {
   final String imgPath;

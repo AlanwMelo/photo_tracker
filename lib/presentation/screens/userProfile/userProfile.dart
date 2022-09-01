@@ -7,6 +7,7 @@ import 'package:photo_tracker/data/firebase/firebaseUser.dart';
 import 'package:photo_tracker/data/mapBoxKeyLoader.dart';
 import 'package:photo_tracker/presentation/feedModeContainer.dart';
 import 'package:photo_tracker/presentation/screens/feed.dart';
+import 'package:photo_tracker/presentation/screens/userProfile/editProfile.dart';
 
 class UserProfile extends StatefulWidget {
   final String userID;
@@ -229,7 +230,10 @@ class _UserProfile extends State<UserProfile> {
 
     return GestureDetector(
       onTap: () {
-        if (followingThisUser && infoLoaded) {
+        if (widget.userID == FirebaseAuth.instance.currentUser!.uid) {
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => EditProfile()));
+        } else if (followingThisUser && infoLoaded) {
           firebaseUser.stopFollowing(userID: widget.userID);
           userFollowersAmount = userFollowersAmount - 1;
           followingThisUser = false;
