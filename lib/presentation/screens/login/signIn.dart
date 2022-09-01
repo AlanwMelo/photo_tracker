@@ -26,13 +26,12 @@ class _TrackerSignInPageState extends State<TrackerSignInPage> {
           child: Center(
             child: Column(
               mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 _firstText(),
                 _icon(),
-                SizedBox(height: 30),
                 _emailFormField(),
-                SizedBox(height: 30),
                 _passwordFormField(),
                 _continueButton(),
                 _divisor(),
@@ -46,7 +45,7 @@ class _TrackerSignInPageState extends State<TrackerSignInPage> {
 
   _firstText() {
     return Container(
-      margin: EdgeInsets.only(top: 70),
+      margin: EdgeInsets.only(top: 30),
       child: Row(
         children: [
           SizedBox(width: 20),

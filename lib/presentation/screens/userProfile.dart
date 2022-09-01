@@ -134,7 +134,6 @@ class _UserProfile extends State<UserProfile> {
       } else if (amount < 1000000) {
         value = '${(amount / 1000).toStringAsFixed(1)}K';
       } else {
-        print(amount / 1000000);
         value = '${(amount / 1000000).toStringAsFixed(2)}M';
       }
     } else {

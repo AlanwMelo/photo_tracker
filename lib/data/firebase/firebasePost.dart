@@ -136,7 +136,6 @@ class FirebasePost {
   }
 
   deletePost({required DocumentReference thisPost}) async {
-    print('lost id ${thisPost.id}');
     try {
       WriteBatch batch = FirebaseFirestore.instance.batch();
       QuerySnapshot imagesToDelete = await thisPost.collection('images').get();
@@ -168,7 +167,6 @@ class FirebasePost {
             FirebaseFirestore.instance.doc('posts/$post/images/${image.name}');
         batch.delete(doc);
       } else {
-        print(image.firebasePath!);
         doc = FirebaseFirestore.instance.doc(image.firebasePath!);
       }
 

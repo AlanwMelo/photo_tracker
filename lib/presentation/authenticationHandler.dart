@@ -33,12 +33,12 @@ handleAuthState(BuildContext context) {
         ),
         BlocBuilder<BlocOfLoadingCoverScreen, LoadingCoverScreenState>(
             builder: (context, state) {
-              if (state.status == LoadingCoverScreenStatus.loading) {
-                return LoadingCoverScreen();
-              } else {
-                return Container();
-              }
-            }),
+          if (state.status == LoadingCoverScreenStatus.loading) {
+            return LoadingCoverScreen();
+          } else {
+            return Container();
+          }
+        }),
       ],
     ),
   );

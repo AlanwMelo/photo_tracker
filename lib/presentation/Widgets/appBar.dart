@@ -68,7 +68,6 @@ class _AppBar extends State<TrackerAppBar> {
                   onLongPress: () {},
                   child: BlocBuilder<BlocOfUserInfo, BlocOfUserInfoState>(
                       builder: (context, state) {
-                    print(state.userProfilePic);
                     return PictureContainer(
                       imgPath: state.userProfilePic,
                       pathOrURl: true,
