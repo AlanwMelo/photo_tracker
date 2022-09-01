@@ -232,7 +232,7 @@ class _UserProfile extends State<UserProfile> {
       onTap: () {
         if (widget.userID == FirebaseAuth.instance.currentUser!.uid) {
           Navigator.push(
-              context, MaterialPageRoute(builder: (context) => EditProfile()));
+              context, MaterialPageRoute(builder: (context) => EditProfile(user: thisUser,)));
         } else if (followingThisUser && infoLoaded) {
           firebaseUser.stopFollowing(userID: widget.userID);
           userFollowersAmount = userFollowersAmount - 1;

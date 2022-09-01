@@ -33,6 +33,26 @@ class FirebaseUser {
     return true;
   }
 
+  updateUserProfile(
+      {required String userID,
+      required bool updateName,
+      required bool updateBio,
+      required bool updatePicture,
+      String? newName,
+      String? newBio,
+      String? newPicURL}) async {
+    try {
+      await _users.doc(userID).update({
+        'name': newName,
+        'userBio': newBio,
+      });
+      return true;
+    } catch (e) {
+      print(e);
+      return false;
+    }
+  }
+
   checkIfHexIsInUe(String hexCode) async {
     QuerySnapshot hexExists =
         await _users.where('hexCode', isEqualTo: hexCode).get();
