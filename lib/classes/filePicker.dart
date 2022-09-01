@@ -5,9 +5,9 @@ class MyFilePicker {
 
   MyFilePicker({required this.pickedFiles});
 
-  pickFiles() async {
+  pickFiles({required bool allowMultiple}) async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
-        allowMultiple: true, type: FileType.custom, allowedExtensions: ['jpg']);
+        allowMultiple: allowMultiple, type: FileType.custom, allowedExtensions: ['jpg']);
 
     pickedFiles(result);
   }

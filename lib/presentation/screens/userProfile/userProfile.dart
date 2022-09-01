@@ -90,18 +90,18 @@ class _UserProfile extends State<UserProfile> {
     return Container(
       margin: EdgeInsets.all(12),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           _pic(),
-          Expanded(
-            child: Container(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _name(),
-                  _bio(),
-                ],
-              ),
+          Container(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _name(),
+                _bio(),
+              ],
             ),
           ),
         ],
@@ -154,7 +154,7 @@ class _UserProfile extends State<UserProfile> {
       child: ClipRRect(
           borderRadius: BorderRadius.circular(100.0),
           child: picURL != ''
-              ? Image.network(picURL, fit: BoxFit.fill)
+              ? Image.network(picURL, fit: BoxFit.cover)
               : Container()),
     );
   }
@@ -184,6 +184,8 @@ class _UserProfile extends State<UserProfile> {
   _name() {
     return Container(
       child: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Container(
             margin: EdgeInsets.only(left: 12),
@@ -207,7 +209,7 @@ class _UserProfile extends State<UserProfile> {
         children: [
           ConstrainedBox(
             constraints: BoxConstraints(
-                minHeight: 0, maxHeight: 150, minWidth: 285, maxWidth: 285),
+                minHeight: 0, maxHeight: 150, minWidth: 230, maxWidth: 230),
             child: Container(
               margin: EdgeInsets.only(right: 12, left: 12, top: 8),
               child: Text(userBio),
@@ -232,7 +234,16 @@ class _UserProfile extends State<UserProfile> {
       onTap: () {
         if (widget.userID == FirebaseAuth.instance.currentUser!.uid) {
           Navigator.push(
-              context, MaterialPageRoute(builder: (context) => EditProfile(user: thisUser,)));
+              context,
+              MaterialPageRoute(
+                  builder: (context) => EditProfile(
+                        user: thisUser,
+                        updated: (response) {
+                          if (response) {
+                            _loadUserInfo();
+                          }
+                        },
+                      )));
         } else if (followingThisUser && infoLoaded) {
           firebaseUser.stopFollowing(userID: widget.userID);
           userFollowersAmount = userFollowersAmount - 1;

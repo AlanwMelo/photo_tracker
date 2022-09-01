@@ -162,7 +162,7 @@ class _AddPhotosScreen extends State<AddPhotosScreen> {
                     loading = false;
                     setState(() {});
                   }
-                }).pickFiles();
+                }).pickFiles(allowMultiple: true);
               },
               child: Text('Add More'),
             ),

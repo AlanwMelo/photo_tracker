@@ -1,6 +1,12 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:photo_tracker/data/firebase/firestore.dart';
 import 'package:photo_tracker/data/hexGenerator.dart';
+import 'package:photo_tracker/data/imageCompressor.dart';
+import 'package:photo_tracker/data/saveProfilePicture.dart';
 
 class FirebaseUser {
   CollectionReference _users = FirebaseFirestore.instance.collection('users');
@@ -40,12 +46,35 @@ class FirebaseUser {
       required bool updatePicture,
       String? newName,
       String? newBio,
-      String? newPicURL}) async {
+      PlatformFile? newPic}) async {
     try {
-      await _users.doc(userID).update({
+      WriteBatch batch = FirebaseFirestore.instance.batch();
+      DocumentReference doc = _users.doc(userID);
+
+      if (updatePicture) {
+        String newLocation = await ImageCompressor().compress(
+            fileName: newPic!.name,
+            tempDir: 'profilePic',
+            filePath: newPic.path!);
+
+        List imgURLs = await FirestoreManager().uploadImageAndGetURL(
+            imagePath: newLocation,
+            firestorePath: 'usersPictures/$userID/profilePic.jpg');
+
+        String imgURL = imgURLs[0];
+
+        await SaveProfilePicture(imgURL).savePicture();
+
+        batch.update(doc, {'profilePicURL': imgURL});
+      }
+
+      batch.update(doc, {
         'name': newName,
         'userBio': newBio,
       });
+
+      batch.commit();
+
       return true;
     } catch (e) {
       print(e);

@@ -55,9 +55,9 @@ class PictureContainer extends StatelessWidget {
     if (pathOrURl) {
       return imgPath == ''
           ? Image.asset('lib/assets/Icon.png')
-          : Image.file(File(imgPath));
+          : Image.file(File(imgPath), fit: BoxFit.cover);
     } else {
-      return Image.network(imgPath);
+      return Image.network(imgPath, fit: BoxFit.cover);
     }
   }
 }
